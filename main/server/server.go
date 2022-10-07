@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"strings"
@@ -54,7 +54,6 @@ func main() {
 	listen, err := net.Listen(TYPE, HOST+":"+PORT)
 	if err != nil {
 		log.Fatal(err)
-		os.Exit(1)
 	}
 
 	fmt.Println("Server is listening on port 8080")
@@ -67,7 +66,6 @@ func main() {
 		conn, err := listen.Accept()
 		if err != nil {
 			log.Fatal(err)
-			os.Exit(1)
 		}
 
 		// call the handleRequest function
