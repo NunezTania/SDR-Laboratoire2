@@ -46,6 +46,15 @@ type User struct {
 	post     Post
 }
 
+// array of events
+var events []Event
+
+// array of posts
+var posts []Post
+
+// array of users
+var users []User
+
 func main() {
 
 	// Creating a simple TCP server
@@ -55,6 +64,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	// manage concurrency
+	//done := make(chan struct{})
 
 	fmt.Println("Server is listening on port 8080")
 
@@ -70,7 +81,9 @@ func main() {
 
 		// call the handleRequest function
 		go handleRequest(conn)
+		// todo done ?
 	}
+	//<-done
 }
 
 func handleRequest(conn net.Conn) {
@@ -82,14 +95,13 @@ func handleRequest(conn net.Conn) {
 	_, err := conn.Read(buf)
 	if err != nil {
 		log.Fatal(err)
-		os.Exit(1)
 	}
 
 	// display the buffer
 	log.Println("La reponse du server est :", string(buf))
 
 	// parse the buffer
-	go parseBuffer(buf)
+	parseBuffer(buf)
 
 	// send a response back to person contacting us
 	conn.Write([]byte("Message received."))
@@ -110,7 +122,7 @@ func parseBuffer(buf []byte) {
 	// do a switch on the first element of slice
 	switch slice[0] {
 	case "CREATE":
-		fmt.Println("CREATE")
+		fmt.Println("START")
 	case "CLOSE":
 		fmt.Println("CLOSE")
 	case "ADD":
@@ -124,4 +136,12 @@ func parseBuffer(buf []byte) {
 	default:
 		fmt.Println("Command not found")
 	}
+}
+
+// Create a few users
+func createUsers() {
+	users = append(users, User{"Michelle", 1234, Post{}})
+	users = append(users, User{"Taro", 1234, Post{}})
+	users = append(users, User{"Catanne", 1234, Post{}})
+	users = append(users, User{"Willi", 1234, Post{}})
 }
