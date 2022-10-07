@@ -1,4 +1,4 @@
-package server
+package main
 
 /*
 list of commands the client can ask the server
@@ -51,7 +51,7 @@ var posts []Post
 // array of users
 var users []User
 
-func RunServer() {
+func main() {
 
 	// Creating a simple TCP server
 
@@ -79,6 +79,7 @@ func RunServer() {
 		go handleRequest(conn)
 		// todo done ?
 	}
+
 	//<-done
 }
 
