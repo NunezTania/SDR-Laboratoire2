@@ -1,11 +1,7 @@
 package server
 
-import (
-	"strings"
-)
-
 /*
-list of commands the client can ask to the server
+list of commands the client can ask the server
 - Create a new event						: CREATE
 - Close the event 							: CLOSE
 - Add a benevole to a post					: ADD
@@ -18,7 +14,7 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"os"
+	"strings"
 )
 
 const (
@@ -55,7 +51,7 @@ var posts []Post
 // array of users
 var users []User
 
-func main() {
+func RunServer() {
 
 	// Creating a simple TCP server
 
