@@ -23,6 +23,11 @@ const (
 	TYPE = "tcp"
 )
 
+// counters
+var eventCounter int = 0
+var postCounter int = 0
+var userCounter int = 0
+
 type Event struct {
 	id      int
 	name    string
@@ -83,13 +88,6 @@ func main() {
 }
 
 func handleRequest(conn net.Conn) {
-	// ask for the username and password
-	for !isAuthentified {
-		authentification()
-	}
-
-	// reinitialize the authentification
-	isAuthentified = false
 
 	// make a buffer to hold incoming data
 	buf := make([]byte, 1024)
@@ -125,11 +123,7 @@ func parseBuffer(buf []byte) {
 	// do a switch on the first element of slice
 	switch slice[0] {
 	case "CREATE":
-		fmt.Println("Starting an event")
-		for !isAuthentified {
-			authentification()
-		}
-		isAuthentified = false
+		createEvent(slice)
 	case "CLOSE":
 		fmt.Println("CLOSE")
 	case "ADD":
@@ -183,4 +177,13 @@ func authentification() {
 	}
 	fmt.Println("Wrong username")
 	authentification()
+}
+
+func createEvent(slice []string) {
+	fmt.Println("Starting an event")
+	for !isAuthentified {
+		authentification()
+	}
+	isAuthentified = false
+	//events = append(events, Event{1, "Festival de la bière", 1})
 }
