@@ -24,35 +24,32 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// read the user input
-	fmt.Println("Please enter a command:")
-	var command string
-	Scanner := bufio.NewScanner(os.Stdin)
-	Scanner.Scan()
-	if err := Scanner.Err(); err != nil {
-		log.Fatal(err)
-	}
-	command = Scanner.Text()
-	if !checkCommands(command) {
-		return
-	}
+	for {
+		fmt.Println("Please enter a command:")
+		var command string
+		Scanner := bufio.NewScanner(os.Stdin)
+		Scanner.Scan()
+		if err := Scanner.Err(); err != nil {
+			log.Fatal(err)
+		}
+		command = Scanner.Text()
+		if !checkCommands(command) {
+			return
+		}
 
-	// send the command to the server
-	_, err = conn.Write([]byte(command))
-	if err != nil {
-		log.Fatal(err)
+		_, err = conn.Write([]byte(command))
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		buf := make([]byte, 1024)
+		_, err = conn.Read(buf)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		fmt.Println("La reponse est : " + string(buf))
 	}
-
-	// read the server response
-	buf := make([]byte, 1024)
-	_, err = conn.Read(buf)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// print the server response
-	fmt.Println("La reponse est : " + string(buf))
-
 	conn.Close()
 }
 
@@ -67,9 +64,8 @@ func helpMenu() {
 }
 
 func checkCommands(command string) bool {
-	// get the first word of the command
 	cmdStart := strings.SplitAfter(command, " ")[0]
-	// check which command it is
+
 	switch cmdStart {
 	case "CREATE ":
 		return checkCreate(command)

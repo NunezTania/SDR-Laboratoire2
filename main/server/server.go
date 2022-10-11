@@ -69,12 +69,12 @@ func main() {
 	createUsers()
 	conn := net.Conn(nil)
 
-	for {
-		conn, err := listen.Accept()
-		if err != nil {
-			log.Fatal(err)
-		}
+	conn, err = listen.Accept()
+	if err != nil {
+		log.Fatal(err)
+	}
 
+	for {
 		go handleRequest(conn)
 	}
 	conn.Close()
