@@ -7,13 +7,13 @@ list of commands the client can ask the server
 - Add a benevole to a post					: ADD
 - List all the manifestations				: LISTM
 - List all the posts of a manifestation		: LISTP
-- List all the benevoles of a manifestation : LISTB
 */
 
 import (
 	"fmt"
 	"log"
 	"net"
+	"strconv"
 	"strings"
 )
 
@@ -26,24 +26,24 @@ const (
 // counters
 var eventCounter int = 0
 var postCounter int = 0
-var userCounter int = 0
 
 type Event struct {
 	id      int
 	name    string
 	ownerId int
+	isOpen  bool
 }
 
 type Post struct {
 	id       int
 	name     string
 	capacity int
-	event    Event
+	eventId  int
 }
 
 type User struct {
 	name     string
-	password int
+	password string
 	post     Post
 }
 
@@ -56,13 +56,7 @@ var posts []Post
 // array of users
 var users []User
 
-var isAuthentified = false
-
 func main() {
-
-	// Creating a simple TCP server
-
-	// listen to incoming connections
 	listen, err := net.Listen(TYPE, HOST+":"+PORT)
 	if err != nil {
 		log.Fatal(err)
@@ -70,120 +64,146 @@ func main() {
 
 	fmt.Println("Server is listening on port 8080")
 
-	// close the listener when the application closes
 	defer listen.Close()
 
 	createUsers()
+	conn := net.Conn(nil)
 
-	// accept connection on port
 	for {
 		conn, err := listen.Accept()
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		// call the handleRequest function
 		go handleRequest(conn)
 	}
+	conn.Close()
 }
 
 func handleRequest(conn net.Conn) {
-
-	// make a buffer to hold incoming data
 	buf := make([]byte, 1024)
 
-	// read the incoming connection into the buffer
 	_, err := conn.Read(buf)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// display the buffer
-	log.Println("La reponse du server est :", string(buf))
+	log.Println("La reponse gere la requete")
 
-	// parse the buffer
-	parseBuffer(buf)
+	conn.Write([]byte(parseBuffer(buf)))
 
-	// send a response back to person contacting us
-	conn.Write([]byte("Message received."))
-	// close the connection when you're done with it
-	conn.Close()
 }
 
-/*
-this function parses the buffer and call the appropriate function
-*/
-func parseBuffer(buf []byte) {
-	// transform the buffer into a string
+func parseBuffer(buf []byte) string {
 	str := string(buf)
-
-	// split the string into a slice
 	slice := strings.Split(str, " ")
 
-	// do a switch on the first element of slice
 	switch slice[0] {
 	case "CREATE":
-		createEvent(slice)
+		return createEvent(slice)
 	case "CLOSE":
-		fmt.Println("CLOSE")
+		return closeEvent(slice)
 	case "ADD":
-		fmt.Println("ADD")
+		return addBenevole(slice)
 	case "LISTM":
-		fmt.Println("LISTM")
+		return listEvents()
 	case "LISTP":
-		fmt.Println("LISTP")
-	case "LISTB":
-		fmt.Println("LISTB")
+		return listPosts(slice)
 	default:
-		fmt.Println("Command not found")
+		return "Command not found"
 	}
 }
 
-// Create a few users
 func createUsers() {
-	events = append(events, Event{1, "Festival de la bière", 1})
-	posts = append(posts, Post{1, "Post1", 3, events[0]})
-	posts = append(posts, Post{2, "Post2", 2, events[0]})
-	users = append(users, User{"Ficelle", 1234, Post{}})
-	users = append(users, User{"Taro", 1234, Post{}})
-	users = append(users, User{"Catanne", 1234, posts[0]})
-	users = append(users, User{"Willi", 1234, posts[1]})
+	events = append(events, Event{0, "Festival de la bière", 1, true})
+	eventCounter++
+	posts = append(posts, Post{0, "Post1", 3, 1})
+	postCounter++
+	posts = append(posts, Post{1, "Post2", 2, 1})
+	postCounter++
+	users = append(users, User{"Ficelle", "1234", Post{}})
+	users = append(users, User{"Taro", "1234", Post{}})
+	users = append(users, User{"Catanne", "1234", Post{}})
+	users = append(users, User{"Willi", "1234", Post{}})
 }
 
-func authentification() {
-	// ask for the username
-	fmt.Println("Please enter your username : ")
-	var username string
-	fmt.Scanln(&username)
-
-	// check if the username exists
+func authentification(username string, password string) bool {
 	for _, user := range users {
-		if user.name == username {
-
-			// ask for the password
-			fmt.Println("Please enter your password : ")
-			var password int
-			fmt.Scanln(&password)
-
-			// check if the password is correct
-			if user.password == password {
-				isAuthentified = true
-				fmt.Println("Authentification successful")
-				return
-			} else {
-				fmt.Println("Wrong password")
-			}
+		if user.name == username && user.password == password {
+			return true
 		}
 	}
-	fmt.Println("Wrong username")
-	authentification()
+	return false
 }
 
-func createEvent(slice []string) {
+func createEvent(slice []string) string {
 	fmt.Println("Starting an event")
-	for !isAuthentified {
-		authentification()
+	if authentification(slice[1], slice[2]) {
+		for i := 3; i < len(slice)-1; i++ {
+			capacity, _ := strconv.Atoi(slice[i+1])
+			posts = append(posts, Post{postCounter, slice[i], capacity, eventCounter})
+			postCounter++
+		}
+		events = append(events, Event{eventCounter, slice[3], eventCounter, true})
+		eventCounter++
+		return "Event created"
+	} else {
+		return "Authentication failed"
 	}
-	isAuthentified = false
-	//events = append(events, Event{1, "Festival de la bière", 1})
+}
+
+func closeEvent(slice []string) string {
+	fmt.Println("Closing an event")
+	if authentification(slice[1], slice[2]) {
+		for i := 0; i < len(events); i++ {
+			id, _ := strconv.Atoi(slice[3])
+			if events[i].id == id {
+				events[i].isOpen = false
+				return "Event closed"
+			}
+		}
+		return "Event not found"
+	} else {
+		return "Authentication failed"
+	}
+}
+
+func addBenevole(slice []string) string {
+	fmt.Println("Adding a benevole")
+	if authentification(slice[1], slice[2]) {
+		for i := 0; i < len(posts); i++ {
+			idEvent, _ := strconv.Atoi(slice[3])
+			idPost, _ := strconv.Atoi(slice[4])
+			if posts[i].id == idPost && posts[i].eventId == idEvent && posts[i].capacity > 0 {
+				// todo change the idpost of the user
+				posts[i].capacity--
+				return "Benevole added"
+			}
+		}
+		return "Post not found"
+	} else {
+		return "Authentication failed"
+	}
+}
+
+func listEvents() string {
+	var str string
+	for i := 0; i < len(events); i++ {
+		if events[i].isOpen {
+			str += "Event's id: " + strconv.Itoa(events[i].id) + " Event's name: " + events[i].name + " OwnerID: " + strconv.Itoa(events[i].ownerId) + " is open:" + strconv.FormatBool(events[i].isOpen)
+		}
+	}
+	return str
+}
+
+func listPosts(slice []string) string {
+	var str string
+	for i := 0; i < len(posts); i++ {
+		idEvent, _ := strconv.Atoi(slice[1])
+		if posts[i].eventId == idEvent {
+			str += "Post's id: " + strconv.Itoa(posts[i].id) + " Post's name: " + posts[i].name + " Capacity: " + strconv.Itoa(posts[i].capacity) + " Event's id: " + strconv.Itoa(posts[i].eventId)
+			// todo do a array with the postID and the user name
+		}
+	}
+	return str
 }
