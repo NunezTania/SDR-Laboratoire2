@@ -67,9 +67,8 @@ func main() {
 	defer listen.Close()
 
 	createUsers()
-	conn := net.Conn(nil)
 
-	conn, err = listen.Accept()
+	conn, err := listen.Accept()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -77,6 +76,7 @@ func main() {
 	for {
 		go handleRequest(conn)
 	}
+
 	conn.Close()
 }
 
