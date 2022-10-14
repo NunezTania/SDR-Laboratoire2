@@ -24,8 +24,8 @@ const (
 )
 
 // counters
-var eventCounter int = 0
-var postCounter int = 0
+var eventCounter = 0
+var postCounter = 0
 
 type Event struct {
 	id      int
