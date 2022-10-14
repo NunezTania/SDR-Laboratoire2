@@ -68,30 +68,35 @@ func main() {
 
 	createUsers()
 
-	conn, err := listen.Accept()
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	for {
+		conn, err := listen.Accept()
+		if err != nil {
+			log.Fatal(err)
+		}
 		go handleRequest(conn)
 	}
-
-	conn.Close()
 }
 
 func handleRequest(conn net.Conn) {
 	buf := make([]byte, 1024)
-
 	_, err := conn.Read(buf)
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	log.Println("La reponse gere la requete")
-
-	conn.Write([]byte(parseBuffer(buf)))
-
+	for commandTreatment := parseBuffer(buf); commandTreatment != "q"; commandTreatment = parseBuffer(buf) {
+		fmt.Println("Handling request")
+		conn.Write([]byte(commandTreatment))
+		buf = make([]byte, 1024)
+		conn.Read(buf)
+	}
+	_, writeErr := conn.Write([]byte("Bye bye, Xoxo"))
+	if writeErr != nil {
+		log.Fatal(writeErr)
+	}
+	closeErr := conn.Close()
+	if closeErr != nil {
+		log.Fatal(closeErr)
+	}
 }
 
 func parseBuffer(buf []byte) string {
@@ -109,6 +114,8 @@ func parseBuffer(buf []byte) string {
 		return listEvents()
 	case "LISTP":
 		return listPosts(slice)
+	case "QUIT":
+		return "q"
 	default:
 		return "Command not found"
 	}
