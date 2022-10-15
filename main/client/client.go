@@ -3,10 +3,13 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"golang.org/x/term"
 	"log"
 	"net"
 	"os"
+	"strconv"
 	"strings"
+	"syscall"
 )
 
 const (
@@ -33,8 +36,8 @@ func main() {
 			log.Fatal(err)
 		}
 		command = Scanner.Text()
-		if !checkCommands(command) {
-			return
+		if !processCommands(command) {
+			continue
 		}
 
 		_, err = conn.Write([]byte(command))
@@ -63,69 +66,91 @@ func helpMenu() {
 	fmt.Println("5. List all the posts of a event")
 }
 
-func checkCommands(command string) bool {
-	cmdStart := strings.SplitAfter(command, " ")[0]
+func getUserAnswer() string {
+	var answer string
+	Scanner := bufio.NewScanner(os.Stdin)
+	Scanner.Scan()
+	if err := Scanner.Err(); err != nil {
+		log.Fatal(err)
+	}
+	answer = Scanner.Text()
+	return answer
+}
 
-	switch cmdStart {
-	case "CREATE ":
-		return checkCreate(command)
-	case "CLOSE ":
-		return checkClose(command)
-	case "ADD ":
-		return checkAdd(command)
-	case "LISTM ":
-		return checkListM(command)
-	case "LISTP ":
-		return checkListP(command)
+func authentificationProcess() string {
+	fmt.Println("Please enter your username:")
+	var username string
+	Scanner := bufio.NewScanner(os.Stdin)
+	Scanner.Scan()
+	if err := Scanner.Err(); err != nil {
+		log.Fatal(err)
+	}
+	username = Scanner.Text()
+
+	fmt.Println("Please enter your password:")
+	var password string
+	bytePassword, err := term.ReadPassword(int(syscall.Stdin))
+	if err != nil {
+		log.Fatal(err)
+	}
+	password = string(bytePassword)
+	return username + " " + password
+}
+
+func processCommands(command string) bool {
+	switch command {
+	case "CREATE":
+		return processCreate(command)
+		/*
+			case "CLOSE":
+				return checkClose(command)
+			case "ADD":
+				return checkAdd(command)
+			case "LISTM":
+				return checkListM(command)
+			case "LISTP":
+				return checkListP(command)
+
+		*/
 	default:
 		fmt.Println("Command not recognized")
 		return false
 	}
 }
 
-func checkListP(command string) bool {
+func processCreate(command string) bool {
+	login := authentificationProcess()
+	fmt.Println("Enter the name of the event:")
+	eventName := getUserAnswer()
+	fmt.Println("Enter the posts:")
+	posts := getUserAnswer()
+	if !checkPosts(posts) || eventName == "" {
+		return false
+	}
+	command += " " + login + " " + eventName + " " + posts
+	fmt.Println("Voila la commande formé " + command)
 	return true
 }
 
-func checkListM(command string) bool {
-	return true
-}
+func checkPosts(command string) bool {
+	posts := strings.Split(command, " ")
 
-func checkAdd(command string) bool {
-	return true
-}
-
-func checkClose(command string) bool {
-	return true
-}
-
-func checkCreate(command string) bool {
-	// check that there is at least 4 words
-	if len(strings.SplitAfter(command, " ")) < 4 {
+	// check that there is at least 2 words
+	if len(posts) < 2 {
 		fmt.Println("Command not recognized 1")
 		return false
 	}
 	// check that there is a pair number of words
-	if (len(strings.SplitAfter(command, " ")))%2 != 0 {
+	if len(posts)%2 != 0 {
 		fmt.Println("Command not recognized 2")
 		return false
 	}
-
-	commandRest := strings.SplitAfter(command, " ")[4:]
-	for i := 0; i < len(commandRest)-1; i += 2 {
-		if len(commandRest[i]) < 1 && len(commandRest[i+1]) < 1 {
-			fmt.Println("Command not recognized 3")
+	// check that the capacity is a number
+	for i := 1; i < len(posts)-1; i += 2 {
+		_, err := strconv.Atoi(posts[i])
+		if err != nil {
 			return false
 		}
-		// todo verify that the capacity is a number
-		/*
-			fmt.Println("DEBUG " + commandRest[i+1] + "result")
-			_, err := strconv.Atoi(commandRest[i+1])
-			if err != nil {
-				fmt.Println("Command not recognized 4")
-				return false
-			}
-		*/
 	}
 	return true
 }
