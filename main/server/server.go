@@ -85,9 +85,15 @@ func handleRequest(conn net.Conn) {
 	}
 	for commandTreatment := parseBuffer(buf); commandTreatment != "q"; commandTreatment = parseBuffer(buf) {
 		fmt.Println("Handling request")
-		conn.Write([]byte(commandTreatment))
+		_, err := conn.Write([]byte(commandTreatment))
+		if err != nil {
+			return
+		}
 		buf = make([]byte, 1024)
-		conn.Read(buf)
+		_, err = conn.Read(buf)
+		if err != nil {
+			return
+		}
 	}
 	_, writeErr := conn.Write([]byte("Bye bye, Xoxo"))
 	if writeErr != nil {
@@ -100,9 +106,7 @@ func handleRequest(conn net.Conn) {
 }
 
 func parseBuffer(buf []byte) string {
-	str := string(buf)
-	slice := strings.Split(str, " ")
-
+	slice := strings.Split(string(buf), " ")
 	switch slice[0] {
 	case "CREATE":
 		return createEvent(slice)
@@ -122,11 +126,12 @@ func parseBuffer(buf []byte) string {
 }
 
 func createUsers() {
+	// todo manage the id of the user
 	events = append(events, Event{0, "Festival de la bière", 1, true})
 	eventCounter++
-	posts = append(posts, Post{0, "Post1", 3, 1})
+	posts = append(posts, Post{0, "Post1", 3, 0})
 	postCounter++
-	posts = append(posts, Post{1, "Post2", 2, 1})
+	posts = append(posts, Post{1, "Post2", 2, 0})
 	postCounter++
 	users = append(users, User{"Ficelle", "1234", Post{}})
 	users = append(users, User{"Taro", "1234", Post{}})
@@ -164,7 +169,7 @@ func closeEvent(slice []string) string {
 	if authentification(slice[1], slice[2]) {
 		for i := 0; i < len(events); i++ {
 			id, _ := strconv.Atoi(slice[3])
-			if events[i].id == id {
+			if events[i].id == id { // todo check that the user is also the owner of the event
 				events[i].isOpen = false
 				return "Event closed"
 			}

@@ -20,8 +20,6 @@ const (
 
 func main() {
 	helpMenu()
-
-	// connection to the server
 	conn, err := net.Dial(TYPE, HOST+":"+PORT)
 	if err != nil {
 		log.Fatal(err)
@@ -36,7 +34,7 @@ func main() {
 			log.Fatal(err)
 		}
 		command = Scanner.Text()
-		if !processCommands(command) {
+		if !processCommands(&command) {
 			continue
 		}
 
@@ -97,28 +95,25 @@ func authentificationProcess() string {
 	return username + " " + password
 }
 
-func processCommands(command string) bool {
-	switch command {
+func processCommands(command *string) bool {
+	switch *command {
 	case "CREATE":
 		return processCreate(command)
-		/*
-			case "CLOSE":
-				return checkClose(command)
-			case "ADD":
-				return checkAdd(command)
-			case "LISTM":
-				return checkListM(command)
-			case "LISTP":
-				return checkListP(command)
-
-		*/
+	case "CLOSE":
+		return processClose(command)
+	case "ADD":
+		return processAdd(command)
+	case "LISTM":
+		return processList(command)
+	case "LISTP":
+		return processList(command)
 	default:
 		fmt.Println("Command not recognized")
 		return false
 	}
 }
 
-func processCreate(command string) bool {
+func processCreate(command *string) bool {
 	login := authentificationProcess()
 	fmt.Println("Enter the name of the event:")
 	eventName := getUserAnswer()
@@ -127,11 +122,12 @@ func processCreate(command string) bool {
 	if !checkPosts(posts) || eventName == "" {
 		return false
 	}
-	command += " " + login + " " + eventName + " " + posts
-	fmt.Println("Voila la commande formé " + command)
+	*command += " " + login + " " + eventName + " " + posts
+	fmt.Println("Voila la commande formé " + *command)
 	return true
 }
 
+// todo is it possible to have no post in an event?
 func checkPosts(command string) bool {
 	posts := strings.Split(command, " ")
 
@@ -147,10 +143,44 @@ func checkPosts(command string) bool {
 	}
 	// check that the capacity is a number
 	for i := 1; i < len(posts)-1; i += 2 {
-		_, err := strconv.Atoi(posts[i])
-		if err != nil {
+		if !isNumber(posts[i]) {
+			fmt.Println("Command not recognized 3")
 			return false
 		}
 	}
+	return true
+}
+
+func processClose(command *string) bool {
+	login := authentificationProcess()
+	fmt.Println("Enter the event id")
+	eventId := getUserAnswer()
+	if !isNumber(eventId) {
+		return false
+	}
+	*command += " " + login + " " + eventId
+	return true
+}
+
+func isNumber(x string) bool {
+	_, err := strconv.Atoi(x)
+	return err == nil
+}
+
+func processAdd(command *string) bool {
+	login := authentificationProcess()
+	fmt.Println("Enter the event id")
+	eventId := getUserAnswer()
+	fmt.Println("Enter the post id")
+	postId := getUserAnswer()
+	if !isNumber(eventId) || !isNumber(postId) {
+		return false
+	}
+	*command += " " + login + " " + eventId + " " + postId
+	return true
+}
+
+func processList(command *string) bool {
+	*command += " "
 	return true
 }
