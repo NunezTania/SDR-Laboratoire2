@@ -49,7 +49,7 @@ func main() {
 			log.Fatal(err)
 		}
 
-		fmt.Println("La reponse est : " + string(buf))
+		fmt.Println("La reponse est : \n" + string(buf))
 	}
 	conn.Close()
 }
@@ -62,6 +62,8 @@ func helpMenu() {
 	fmt.Println("3. ADD eventId postId")
 	fmt.Println("4. List all the event")
 	fmt.Println("5. List all the posts of a event")
+	fmt.Println("6. List all the staff of a event")
+	fmt.Println("7. Quit")
 }
 
 func getUserAnswer() string {
@@ -104,8 +106,11 @@ func processCommands(command *string) bool {
 	case "ADD":
 		return processAdd(command)
 	case "LISTM":
-		return processList(command)
+		*command += " "
+		return true
 	case "LISTP":
+		return processList(command)
+	case "LISTU":
 		return processList(command)
 	default:
 		fmt.Println("Command not recognized")
@@ -169,9 +174,9 @@ func isNumber(x string) bool {
 
 func processAdd(command *string) bool {
 	login := authentificationProcess()
-	fmt.Println("Enter the event id")
+	fmt.Println("Enter the event id:")
 	eventId := getUserAnswer()
-	fmt.Println("Enter the post id")
+	fmt.Println("Enter the post id:")
 	postId := getUserAnswer()
 	if !isNumber(eventId) || !isNumber(postId) {
 		return false
@@ -181,6 +186,11 @@ func processAdd(command *string) bool {
 }
 
 func processList(command *string) bool {
-	*command += " "
+	fmt.Println("Enter the event id:")
+	eventId := getUserAnswer()
+	if !isNumber(eventId) {
+		return false
+	}
+	*command += " " + eventId
 	return true
 }

@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="96597984-09df-44c3-a8c1-1f54c5238989" name="Changes" comment="process of cmd CREATE">
+    <list default="true" id="96597984-09df-44c3-a8c1-1f54c5238989" name="Changes" comment="process all cmd">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main/client/client.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/client/client.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main/server/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/server/server.go" afterDir="false" />
@@ -75,7 +75,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="process of cmd CREATE" />
-    <option name="LAST_COMMIT_MESSAGE" value="process of cmd CREATE" />
+    <MESSAGE value="process all cmd" />
+    <option name="LAST_COMMIT_MESSAGE" value="process all cmd" />
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>

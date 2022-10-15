@@ -7,6 +7,8 @@ list of commands the client can ask the server
 - Add a benevole to a post					: ADD
 - List all the manifestations				: LISTM
 - List all the posts of a manifestation		: LISTP
+- List all the users of a manifestation		: LISTU
+- Quit the server							: QUIT
 */
 
 import (
@@ -23,15 +25,15 @@ const (
 	TYPE = "tcp"
 )
 
-// counters
 var eventCounter = 0
 var postCounter = 0
 
 type Event struct {
-	id      int
-	name    string
-	ownerId int
-	isOpen  bool
+	id     int
+	name   string
+	owner  User
+	isOpen bool
+	posts  []Post
 }
 
 type Post struct {
@@ -39,21 +41,16 @@ type Post struct {
 	name     string
 	capacity int
 	eventId  int
+	staff    []User
 }
 
 type User struct {
 	name     string
 	password string
-	post     Post
 }
 
-// array of events
 var events []Event
-
-// array of posts
 var posts []Post
-
-// array of users
 var users []User
 
 func main() {
@@ -61,13 +58,9 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	fmt.Println("Server is listening on port 8080")
-
 	defer listen.Close()
-
 	createUsers()
-
 	for {
 		conn, err := listen.Accept()
 		if err != nil {
@@ -118,6 +111,8 @@ func parseBuffer(buf []byte) string {
 		return listEvents()
 	case "LISTP":
 		return listPosts(slice)
+	case "LISTU":
+		return listUsers(slice)
 	case "QUIT":
 		return "q"
 	default:
@@ -126,17 +121,16 @@ func parseBuffer(buf []byte) string {
 }
 
 func createUsers() {
-	// todo manage the id of the user
-	events = append(events, Event{0, "Festival de la bière", 1, true})
+	users = append(users, User{"Bob", "1234"})
+	users = append(users, User{"Lea", "1234"})
+	users = append(users, User{"Leo", "1234"})
+	users = append(users, User{"Willi", "1234"})
+	posts = append(posts, Post{postCounter, "Post1", 3, eventCounter, users[0:1]})
+	postCounter++
+	posts = append(posts, Post{postCounter, "Post2", 2, eventCounter, users[2:4]})
+	postCounter++
+	events = append(events, Event{eventCounter, "Festival de la bière", users[0], true, posts})
 	eventCounter++
-	posts = append(posts, Post{0, "Post1", 3, 0})
-	postCounter++
-	posts = append(posts, Post{1, "Post2", 2, 0})
-	postCounter++
-	users = append(users, User{"Ficelle", "1234", Post{}})
-	users = append(users, User{"Taro", "1234", Post{}})
-	users = append(users, User{"Catanne", "1234", Post{}})
-	users = append(users, User{"Willi", "1234", Post{}})
 }
 
 func authentification(username string, password string) bool {
@@ -151,12 +145,15 @@ func authentification(username string, password string) bool {
 func createEvent(slice []string) string {
 	fmt.Println("Starting an event")
 	if authentification(slice[1], slice[2]) {
+		owner := User{slice[1], slice[2]}
+		var newPost []Post
 		for i := 3; i < len(slice)-1; i++ {
 			capacity, _ := strconv.Atoi(slice[i+1])
-			posts = append(posts, Post{postCounter, slice[i], capacity, eventCounter})
+			newPost = append(newPost, Post{postCounter, slice[i], capacity, eventCounter, nil})
 			postCounter++
 		}
-		events = append(events, Event{eventCounter, slice[3], eventCounter, true})
+		posts = append(posts, newPost...)
+		events = append(events, Event{eventCounter, slice[3], owner, true, newPost})
 		eventCounter++
 		return "Event created"
 	} else {
@@ -169,7 +166,7 @@ func closeEvent(slice []string) string {
 	if authentification(slice[1], slice[2]) {
 		for i := 0; i < len(events); i++ {
 			id, _ := strconv.Atoi(slice[3])
-			if events[i].id == id { // todo check that the user is also the owner of the event
+			if events[i].id == id && events[i].owner.name == slice[1] {
 				events[i].isOpen = false
 				return "Event closed"
 			}
@@ -186,8 +183,10 @@ func addBenevole(slice []string) string {
 		for i := 0; i < len(posts); i++ {
 			idEvent, _ := strconv.Atoi(slice[3])
 			idPost, _ := strconv.Atoi(slice[4])
-			if posts[i].id == idPost && posts[i].eventId == idEvent && posts[i].capacity > 0 {
-				// todo change the idpost of the user
+			if posts[i].id == idPost && posts[i].eventId == idEvent && posts[i].capacity > 0 && getEventById(slice[3]).isOpen {
+				// todo check if user is already in a post of this event
+				// if it's the case, erase the user from the old post
+				posts[i].staff = append(posts[i].staff, User{slice[1], slice[2]})
 				posts[i].capacity--
 				return "Benevole added"
 			}
@@ -202,7 +201,7 @@ func listEvents() string {
 	var str string
 	for i := 0; i < len(events); i++ {
 		if events[i].isOpen {
-			str += "Event's id: " + strconv.Itoa(events[i].id) + " Event's name: " + events[i].name + " OwnerID: " + strconv.Itoa(events[i].ownerId) + " is open:" + strconv.FormatBool(events[i].isOpen)
+			str += "Event's id: " + strconv.Itoa(events[i].id) + ", Event's name: " + events[i].name + ", Owner: " + events[i].owner.name + ", is open:" + strconv.FormatBool(events[i].isOpen) + "\n"
 		}
 	}
 	return str
@@ -213,9 +212,39 @@ func listPosts(slice []string) string {
 	for i := 0; i < len(posts); i++ {
 		idEvent, _ := strconv.Atoi(slice[1])
 		if posts[i].eventId == idEvent {
-			str += "Post's id: " + strconv.Itoa(posts[i].id) + " Post's name: " + posts[i].name + " Capacity: " + strconv.Itoa(posts[i].capacity) + " Event's id: " + strconv.Itoa(posts[i].eventId)
-			// todo do a array with the postID and the user name
+			str += "Post's id: " + strconv.Itoa(posts[i].id) + ", Post's name: " + posts[i].name + ", Capacity: " + strconv.Itoa(posts[i].capacity) + "\n"
 		}
 	}
 	return str
+}
+
+/*
+	Event   | postId 1| postId 2| postId 3|
+
+nbInscrit|    1    |    2    |    3    |
+user 1   |    x    |         |         |
+user 2   |		   |         |    x    |
+*/
+func listUsers(slice []string) string {
+	eventPost := getEventById(slice[1]).posts
+	var str = "Event's id: " + slice[1]
+	for i := 0; i < len(eventPost); i++ {
+		str += "Post's id: " + strconv.Itoa(eventPost[i].id)
+	}
+	str += "\n"
+	for i := 0; i < len(users); i++ {
+		str += users[i].name + "\n"
+	}
+	// todo fill the matrix with the users-posts
+	return str
+}
+
+func getEventById(id string) Event {
+	for i := 0; i < len(events); i++ {
+		idEvent, _ := strconv.Atoi(id)
+		if events[i].id == idEvent {
+			return events[i]
+		}
+	}
+	return Event{}
 }
