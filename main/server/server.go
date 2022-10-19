@@ -122,20 +122,20 @@ func createUsersAndEvents() {
 	users = append(users, User{"Willi", "1234"})
 	users = append(users, User{"Lili", "1234"})
 	// creation of posts
-	posts = append(posts, Post{postCounter, "Bar à bière", 3, eventCounter, users[0:1]})
+	posts = append(posts, Post{postCounter, "Bar à bière", 3, 0, users[0:1]})
 	postCounter++
-	posts = append(posts, Post{postCounter, "Securité", 2, eventCounter, users[2:4]})
+	posts = append(posts, Post{postCounter, "Securité", 2, 0, users[2:4]})
 	postCounter++
-	posts = append(posts, Post{postCounter, "Vente de ticket", 5, eventCounter, users[0:1]})
+	posts = append(posts, Post{postCounter, "Vente de ticket", 5, 1, users[0:1]})
 	postCounter++
-	posts = append(posts, Post{postCounter, "Logistique", 1, eventCounter, users[2:4]})
+	posts = append(posts, Post{postCounter, "Logistique", 1, 1, users[2:4]})
 	postCounter++
-	posts = append(posts, Post{postCounter, "Securité", 2, eventCounter, users[2:4]})
+	posts = append(posts, Post{postCounter, "Securité", 2, 1, users[2:4]})
 	postCounter++
 	// creation of events
 	events = append(events, Event{eventCounter, "Festival de la musique", users[0], true, posts[0:2]})
 	eventCounter++
-	events = append(events, Event{eventCounter, "Festival de la bière", users[0], true, posts[2:4]})
+	events = append(events, Event{eventCounter, "Festival de la bière", users[0], true, posts[3:5]})
 	eventCounter++
 }
 

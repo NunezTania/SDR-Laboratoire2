@@ -34,10 +34,6 @@ func main() {
 			log.Fatal(err)
 		}
 		command = Scanner.Text()
-		if command == "QUIT" {
-			fmt.Println("Thanks and goodbye")
-			break
-		}
 		if !processCommands(&command) {
 			continue
 		}
@@ -55,7 +51,7 @@ func main() {
 
 		fmt.Println("La reponse est : \n" + string(buf))
 	}
-	conn.Close()
+	//conn.Close()
 }
 
 func helpMenu() {
@@ -116,6 +112,9 @@ func processCommands(command *string) bool {
 		return processList(command)
 	case "LISTU":
 		return processList(command)
+	case "QUIT":
+		*command += " "
+		return true
 	default:
 		fmt.Println("Command not recognized")
 		return false
