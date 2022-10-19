@@ -14,7 +14,7 @@ import (
 
 const (
 	HOST = "localhost"
-	PORT = "8080"
+	PORT = "5555"
 	TYPE = "tcp"
 )
 
@@ -35,6 +35,9 @@ func main() {
 		}
 		command = Scanner.Text()
 		if !processCommands(&command) {
+			if command == "QUIT " {
+				break
+			}
 			continue
 		}
 
@@ -51,7 +54,10 @@ func main() {
 
 		fmt.Println("La reponse est : \n" + string(buf))
 	}
-	//conn.Close()
+	errClosedConn := conn.Close()
+	if err != nil {
+		log.Fatal(errClosedConn)
+	}
 }
 
 func helpMenu() {
@@ -74,6 +80,7 @@ func getUserAnswer() string {
 		log.Fatal(err)
 	}
 	answer = Scanner.Text()
+	fmt.Println("Voila la reponse " + answer)
 	return answer
 }
 

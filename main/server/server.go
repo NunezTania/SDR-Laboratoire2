@@ -4,6 +4,7 @@ package main
 // todo trouver pourquoi le server se deconnecte parfois
 // todo ecrire les commentaires
 // todo ecriture des tests
+// todo terminer la fonction addBenevole()
 
 import (
 	"fmt"
@@ -15,7 +16,7 @@ import (
 
 const (
 	HOST = "localhost"
-	PORT = "8080"
+	PORT = "5555"
 	TYPE = "tcp"
 )
 
@@ -122,20 +123,20 @@ func createUsersAndEvents() {
 	users = append(users, User{"Willi", "1234"})
 	users = append(users, User{"Lili", "1234"})
 	// creation of posts
-	posts = append(posts, Post{postCounter, "Bar à bière", 3, 0, users[0:1]})
+	posts = append(posts, Post{postCounter, "Bar à bière", 3, eventCounter, users[0:1]})
 	postCounter++
-	posts = append(posts, Post{postCounter, "Securité", 2, 0, users[2:4]})
+	posts = append(posts, Post{postCounter, "Securité", 2, eventCounter, users[2:4]})
 	postCounter++
-	posts = append(posts, Post{postCounter, "Vente de ticket", 5, 1, users[0:1]})
+	posts = append(posts, Post{postCounter, "Vente de ticket", 5, eventCounter, users[0:1]})
 	postCounter++
-	posts = append(posts, Post{postCounter, "Logistique", 1, 1, users[2:4]})
+	posts = append(posts, Post{postCounter, "Logistique", 1, eventCounter, users[2:4]})
 	postCounter++
-	posts = append(posts, Post{postCounter, "Securité", 2, 1, users[2:4]})
+	posts = append(posts, Post{postCounter, "Securité", 2, eventCounter, users[2:4]})
 	postCounter++
 	// creation of events
 	events = append(events, Event{eventCounter, "Festival de la musique", users[0], true, posts[0:2]})
 	eventCounter++
-	events = append(events, Event{eventCounter, "Festival de la bière", users[0], true, posts[3:5]})
+	events = append(events, Event{eventCounter, "Festival de la bière", users[0], true, posts[2:4]})
 	eventCounter++
 }
 
@@ -186,25 +187,34 @@ func closeEvent(slice []string) string {
 func addBenevole(slice []string) string {
 	fmt.Println("Adding a benevole")
 	if authentification(slice[1], slice[2]) {
-		idEvent, _ := strconv.Atoi(slice[3])
-		idPost, _ := strconv.Atoi(slice[4])
 		for i := 0; i < len(posts); i++ {
+			idEvent, _ := strconv.Atoi(slice[3])
+			idPost, _ := strconv.Atoi(slice[4])
+
 			if posts[i].id == idPost && posts[i].eventId == idEvent && posts[i].capacity > 0 && getEventById(slice[3]).isOpen {
-				for i, post := range getEventById(slice[3]).posts {
-					if (contains(post.staff, User{slice[1], slice[2]})) {
-						post.staff[i] = post.staff[len(post.staff)-1]
-						post.staff = post.staff[:len(post.staff)-1]
-					}
-				}
+				// todo check if user is already in a post of this event
+				// if it's the case, erase the user from the old post
 				posts[i].staff = append(posts[i].staff, User{slice[1], slice[2]})
 				posts[i].capacity--
+				// on cherche si le benevole ne fait pas deja partie de l'event
+				// on itere sur tout les poste du festival
+				for _, post := range getEventById(slice[3]).posts {
+					/*
+						if (post.staff.contains(User{slice[1], slice[2]})) {
+							post.staff.remove(User{slice[1], slice[2]})
+						}
+					*/
+					fmt.Println(post)
+
+				}
 			}
+
 			return "Benevole added"
 		}
-		return "Couldn't add benevole to this post"
 	} else {
 		return "Authentication failed"
 	}
+	return "Benevole couldn't be added"
 }
 
 func listEvents() string {
@@ -231,22 +241,42 @@ func listPosts(slice []string) string {
 /*
 	Event   | postId 1| postId 2| postId 3|
 
-nbInscrit|    1    |    2    |    3    |
-user 1   |    x    |         |         |
-user 2   |		   |         |    x    |
+nbInscrit |    1    |    2    |    3    |
+user 1    |    x    |         |         |
+user 2    |		    |         |    x    |
 */
 func listUsers(slice []string) string {
-	eventPost := getEventById(slice[1]).posts
-	var str = "Event's id: " + slice[1]
-	for i := 0; i < len(eventPost); i++ {
-		str += "Post's id: " + strconv.Itoa(eventPost[i].id)
+	var event = getEventById(slice[1])
+
+	var tabCell string = "%-15v"
+	var tabCellCross string = "%-8v"
+	var firstColumn string = "%-25v" // Line label
+	var header string = fmt.Sprintf(firstColumn, event.name) + "|"
+	var nbInscrit string = fmt.Sprintf(firstColumn, "nbInscrit") + "|"
+	var tab string = ""
+
+	for i, post := range event.posts {
+		header += fmt.Sprintf(tabCell, post.name+" "+strconv.Itoa(post.id))
+		header += "|"
+		nbInscrit += fmt.Sprintf(tabCell, len(post.staff))
+		nbInscrit += "|"
+		for _, user := range post.staff {
+			tab += fmt.Sprintf(firstColumn, user.name) + "|"
+			for j := 0; j < len(event.posts); j++ {
+				if j == i {
+					tab += fmt.Sprintf(tabCellCross, "x") + "       "
+				} else {
+					tab += fmt.Sprintf(tabCellCross, "") + "       "
+				}
+				tab += "|"
+			}
+			tab += "\n"
+		}
 	}
-	str += "\n"
-	for i := 0; i < len(users); i++ {
-		str += users[i].name + "\n"
-	}
-	// todo fill the matrix with the users-posts
-	return str
+	header += "\n"
+	nbInscrit += "\n"
+
+	return header + nbInscrit + tab
 }
 
 func getEventById(id string) Event {
@@ -257,13 +287,4 @@ func getEventById(id string) Event {
 		}
 	}
 	return Event{}
-}
-
-func contains(users []User, person User) bool {
-	for _, a := range users {
-		if a == person {
-			return true
-		}
-	}
-	return false
 }
