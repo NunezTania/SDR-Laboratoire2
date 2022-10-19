@@ -35,6 +35,9 @@ func main() {
 		}
 		command = Scanner.Text()
 		if !processCommands(&command) {
+			if command == "QUIT " {
+				break
+			}
 			continue
 		}
 
@@ -50,10 +53,10 @@ func main() {
 		}
 
 		fmt.Println("La reponse est : \n" + string(buf))
-		if command == "QUIT " {
-			conn.Close()
-			return
-		}
+	}
+	errClosedConn := conn.Close()
+	if err != nil {
+		log.Fatal(errClosedConn)
 	}
 }
 
