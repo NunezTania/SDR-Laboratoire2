@@ -2,7 +2,7 @@ package main
 
 // A faire :
 // todo trouver pourquoi le server se deconnecte parfois
-// todo ecrire les commentaires
+// todo ecrire les commentaires avec godoc
 // todo ecriture des tests
 
 import (
@@ -82,7 +82,7 @@ func handleRequest(conn net.Conn) {
 			return
 		}
 	}
-	_, writeErr := conn.Write([]byte("Bye bye, Xoxo"))
+	_, writeErr := conn.Write([]byte("Bye"))
 	if writeErr != nil {
 		log.Fatal(writeErr)
 	}
@@ -121,6 +121,7 @@ func createUsersAndEvents() {
 	users = append(users, User{"Leo", "1234"})
 	users = append(users, User{"Willi", "1234"})
 	users = append(users, User{"Lili", "1234"})
+	users = append(users, User{"T", "1234"})
 	// creation of posts
 	posts = append(posts, Post{postCounter, "Bar à bière", 3, 0, users[0:1]})
 	postCounter++
@@ -130,12 +131,12 @@ func createUsersAndEvents() {
 	postCounter++
 	posts = append(posts, Post{postCounter, "Logistique", 1, 1, users[2:4]})
 	postCounter++
-	posts = append(posts, Post{postCounter, "Securité", 2, 1, users[2:4]})
+	posts = append(posts, Post{postCounter, "Securité", 2, 1, users[4:5]})
 	postCounter++
 	// creation of events
 	events = append(events, Event{eventCounter, "Festival de la musique", users[0], true, posts[0:2]})
 	eventCounter++
-	events = append(events, Event{eventCounter, "Festival de la bière", users[0], true, posts[3:5]})
+	events = append(events, Event{eventCounter, "Festival de la bière", users[0], true, posts[2:5]})
 	eventCounter++
 }
 
@@ -153,7 +154,8 @@ func createEvent(slice []string) string {
 	if authentification(slice[1], slice[2]) {
 		owner := User{slice[1], slice[2]}
 		var newPost []Post
-		for i := 3; i < len(slice)-1; i++ {
+		for i := 4; i < len(slice)-1; i += 2 {
+			//var capa = slice[i+1]
 			capacity, _ := strconv.Atoi(slice[i+1])
 			newPost = append(newPost, Post{postCounter, slice[i], capacity, eventCounter, nil})
 			postCounter++
@@ -171,7 +173,8 @@ func closeEvent(slice []string) string {
 	fmt.Println("Closing an event")
 	if authentification(slice[1], slice[2]) {
 		for i := 0; i < len(events); i++ {
-			id, _ := strconv.Atoi(slice[3])
+			var idE = slice[3]
+			id, _ := strconv.Atoi(idE)
 			if events[i].id == id && events[i].owner.name == slice[1] {
 				events[i].isOpen = false
 				return "Event closed"
@@ -186,8 +189,11 @@ func closeEvent(slice []string) string {
 func addBenevole(slice []string) string {
 	fmt.Println("Adding a benevole")
 	if authentification(slice[1], slice[2]) {
-		idEvent, _ := strconv.Atoi(slice[3])
-		idPost, _ := strconv.Atoi(slice[4])
+		var idE = slice[3]
+		var idP = slice[4]
+		idEvent, _ := strconv.Atoi(idE)
+		idPost, _ := strconv.Atoi(idP)
+		fmt.Println(idEvent)
 		for i := 0; i < len(posts); i++ {
 			if posts[i].id == idPost && posts[i].eventId == idEvent && posts[i].capacity > 0 && getEventById(slice[3]).isOpen {
 				for i, post := range getEventById(slice[3]).posts {
@@ -220,8 +226,12 @@ func listEvents() string {
 func listPosts(slice []string) string {
 	var str string
 	for i := 0; i < len(posts); i++ {
-		idEvent, _ := strconv.Atoi(slice[1])
+		var idE = slice[1]
+		idEvent, _ := strconv.Atoi(idE)
+		fmt.Println(idEvent)
 		if posts[i].eventId == idEvent {
+			//fmt.Println(idEvent)
+			//fmt.Println(posts[i].eventId)
 			str += "Post's id: " + strconv.Itoa(posts[i].id) + ", Post's name: " + posts[i].name + ", Capacity: " + strconv.Itoa(posts[i].capacity) + "\n"
 		}
 	}
@@ -252,6 +262,8 @@ func listUsers(slice []string) string {
 func getEventById(id string) Event {
 	for i := 0; i < len(events); i++ {
 		idEvent, _ := strconv.Atoi(id)
+		fmt.Println(idEvent)
+		fmt.Println()
 		if events[i].id == idEvent {
 			return events[i]
 		}

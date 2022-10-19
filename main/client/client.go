@@ -50,8 +50,11 @@ func main() {
 		}
 
 		fmt.Println("La reponse est : \n" + string(buf))
+		if command == "QUIT " {
+			conn.Close()
+			return
+		}
 	}
-	//conn.Close()
 }
 
 func helpMenu() {
