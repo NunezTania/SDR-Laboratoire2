@@ -4,7 +4,6 @@ package main
 // todo trouver pourquoi le server se deconnecte parfois
 // todo ecrire les commentaires
 // todo ecriture des tests
-// todo terminer la fonction addBenevole()
 
 import (
 	"fmt"
@@ -187,32 +186,25 @@ func closeEvent(slice []string) string {
 func addBenevole(slice []string) string {
 	fmt.Println("Adding a benevole")
 	if authentification(slice[1], slice[2]) {
+		idEvent, _ := strconv.Atoi(slice[3])
+		idPost, _ := strconv.Atoi(slice[4])
 		for i := 0; i < len(posts); i++ {
-			idEvent, _ := strconv.Atoi(slice[3])
-			idPost, _ := strconv.Atoi(slice[4])
-
 			if posts[i].id == idPost && posts[i].eventId == idEvent && posts[i].capacity > 0 && getEventById(slice[3]).isOpen {
-				// todo check if user is already in a post of this event
-				// if it's the case, erase the user from the old post
+				for i, post := range getEventById(slice[3]).posts {
+					if (contains(post.staff, User{slice[1], slice[2]})) {
+						post.staff[i] = post.staff[len(post.staff)-1]
+						post.staff = post.staff[:len(post.staff)-1]
+					}
+				}
 				posts[i].staff = append(posts[i].staff, User{slice[1], slice[2]})
 				posts[i].capacity--
-				// on cherche si le benevole ne fait pas deja partie de l'event
-				// on itere sur tout les poste du festival
-				for _, post := range getEventById(slice[3]).posts {
-					if (post.staff.contains(User{slice[1], slice[2]})) {
-						post.staff.remove(User{slice[1], slice[2]})
-					}
-
-				}
 			}
-
 			return "Benevole added"
 		}
+		return "Couldn't add benevole to this post"
+	} else {
+		return "Authentication failed"
 	}
-	return "Post not found"
-} else {
-return "Authentication failed"
-}
 }
 
 func listEvents() string {
@@ -265,4 +257,13 @@ func getEventById(id string) Event {
 		}
 	}
 	return Event{}
+}
+
+func contains(users []User, person User) bool {
+	for _, a := range users {
+		if a == person {
+			return true
+		}
+	}
+	return false
 }
