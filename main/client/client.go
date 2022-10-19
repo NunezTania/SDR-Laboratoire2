@@ -34,6 +34,10 @@ func main() {
 			log.Fatal(err)
 		}
 		command = Scanner.Text()
+		if command == "QUIT" {
+			fmt.Println("Thanks and goodbye")
+			break
+		}
 		if !processCommands(&command) {
 			continue
 		}
@@ -57,13 +61,13 @@ func main() {
 func helpMenu() {
 	fmt.Println("Hello and Welcome to the Event Manager")
 	fmt.Println("Here is a list of possible commands:")
-	fmt.Println("1. CREATE userName userPassword eventName postName1 capacity1 postName2 capacity2 ... ")
-	fmt.Println("2. CLOSE eventName")
-	fmt.Println("3. ADD eventId postId")
-	fmt.Println("4. List all the event")
-	fmt.Println("5. List all the posts of a event")
-	fmt.Println("6. List all the staff of a event")
-	fmt.Println("7. Quit")
+	fmt.Println("1. CREATE")
+	fmt.Println("2. CLOSE")
+	fmt.Println("3. ADD")
+	fmt.Println("4. LISTM")
+	fmt.Println("5. LISTP")
+	fmt.Println("6. LISTU")
+	fmt.Println("7. QUIT")
 }
 
 func getUserAnswer() string {

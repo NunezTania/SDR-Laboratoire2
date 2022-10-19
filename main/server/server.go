@@ -1,15 +1,10 @@
 package main
 
-/*
-list of commands the client can ask the server
-- Create a new event						: CREATE
-- Close the event 							: CLOSE
-- Add a benevole to a post					: ADD
-- List all the manifestations				: LISTM
-- List all the posts of a manifestation		: LISTP
-- List all the users of a manifestation		: LISTU
-- Quit the server							: QUIT
-*/
+// A faire :
+// todo trouver pourquoi le server se deconnecte parfois
+// todo ecrire les commentaires
+// todo ecriture des tests
+// todo terminer la fonction addBenevole()
 
 import (
 	"fmt"
@@ -60,7 +55,7 @@ func main() {
 	}
 	fmt.Println("Server is listening on port 8080")
 	defer listen.Close()
-	createUsers()
+	createUsersAndEvents()
 	for {
 		conn, err := listen.Accept()
 		if err != nil {
@@ -120,16 +115,28 @@ func parseBuffer(buf []byte) string {
 	}
 }
 
-func createUsers() {
+func createUsersAndEvents() {
+	// creation of users
 	users = append(users, User{"Bob", "1234"})
 	users = append(users, User{"Lea", "1234"})
 	users = append(users, User{"Leo", "1234"})
 	users = append(users, User{"Willi", "1234"})
-	posts = append(posts, Post{postCounter, "Post1", 3, eventCounter, users[0:1]})
+	users = append(users, User{"Lili", "1234"})
+	// creation of posts
+	posts = append(posts, Post{postCounter, "Bar à bière", 3, eventCounter, users[0:1]})
 	postCounter++
-	posts = append(posts, Post{postCounter, "Post2", 2, eventCounter, users[2:4]})
+	posts = append(posts, Post{postCounter, "Securité", 2, eventCounter, users[2:4]})
 	postCounter++
-	events = append(events, Event{eventCounter, "Festival de la bière", users[0], true, posts})
+	posts = append(posts, Post{postCounter, "Vente de ticket", 5, eventCounter, users[0:1]})
+	postCounter++
+	posts = append(posts, Post{postCounter, "Logistique", 1, eventCounter, users[2:4]})
+	postCounter++
+	posts = append(posts, Post{postCounter, "Securité", 2, eventCounter, users[2:4]})
+	postCounter++
+	// creation of events
+	events = append(events, Event{eventCounter, "Festival de la musique", users[0], true, posts[0:2]})
+	eventCounter++
+	events = append(events, Event{eventCounter, "Festival de la bière", users[0], true, posts[2:4]})
 	eventCounter++
 }
 
@@ -171,7 +178,7 @@ func closeEvent(slice []string) string {
 				return "Event closed"
 			}
 		}
-		return "Event not found"
+		return "Event couldn't be closed"
 	} else {
 		return "Authentication failed"
 	}
@@ -183,18 +190,29 @@ func addBenevole(slice []string) string {
 		for i := 0; i < len(posts); i++ {
 			idEvent, _ := strconv.Atoi(slice[3])
 			idPost, _ := strconv.Atoi(slice[4])
+
 			if posts[i].id == idPost && posts[i].eventId == idEvent && posts[i].capacity > 0 && getEventById(slice[3]).isOpen {
 				// todo check if user is already in a post of this event
 				// if it's the case, erase the user from the old post
 				posts[i].staff = append(posts[i].staff, User{slice[1], slice[2]})
 				posts[i].capacity--
-				return "Benevole added"
+				// on cherche si le benevole ne fait pas deja partie de l'event
+				// on itere sur tout les poste du festival
+				for _, post := range getEventById(slice[3]).posts {
+					if (post.staff.contains(User{slice[1], slice[2]})) {
+						post.staff.remove(User{slice[1], slice[2]})
+					}
+
+				}
 			}
+
+			return "Benevole added"
 		}
-		return "Post not found"
-	} else {
-		return "Authentication failed"
 	}
+	return "Post not found"
+} else {
+return "Authentication failed"
+}
 }
 
 func listEvents() string {
