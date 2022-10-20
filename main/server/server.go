@@ -7,6 +7,7 @@ package main
 // todo terminer la fonction addBenevole()
 
 import (
+	"SDR-Laboratoire1/main/dataRW"
 	"bytes"
 	"fmt"
 	"log"
@@ -50,6 +51,7 @@ var posts []Post
 var users []User
 
 func main() {
+	go dataRW.HandleRWActions()
 	listen, err := net.Listen(TYPE, HOST+":"+PORT)
 	if err != nil {
 		log.Fatal(err)
@@ -72,7 +74,7 @@ func handleRequest(conn net.Conn) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	for commandTreatment := parseBuffer(buf); commandTreatment != "q"; commandTreatment = parseBuffer(buf) {
+	for commandTreatment := askDataRW(buf); commandTreatment != "q"; commandTreatment = askDataRW(buf) {
 		fmt.Println("Handling request")
 		_, err := conn.Write([]byte(commandTreatment))
 		if err != nil {
@@ -92,6 +94,14 @@ func handleRequest(conn net.Conn) {
 	if closeErr != nil {
 		log.Fatal(closeErr)
 	}
+}
+
+func askDataRW(commandParameters []byte) string {
+	clientChannel := make(chan []byte)
+	dataRW.DataChannel <- clientChannel
+	clientChannel <- commandParameters
+	response := <-clientChannel
+	return string(response)
 }
 
 func parseBuffer(buf []byte) string {

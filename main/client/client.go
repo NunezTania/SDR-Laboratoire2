@@ -137,7 +137,7 @@ func processCreate(command *string) bool {
 		return false
 	}
 	*command += " " + login + " " + eventName + " " + posts
-	fmt.Println("Voila la commande formé " + *command)
+	//fmt.Println("Voila la commande formé " + *command)
 	return true
 }
 
