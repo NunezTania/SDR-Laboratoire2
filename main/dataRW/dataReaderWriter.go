@@ -43,7 +43,7 @@ func createUsersAndEvents() {
 	users = append(users, User{"Lea", "1234"})
 	users = append(users, User{"Leo", "1234"})
 	users = append(users, User{"Willi", "1234"})
-	users = append(users, User{"Lili", "1234"})
+	users = append(users, User{"Lili", "12345"})
 	users = append(users, User{"T", "1234"})
 	// creation of posts
 	posts = append(posts, Post{postCounter, "Bar à bière", 3, 0, users[0:1]})
@@ -72,15 +72,14 @@ func authentification(username string, password string) bool {
 	return false
 }
 
-func removeUserPost(username string, password string) {
-	for _, event := range events {
-		for _, post := range event.posts {
-			for i, staff := range post.staff {
-				if staff.name == username && staff.password == password {
-					fmt.Println("Removing user from post")
-					post.staff = append(post.staff[:i], post.staff[i+1:]...)
-					post.capacity++
-				}
+func removeUserPost(username string, password string, idEvent string) {
+	event := getEventById(idEvent)
+	for _, post := range event.posts {
+		for i, staff := range post.staff {
+			if staff.name == username && staff.password == password {
+				fmt.Println("Removing user from post")
+				post.staff = append(post.staff[:i], post.staff[i+1:]...)
+				post.capacity++
 			}
 		}
 	}
@@ -147,20 +146,26 @@ func closeEvent(commandParameters []string) string {
 
 func addBenevole(slice []string) string {
 	fmt.Println("Adding a benevole")
+	uname := slice[0]
+	pwd := slice[1]
+	idEvent := slice[2]
+	idPost := slice[3]
 	if authentification(slice[0], slice[1]) {
-		idPost, _ := strconv.Atoi(string(bytes.Trim([]byte(slice[3]), "\x00")))
-		removeUserPost(slice[0], slice[1])
-		event := getEventById(slice[2])
-		fmt.Println(event)
-		post := getEventById(slice[2]).posts[idPost]
+		idPost, _ := strconv.Atoi(string(bytes.Trim([]byte(idPost), "\x00")))
+		//removeUserPost(uname, pwd, idEvent)
+		event := getEventById(idEvent)
+		post := getEventById(idEvent).posts[idPost]
 		if post.capacity < 1 {
 			return "Could not add user to post because post is full"
 		}
-		fmt.Println(post.staff)
-		newStaff := append(post.staff, User{slice[0], slice[1]})
-		post.staff = newStaff
-		fmt.Println(post.staff)
-		fmt.Println(event)
+		var staff []User
+		copy(post.staff, staff)
+		if !contains(post.staff, User{uname, pwd}) {
+			for _, user := range post.staff {
+				staff = append(staff, user)
+			}
+			event.posts[idPost].staff = append(staff, User{uname, pwd})
+		}
 		return "User successfully added to post"
 	}
 	return "Authentication failed"
@@ -190,7 +195,7 @@ func listPosts(slice []string) string {
 func listUsers(slice []string) string {
 	var event = getEventById(slice[0])
 
-	tabCell := "%-15v"
+	tabCell := "%-20v"
 	tabCellCross := "%-8v"
 	firstColumn := "%-25v" // Line label
 	header := fmt.Sprintf(firstColumn, event.name) + "|"
