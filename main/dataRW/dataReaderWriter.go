@@ -78,7 +78,7 @@ func removeUserPost(username string, password string, idEvent string) {
 		for i, staff := range post.staff {
 			if staff.name == username && staff.password == password {
 				fmt.Println("Removing user from post")
-				post.staff = append(post.staff[:i], post.staff[i+1:]...)
+				events[event.id].posts[post.id].staff = append(events[event.id].posts[post.id].staff[:i], events[event.id].posts[post.id].staff[i+1:]...)
 				post.capacity++
 			}
 		}
@@ -152,7 +152,7 @@ func addBenevole(slice []string) string {
 	idPost := slice[3]
 	if authentification(slice[0], slice[1]) {
 		idPost, _ := strconv.Atoi(string(bytes.Trim([]byte(idPost), "\x00")))
-		//removeUserPost(uname, pwd, idEvent)
+		removeUserPost(uname, pwd, idEvent)
 		event := getEventById(idEvent)
 		post := getEventById(idEvent).posts[idPost]
 		if post.capacity < 1 {
@@ -196,7 +196,7 @@ func listUsers(slice []string) string {
 	var event = getEventById(slice[0])
 
 	tabCell := "%-20v"
-	tabCellCross := "%-8v"
+	tabCellCross := "%-10v"
 	firstColumn := "%-25v" // Line label
 	header := fmt.Sprintf(firstColumn, event.name) + "|"
 	nbInscrit := fmt.Sprintf(firstColumn, "nbInscrit") + "|"
@@ -211,9 +211,9 @@ func listUsers(slice []string) string {
 			tab += fmt.Sprintf(firstColumn, user.name) + "|"
 			for j := 0; j < len(event.posts); j++ {
 				if j == i {
-					tab += fmt.Sprintf(tabCellCross, "x") + "       "
+					tab += fmt.Sprintf(tabCellCross, "x") + "          "
 				} else {
-					tab += fmt.Sprintf(tabCellCross, "") + "       "
+					tab += fmt.Sprintf(tabCellCross, "") + "          "
 				}
 				tab += "|"
 			}
