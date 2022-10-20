@@ -65,6 +65,7 @@ func main() {
 	}
 }
 
+// helpMenu displays all the commands that can be used by the user
 func helpMenu() {
 	fmt.Println("Hello and Welcome to the Event Manager")
 	fmt.Println("Here is a list of possible commands:")

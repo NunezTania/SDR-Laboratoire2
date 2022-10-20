@@ -4,9 +4,12 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="96597984-09df-44c3-a8c1-1f54c5238989" name="Changes" comment="merging">
+    <list default="true" id="96597984-09df-44c3-a8c1-1f54c5238989" name="Changes" comment="fix convert to int">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main/server/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/server/server.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/client/client.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/client/client.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/dataRW/dataReaderWriter.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/dataRW/dataReaderWriter.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -81,7 +84,8 @@
     <MESSAGE value="bug fixed" />
     <MESSAGE value="rien ne vas plus" />
     <MESSAGE value="merging" />
-    <option name="LAST_COMMIT_MESSAGE" value="merging" />
+    <MESSAGE value="fix convert to int" />
+    <option name="LAST_COMMIT_MESSAGE" value="fix convert to int" />
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>

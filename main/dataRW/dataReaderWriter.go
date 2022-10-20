@@ -34,6 +34,7 @@ var eventCounter = 0
 var postCounter = 0
 
 var events []Event
+
 var posts []Post
 var users []User
 
@@ -149,18 +150,22 @@ func addBenevole(slice []string) string {
 	fmt.Println("Adding a benevole")
 	if authentification(slice[0], slice[1]) {
 		idPost, _ := strconv.Atoi(string(bytes.Trim([]byte(slice[3]), "\x00")))
-		removeUserPost(slice[0], slice[1])
+		//removeUserPost(slice[0], slice[1])
 		event := getEventById(slice[2])
-		fmt.Println(event)
+		fmt.Println("event : ", event)
 		post := getEventById(slice[2]).posts[idPost]
+		fmt.Println("post : ", post)
 		if post.capacity < 1 {
 			return "Could not add user to post because post is full"
 		}
-		fmt.Println(post.staff)
-		newStaff := append(post.staff, User{slice[0], slice[1]})
-		post.staff = newStaff
-		fmt.Println(post.staff)
-		fmt.Println(event)
+		fmt.Println("post's staff : ", event.posts[idPost].staff)
+		event.posts[idPost].staff = append(event.posts[idPost].staff, User{slice[0], slice[1]})
+		//newStaff := append(post.staff, User{slice[0], slice[1]})
+		event.posts[idPost].capacity--
+		fmt.Println("post's staff after : ", event.posts[idPost].staff)
+		// modify the post inside the event
+		fmt.Println("event now : ", event)
+		fmt.Println("staff du poste de l'event", event.posts[idPost].staff)
 		return "User successfully added to post"
 	}
 	return "Authentication failed"
@@ -177,12 +182,10 @@ func listEvents() string {
 }
 
 func listPosts(slice []string) string {
+	event := getEventById(slice[0])
 	var str string
-	for i := 0; i < len(posts); i++ {
-		idEvent, _ := strconv.Atoi(string(bytes.Trim([]byte(slice[0]), "\x00")))
-		if posts[i].eventId == idEvent {
-			str += "Post's id: " + strconv.Itoa(posts[i].id) + ", Post's name: " + posts[i].name + ", Capacity: " + strconv.Itoa(posts[i].capacity) + "\n"
-		}
+	for i := 0; i < len(event.posts); i++ {
+		str += "Post's id: " + strconv.Itoa(posts[i].id) + ", Post's name: " + posts[i].name + ", Capacity: " + strconv.Itoa(posts[i].capacity) + "\n"
 	}
 	return str
 }
