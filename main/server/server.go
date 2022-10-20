@@ -7,6 +7,7 @@ package main
 // todo terminer la fonction addBenevole()
 
 import (
+	"bytes"
 	"fmt"
 	"log"
 	"net"
@@ -156,8 +157,7 @@ func createEvent(slice []string) string {
 		owner := User{slice[1], slice[2]}
 		var newPost []Post
 		for i := 4; i < len(slice)-1; i += 2 {
-			//var capa = slice[i+1]
-			capacity, _ := strconv.Atoi(slice[i+1])
+			capacity, _ := strconv.Atoi(string(bytes.Trim([]byte(slice[i+1]), "\x00")))
 			newPost = append(newPost, Post{postCounter, slice[i], capacity, eventCounter, nil})
 			postCounter++
 		}
@@ -174,8 +174,7 @@ func closeEvent(slice []string) string {
 	fmt.Println("Closing an event")
 	if authentification(slice[1], slice[2]) {
 		for i := 0; i < len(events); i++ {
-			var idE = slice[3]
-			id, _ := strconv.Atoi(idE)
+			id, _ := strconv.Atoi(string(bytes.Trim([]byte(slice[3]), "\x00")))
 			if events[i].id == id && events[i].owner.name == slice[1] {
 				events[i].isOpen = false
 				return "Event closed"
@@ -191,8 +190,8 @@ func addBenevole(slice []string) string {
 	fmt.Println("Adding a benevole")
 	if authentification(slice[1], slice[2]) {
 		for i := 0; i < len(posts); i++ {
-			idEvent, _ := strconv.Atoi(slice[3])
-			idPost, _ := strconv.Atoi(slice[4])
+			idEvent, _ := strconv.Atoi(string(bytes.Trim([]byte(slice[3]), "\x00")))
+			idPost, _ := strconv.Atoi(string(bytes.Trim([]byte(slice[4]), "\x00")))
 
 			if posts[i].id == idPost && posts[i].eventId == idEvent && posts[i].capacity > 0 && getEventById(slice[3]).isOpen {
 				for i, post := range getEventById(slice[3]).posts {
@@ -236,7 +235,7 @@ func listEvents() string {
 func listPosts(slice []string) string {
 	var str string
 	for i := 0; i < len(posts); i++ {
-		idEvent, _ := strconv.Atoi(slice[1])
+		idEvent, _ := strconv.Atoi(string(bytes.Trim([]byte(slice[1]), "\x00")))
 		if posts[i].eventId == idEvent {
 			str += "Post's id: " + strconv.Itoa(posts[i].id) + ", Post's name: " + posts[i].name + ", Capacity: " + strconv.Itoa(posts[i].capacity) + "\n"
 		}
@@ -287,7 +286,7 @@ func listUsers(slice []string) string {
 
 func getEventById(id string) Event {
 	for i := 0; i < len(events); i++ {
-		idEvent, _ := strconv.Atoi(id)
+		idEvent, _ := strconv.Atoi(string(bytes.Trim([]byte(id), "\x00")))
 		if events[i].id == idEvent {
 			return events[i]
 		}
