@@ -33,12 +33,17 @@ func main() {
 		if err := Scanner.Err(); err != nil {
 			log.Fatal(err)
 		}
+
 		command = Scanner.Text()
+
+		// Command was not recognized
 		if !processCommands(&command) {
-			if command == "QUIT " {
-				break
-			}
 			continue
+		}
+
+		// User quits the program
+		if command == "QUIT " {
+			break
 		}
 
 		_, err = conn.Write([]byte(command))

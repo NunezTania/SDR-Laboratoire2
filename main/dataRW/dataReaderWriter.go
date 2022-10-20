@@ -49,7 +49,7 @@ func createUsersAndEvents() {
 	posts = append(posts, Post{postCounter, "Bar à bière", 3, 0, users[0:1]})
 	postCounter++
 	posts = append(posts, Post{postCounter, "Securité", 2, 0, users[2:4]})
-	postCounter++
+	postCounter = 0
 	posts = append(posts, Post{postCounter, "Vente de ticket", 5, 1, users[0:1]})
 	postCounter++
 	posts = append(posts, Post{postCounter, "Logistique", 1, 1, users[2:4]})
@@ -70,6 +70,20 @@ func authentification(username string, password string) bool {
 		}
 	}
 	return false
+}
+
+func removeUserPost(username string, password string) {
+	for _, event := range events {
+		for _, post := range event.posts {
+			for i, staff := range post.staff {
+				if staff.name == username && staff.password == password {
+					fmt.Println("Removing user from post")
+					post.staff = append(post.staff[:i], post.staff[i+1:]...)
+					post.capacity++
+				}
+			}
+		}
+	}
 }
 
 func getEventById(id string) Event {
@@ -100,6 +114,7 @@ func createEvent(parameters []string) string {
 		return "Invalid Number of arguments"
 	}
 	if authentification(uname, pwd) {
+		postCounter = 0
 		owner := User{uname, pwd}
 		var newPost []Post
 		for i := 0; i < len(posts)-1; i += 2 {
@@ -133,37 +148,22 @@ func closeEvent(commandParameters []string) string {
 func addBenevole(slice []string) string {
 	fmt.Println("Adding a benevole")
 	if authentification(slice[0], slice[1]) {
-		for i := 0; i < len(posts); {
-			idEvent, _ := strconv.Atoi(string(bytes.Trim([]byte(slice[2]), "\x00")))
-			idPost, _ := strconv.Atoi(string(bytes.Trim([]byte(slice[3]), "\x00")))
-
-			if posts[i].id == idPost && posts[i].eventId == idEvent && posts[i].capacity > 0 && getEventById(slice[3]).isOpen {
-				for i, post := range getEventById(slice[2]).posts {
-					if (contains(post.staff, User{slice[0], slice[1]})) {
-						post.staff[i] = post.staff[len(post.staff)-1]
-						post.staff = post.staff[:len(post.staff)-1]
-					}
-				}
-				posts[i].staff = append(posts[i].staff, User{slice[0], slice[1]})
-				posts[i].capacity--
-				// on cherche si le benevole ne fait pas deja partie de l'event
-				// on itere sur tout les poste du festival
-				for _, post := range getEventById(slice[2]).posts {
-					/*
-						if (post.staff.contains(User{slice[1], slice[2]})) {
-							post.staff.remove(User{slice[1], slice[2]})
-						}
-					*/
-					fmt.Println(post)
-
-				}
-			}
-			return "Benevole added"
+		idPost, _ := strconv.Atoi(string(bytes.Trim([]byte(slice[3]), "\x00")))
+		removeUserPost(slice[0], slice[1])
+		event := getEventById(slice[2])
+		fmt.Println(event)
+		post := getEventById(slice[2]).posts[idPost]
+		if post.capacity < 1 {
+			return "Could not add user to post because post is full"
 		}
-		return "Couldn't add benevole to this post"
-	} else {
-		return "Authentication failed"
+		fmt.Println(post.staff)
+		newStaff := append(post.staff, User{slice[0], slice[1]})
+		post.staff = newStaff
+		fmt.Println(post.staff)
+		fmt.Println(event)
+		return "User successfully added to post"
 	}
+	return "Authentication failed"
 }
 
 func listEvents() string {
