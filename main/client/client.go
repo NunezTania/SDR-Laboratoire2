@@ -18,6 +18,7 @@ const (
 	TYPE = "tcp"
 )
 
+// main function of the program client
 func main() {
 	helpMenu()
 	conn, err := net.Dial(TYPE, HOST+":"+PORT)
@@ -36,12 +37,10 @@ func main() {
 
 		command = Scanner.Text()
 
-		// Command was not recognized
 		if !processCommands(&command) {
 			continue
 		}
 
-		// User quits the program
 		if command == "QUIT " {
 			break
 		}
@@ -78,6 +77,7 @@ func helpMenu() {
 	fmt.Println("7. QUIT")
 }
 
+// getUserAnswer returns the answer of the user
 func getUserAnswer() string {
 	var answer string
 	Scanner := bufio.NewScanner(os.Stdin)
@@ -89,6 +89,7 @@ func getUserAnswer() string {
 	return answer
 }
 
+// authentificationProcess returns the login and the password of the user
 func authentificationProcess() string {
 	fmt.Println("Please enter your username:")
 	var username string
@@ -109,6 +110,7 @@ func authentificationProcess() string {
 	return username + " " + password
 }
 
+// processCommands returns true if the command is valid
 func processCommands(command *string) bool {
 	switch *command {
 	case "CREATE":
@@ -133,6 +135,7 @@ func processCommands(command *string) bool {
 	}
 }
 
+// processCreate process the creation of a new event returns true if the command is valid
 func processCreate(command *string) bool {
 	login := authentificationProcess()
 	fmt.Println("Enter the name of the event:")
@@ -143,11 +146,10 @@ func processCreate(command *string) bool {
 		return false
 	}
 	*command += " " + login + " " + eventName + " " + posts
-	//fmt.Println("Voila la commande formé " + *command)
 	return true
 }
 
-// todo is it possible to have no post in an event?
+// checkPosts verify that the posts created are valid and returns true if they are
 func checkPosts(command string) bool {
 	posts := strings.Split(command, " ")
 
@@ -171,6 +173,7 @@ func checkPosts(command string) bool {
 	return true
 }
 
+// processClose process the closure of an event returns true if the command is valid
 func processClose(command *string) bool {
 	login := authentificationProcess()
 	fmt.Println("Enter the event id")
@@ -182,11 +185,13 @@ func processClose(command *string) bool {
 	return true
 }
 
+// isNumber returns true if the string is a number
 func isNumber(x string) bool {
 	_, err := strconv.Atoi(x)
 	return err == nil
 }
 
+// processAdd process the addition of a staff in an event returns true if the command is valid
 func processAdd(command *string) bool {
 	login := authentificationProcess()
 	fmt.Println("Enter the event id:")
@@ -200,6 +205,7 @@ func processAdd(command *string) bool {
 	return true
 }
 
+// processList process the listing command returns true if the command is valid
 func processList(command *string) bool {
 	fmt.Println("Enter the event id:")
 	eventId := getUserAnswer()

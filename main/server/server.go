@@ -1,11 +1,5 @@
 package main
 
-// A faire :
-// todo trouver pourquoi le server se deconnecte parfois
-// todo ecrire les commentaires avec godoc
-// todo ecriture des tests
-// todo terminer la fonction addBenevole()
-
 import (
 	"SDR-Laboratoire1/main/dataRW"
 	"fmt"
@@ -47,6 +41,7 @@ var events []Event
 var posts []Post
 var users []User
 
+// main function of the server
 func main() {
 	go dataRW.HandleRWActions()
 	listen, err := net.Listen(TYPE, HOST+":"+PORT)
@@ -65,6 +60,7 @@ func main() {
 	}
 }
 
+// handleRequest handles the requests from the clients
 func handleRequest(conn net.Conn) {
 	buf := make([]byte, 1024)
 	_, err := conn.Read(buf)
@@ -93,6 +89,7 @@ func handleRequest(conn net.Conn) {
 	}
 }
 
+// askDataRW asks the dataRW to treat the command
 func askDataRW(commandParameters []byte) string {
 	clientChannel := make(chan []byte)
 	dataRW.DataChannel <- clientChannel
@@ -101,6 +98,7 @@ func askDataRW(commandParameters []byte) string {
 	return string(response)
 }
 
+// createUsersAndEvents creates some users and some events
 func createUsersAndEvents() {
 	// creation of users
 	users = append(users, User{"Bob", "1234"})

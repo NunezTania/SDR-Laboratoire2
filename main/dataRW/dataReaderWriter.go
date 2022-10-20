@@ -36,6 +36,7 @@ var postCounter = 0
 var events []Event
 var users []User
 
+// createUserAndEvent creates a user and an event
 func createUsersAndEvents() {
 	// creation of users
 	users = append(users, User{"Bob", "1234"})
@@ -63,6 +64,7 @@ func createUsersAndEvents() {
 	eventCounter++
 }
 
+// authentification checks if the user is in the list of users and password is correct
 func authentification(username string, password string) bool {
 	for _, user := range users {
 		if user.name == username && user.password == password {
@@ -72,6 +74,7 @@ func authentification(username string, password string) bool {
 	return false
 }
 
+// removeUserPost removes a user from a post
 func removeUserPost(username string, password string, idEvent string) {
 	event := getEventById(idEvent)
 	for _, post := range event.posts {
@@ -85,6 +88,7 @@ func removeUserPost(username string, password string, idEvent string) {
 	}
 }
 
+// getEventById returns the event with the given id
 func getEventById(id string) Event {
 	for i := 0; i < len(events); i++ {
 		idEvent, _ := strconv.Atoi(string(bytes.Trim([]byte(id), "\x00")))
@@ -95,6 +99,7 @@ func getEventById(id string) Event {
 	return Event{}
 }
 
+// contains check if a person is contains inside users
 func contains(users []User, person User) bool {
 	for _, a := range users {
 		if a == person {
@@ -104,6 +109,7 @@ func contains(users []User, person User) bool {
 	return false
 }
 
+// createEvent creates an event
 func createEvent(parameters []string) string {
 	uname := parameters[0]
 	pwd := parameters[1]
@@ -128,6 +134,7 @@ func createEvent(parameters []string) string {
 	return "Authentification failed"
 }
 
+// closeEvent closes an event
 func closeEvent(commandParameters []string) string {
 	fmt.Println("Closing an event")
 	if authentification(commandParameters[0], commandParameters[1]) {
@@ -144,6 +151,7 @@ func closeEvent(commandParameters []string) string {
 	}
 }
 
+// addBenevole adds a benevole to a post
 func addBenevole(slice []string) string {
 	fmt.Println("Adding a benevole")
 	uname := slice[0]
@@ -171,6 +179,7 @@ func addBenevole(slice []string) string {
 	return "Authentication failed"
 }
 
+// listEvents lists all the events
 func listEvents() string {
 	var str string
 	for i := 0; i < len(events); i++ {
@@ -181,6 +190,7 @@ func listEvents() string {
 	return str
 }
 
+// listPosts lists all the posts of an event
 func listPosts(slice []string) string {
 	event := getEventById(slice[0])
 	var str string
@@ -190,6 +200,7 @@ func listPosts(slice []string) string {
 	return str
 }
 
+// listUsers lists all the users of all the posts of an event
 func listUsers(slice []string) string {
 	var event = getEventById(slice[0])
 
@@ -224,6 +235,7 @@ func listUsers(slice []string) string {
 	return header + nbInscrit + tab
 }
 
+// processCommand processes the command
 func processCommand(commandParameters []string) string {
 	fmt.Println("Processing in dataRW")
 	switch commandParameters[0] {
@@ -246,6 +258,7 @@ func processCommand(commandParameters []string) string {
 	}
 }
 
+// HandleRWActions handles the read/write actions
 func HandleRWActions() {
 	createUsersAndEvents()
 	for {
