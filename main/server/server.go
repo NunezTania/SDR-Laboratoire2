@@ -1,9 +1,8 @@
-package server
-
-// The server package contains the server of the program.
+// Package server contains the server of the program.
 // It is used to communicate with the client.
 // And can be used to create, close, add and list events.
 // In order to manage data, it uses the dataRW package.
+package server
 
 import (
 	"SDR-Laboratoire1/main/dataRW"
@@ -14,7 +13,7 @@ import (
 
 const (
 	HOST = "localhost"
-	PORT = "5555"
+	PORT = "5556"
 	TYPE = "tcp"
 )
 

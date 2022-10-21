@@ -9,6 +9,7 @@
       <change beforePath="$PROJECT_DIR$/main/client/client.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/client/client.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main/dataRW/dataReaderWriter.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/dataRW/dataReaderWriter.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main/server/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/server/server.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/serverclient_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/test/serverclient_test.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,7 +44,7 @@
     &quot;last_opened_file_path&quot;: &quot;C:/Users/magal&quot;
   }
 }</component>
-  <component name="RunManager" selected="Go Test.Test in SDR-Laboratoire1/test">
+  <component name="RunManager" selected="Go Test.go test SDR-Laboratoire1/test">
     <configuration name="go build SDR-Laboratoire1/main/server" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="SDR-Laboratoire1" />
       <working_directory value="$PROJECT_DIR$" />
@@ -65,8 +66,33 @@
       <pattern value="^\QTest\E$" />
       <method v="2" />
     </configuration>
+    <configuration name="TestCapacity in SDR-Laboratoire1/test" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="SDR-Laboratoire1" />
+      <working_directory value="$PROJECT_DIR$/test" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="SDR-Laboratoire1/test" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <pattern value="^\QTestCapacity\E$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go test SDR-Laboratoire1/test" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="SDR-Laboratoire1" />
+      <working_directory value="$PROJECT_DIR$/test" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="SDR-Laboratoire1/test" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Test.go test SDR-Laboratoire1/test" />
+        <item itemvalue="Go Test.TestCapacity in SDR-Laboratoire1/test" />
         <item itemvalue="Go Test.Test in SDR-Laboratoire1/test" />
         <item itemvalue="Go Build.go build SDR-Laboratoire1/main/server" />
       </list>

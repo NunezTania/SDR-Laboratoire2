@@ -1,3 +1,5 @@
+// Package test contains the tests for the server
+// All the commands are tested
 package test
 
 import (
@@ -12,7 +14,7 @@ import (
 
 const (
 	HOST = "localhost"
-	PORT = "5555"
+	PORT = "5556"
 	TYPE = "tcp"
 )
 
@@ -200,7 +202,40 @@ func TestCapacity(t *testing.T) {
 		log.Fatal(errR)
 	}
 
-	// Add a staff
+	// Add a first staff
+	bufferClient = make([]byte, 1024)
+	cmdAddUser := "ADD Lili 1234 2 0"
+	_, errW = conn.Write([]byte(cmdAddUser))
+	if errW != nil {
+		log.Fatal(errW)
+	}
+	_, errR = conn.Read(bufferClient)
+	bufferClient = bytes.Trim(bufferClient, "\x00")
+	if errR != nil {
+		log.Fatal(errR)
+	}
+	expected := "User successfully added to post"
+	if strings.Compare(string(bufferClient), expected) != 0 {
+		_ = fmt.Errorf("Expected: %s, got: %s", expected, string(bufferClient))
+	}
+
+	// add a second staff
+	bufferClient = make([]byte, 1024)
+	cmdAddUser = "ADD Leo 1234 2 0"
+	_, errW = conn.Write([]byte(cmdAddUser))
+	if errW != nil {
+		log.Fatal(errW)
+	}
+	_, errR = conn.Read(bufferClient)
+	bufferClient = bytes.Trim(bufferClient, "\x00")
+	if errR != nil {
+		log.Fatal(errR)
+	}
+	expected = "Could not add user to post because post is full"
+	if strings.Compare(string(bufferClient), expected) != 0 {
+		_ = fmt.Errorf("Expected: %s, got: %s", expected, string(bufferClient))
+	}
+
 }
 
 func TestCloseWithSuccessfulAuth(t *testing.T) {
