@@ -1,5 +1,3 @@
-// Package test contains the tests for the server
-// All the commands are tested
 package test
 
 import (
@@ -64,7 +62,7 @@ func TestLISTM(t *testing.T) {
 		"Event's id: 2, Event's name: FestiNeuch, Owner: Lili, is open:true\n"
 	if strings.Compare(string(bufferClientIn),
 		expected) != 0 {
-		fmt.Errorf("Expected: %s, got: %s", expected, string(bufferClientIn))
+		log.Fatal(fmt.Errorf("Expected: %s, got: %s", expected, string(bufferClientIn)))
 	}
 
 }
@@ -86,7 +84,7 @@ func TestFalseCmd(t *testing.T) {
 	expected := "Command not found"
 	if strings.Compare(string(bufferClientIn),
 		expected) != 0 {
-		_ = fmt.Errorf("Expected: %s, got: %s", expected, string(bufferClientIn))
+		log.Fatal(fmt.Errorf("Expected: %s, got: %s", expected, string(bufferClientIn)))
 	}
 }
 
@@ -130,7 +128,7 @@ func TestADDOne(t *testing.T) {
 	}
 
 	if !strings.Contains(string(bufferClientIn), "Bob") {
-		_ = fmt.Errorf("Expected string to contain Bob as he was added to event 2, got: %s", string(bufferClientIn))
+		log.Fatal(fmt.Errorf("Expected string to contain Bob as he was added to event 2, got: %s", string(bufferClientIn)))
 	}
 }
 
@@ -150,12 +148,16 @@ func TestADDTwo(t *testing.T) {
 		log.Fatal(errR)
 	}
 
-	expected := "Festival de la bière     |Vente de ticket 0   |Logistique 1        |Securité 2          |\nnbInscrit                |1                   |2                   |1                   |\nBob                      |x                   |                    |                    |\nLeo                      |                    |x                   |                    |\nWilli                    |                    |x                   |                    |\nLili                     |                    |                    |x                   |"
+	expected := "Festival de la bière     |Vente de ticket 0   |Logistique 1        |Securité 2          |" +
+		"\nnbInscrit                |1                   |2                   |1                   |" +
+		"\nBob                      |x                   |                    |                    |" +
+		"\nLeo                      |                    |x                   |                    |" +
+		"\nWilli                    |                    |x                   |                    |" +
+		"\nLili                     |                    |                    |x                   |\n"
 
 	if strings.Compare(string(bufferClient), expected) != 0 {
-		_ = fmt.Errorf("Expected: %s, got: %s", expected, string(bufferClient))
+		log.Fatal(fmt.Errorf("Expected:\n%s\ngot:\n%s", expected, string(bufferClient)))
 	}
-	setUp()
 	// Add user Lili to an event where she already is
 	bufferClient = make([]byte, 1024)
 	cmdAddUser = "ADD Lili 1234 1 1"
@@ -179,9 +181,14 @@ func TestADDTwo(t *testing.T) {
 	if errR != nil {
 		log.Fatal(errR)
 	}
-	expected = "Festival de la bière     |Vente de ticket 0   |Logistique 1        |Securité 2          |\nnbInscrit                |1                   |3                   |0                   |\nBob                      |x                   |                    |                    |\nLeo                      |                    |x                   |                    |\nWilli                    |                    |x                   |                    |\nLili                     |                    |x                   |                    |"
+	expected = "Festival de la bière     |Vente de ticket 0   |Logistique 1        |Securité 2          |" +
+		"\nnbInscrit                |1                   |3                   |0                   |" +
+		"\nBob                      |x                   |                    |                    |" +
+		"\nLeo                      |                    |x                   |                    |" +
+		"\nWilli                    |                    |x                   |                    |" +
+		"\nLili                     |                    |x                   |                    |\n"
 	if strings.Compare(string(bufferClient), expected) != 0 {
-		_ = fmt.Errorf("Expected: %s, got: %s", expected, string(bufferClient))
+		log.Fatal(fmt.Errorf("Expected: %s\n got:\n %s", expected, string(bufferClient)))
 	}
 
 }
@@ -254,7 +261,7 @@ func TestCloseWithSuccessfulAuth(t *testing.T) {
 	}
 	expected := "Event closed"
 	if strings.Compare(string(bufferClient), expected) != 0 {
-		_ = fmt.Errorf("Expected: %s, got: %s", expected, string(bufferClient))
+		log.Fatal(fmt.Errorf("Expected: %s, got: %s", expected, string(bufferClient)))
 	}
 }
 
@@ -274,7 +281,7 @@ func TestCloseWithUnsuccessfulAuth(t *testing.T) {
 	}
 	expected := "Event couldn't be closed"
 	if strings.Compare(string(bufferClient), expected) != 0 {
-		_ = fmt.Errorf("Expected: %s, got: %s", expected, string(bufferClient))
+		log.Fatal(fmt.Errorf("Expected: %s, got: %s", expected, string(bufferClient)))
 	}
 }
 
@@ -293,8 +300,8 @@ func TestCreateEventWithUnsuccessfulAuth(t *testing.T) {
 	if errR != nil {
 		log.Fatal(errR)
 	}
-	expected := "Authentication failed"
+	expected := "Authentification failed"
 	if strings.Compare(string(bufferClient), expected) != 0 {
-		_ = fmt.Errorf("Expected: %s, got: %s", expected, string(bufferClient))
+		log.Fatal(fmt.Errorf("Expected: %s, got: %s", expected, string(bufferClient)))
 	}
 }
