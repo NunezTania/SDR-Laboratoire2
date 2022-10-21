@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"strings"
 	"testing"
 )
 
@@ -28,30 +29,43 @@ func TestLISTM(t *testing.T) {
 	}
 
 	// Create a new event
-
-	// Display all the events
-	bufferClientIn := make([]byte, 1024)
-	_, errW := conn.Write([]byte("LISTM "))
+	bufferClient := make([]byte, 1024)
+	cmdCreateEvent := "CREATE Lili 1234 FestiNeuch PostOne 2 PostTwo 4"
+	_, errW := conn.Write([]byte(cmdCreateEvent))
 	if errW != nil {
 		log.Fatal(errW)
 	}
-	_, errR := conn.Read(bufferClientIn)
+	_, errR := conn.Read(bufferClient)
+	bufferClient = bytes.Trim(bufferClient, "\x00")
+	if err != nil {
+		log.Fatal(errR)
+	}
+
+	// Display all the events
+	bufferClientIn := make([]byte, 1024)
+	_, errW = conn.Write([]byte("LISTM "))
+	if errW != nil {
+		log.Fatal(errW)
+	}
+	_, errR = conn.Read(bufferClientIn)
 	bufferClientIn = bytes.Trim(bufferClientIn, "\x00")
 	if errR != nil {
 		log.Fatal(errR)
 	}
-	if string(bufferClientIn) != "Event's id: 0, Event's name: Festival de la musique, Owner: Bob, is open:true\nEvent's id: 1, Event's name: Festival de la bière, Owner: Bob, is open:true" {
-		fmt.Println("Test failed")
-	} else {
-		fmt.Println("Test passed")
+
+	expected := "Event's id: 0, Event's name: Festival de la musique, Owner: Bob, is open:true\n" +
+		"Event's id: 1, Event's name: Festival de la bière, Owner: Bob, is open:true\n" +
+		"Event's id: 2, Event's name: FestiNeuch, Owner: Lili, is open:true\n"
+	if strings.Compare(string(bufferClientIn),
+		expected) != 0 {
+		fmt.Errorf("Expected: %s, got: %s", expected, string(bufferClientIn))
 	}
-	fmt.Println(fmt.Sprintf("%s", bufferClientIn))
 
 }
 
 // Test idea
 
-// 1. CREATE an event and do LISTM, check that the new event is there
+// DONE!!! 1. CREATE an event and do LISTM, check that the new event is there
 
 // 2. CREATE an event, ADD a staff, LISTU and check that the staff was added to the event
 
