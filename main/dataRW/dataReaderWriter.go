@@ -240,7 +240,6 @@ func listUsers(slice []string) string {
 
 // processCommand processes the command
 func processCommand(commandParameters []string) string {
-	fmt.Println("Processing in dataRW")
 	switch commandParameters[0] {
 	case "CREATE":
 		return createEvent(commandParameters[1:])
@@ -265,7 +264,9 @@ func processCommand(commandParameters []string) string {
 func HandleRWActions() {
 	createUsersAndEvents()
 	for {
+		// Blocking eventual other requests for concurrent data access
 		clientChan := <-DataChannel
+		fmt.Println("Processing RW operation")
 		// Process request
 		command := <-clientChan
 		clientChan <- []byte(processCommand(strings.Split(string(command), " ")))
