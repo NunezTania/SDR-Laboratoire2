@@ -12,7 +12,7 @@ import (
 
 const (
 	HOST = "localhost"
-	PORT = "5556"
+	PORT = "5557"
 	TYPE = "tcp"
 )
 

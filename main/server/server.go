@@ -13,7 +13,7 @@ import (
 
 const (
 	HOST = "localhost"
-	PORT = "5556"
+	PORT = "5557"
 	TYPE = "tcp"
 )
 
@@ -59,18 +59,18 @@ func Run() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		go handleRequest(conn)
+		go HandleRequest(conn)
 	}
 }
 
-// handleRequest handles the requests from the clients
-func handleRequest(conn net.Conn) {
+// HandleRequest handles the requests from the clients
+func HandleRequest(conn net.Conn) {
 	buf := make([]byte, 1024)
 	_, err := conn.Read(buf)
 	if err != nil {
 		log.Fatal(err)
 	}
-	for commandTreatment := askDataRW(buf); commandTreatment != "q"; commandTreatment = askDataRW(buf) {
+	for commandTreatment := AskDataRW(buf); commandTreatment != "q"; commandTreatment = AskDataRW(buf) {
 		fmt.Println("Handling request")
 		_, err := conn.Write([]byte(commandTreatment))
 		if err != nil {
@@ -92,8 +92,8 @@ func handleRequest(conn net.Conn) {
 	}
 }
 
-// askDataRW asks the dataRW to treat the command
-func askDataRW(commandParameters []byte) string {
+// AskDataRW asks the dataRW to treat the command
+func AskDataRW(commandParameters []byte) string {
 	clientChannel := make(chan []byte)
 	dataRW.DataChannel <- clientChannel
 	clientChannel <- commandParameters

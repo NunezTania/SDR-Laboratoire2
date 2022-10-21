@@ -4,11 +4,10 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="96597984-09df-44c3-a8c1-1f54c5238989" name="Changes" comment="capacity test">
+    <list default="true" id="96597984-09df-44c3-a8c1-1f54c5238989" name="Changes" comment="update">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main/client/client.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/client/client.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/dataRW/dataReaderWriter.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/dataRW/dataReaderWriter.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main/server/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/server/server.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/test/serverclient_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/test/serverclient_test.go" afterDir="false" />
     </list>
@@ -46,7 +45,7 @@
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;
   }
 }</component>
-  <component name="RunManager" selected="Go Build.go build SDR-Laboratoire1/main">
+  <component name="RunManager" selected="Go Test.go test SDR-Laboratoire1/test">
     <configuration name="go build SDR-Laboratoire1/main" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="SDR-Laboratoire1" />
       <working_directory value="$PROJECT_DIR$" />
@@ -56,16 +55,7 @@
       <filePath value="$PROJECT_DIR$/main/main.go" />
       <method v="2" />
     </configuration>
-    <configuration name="go build SDR-Laboratoire1/main/client" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
-      <module name="SDR-Laboratoire1" />
-      <working_directory value="$PROJECT_DIR$" />
-      <kind value="PACKAGE" />
-      <package value="SDR-Laboratoire1/main/client" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$/main/client/client.go" />
-      <method v="2" />
-    </configuration>
-    <configuration name="Test in SDR-Laboratoire1/test" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="TestADDOne in SDR-Laboratoire1/test" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="SDR-Laboratoire1" />
       <working_directory value="$PROJECT_DIR$/test" />
       <root_directory value="$PROJECT_DIR$" />
@@ -74,10 +64,10 @@
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
-      <pattern value="^\QTest\E$" />
+      <pattern value="^\QTestADDOne\E$" />
       <method v="2" />
     </configuration>
-    <configuration name="TestCapacity in SDR-Laboratoire1/test" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="TestLISTM in SDR-Laboratoire1/test" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="SDR-Laboratoire1" />
       <working_directory value="$PROJECT_DIR$/test" />
       <root_directory value="$PROJECT_DIR$" />
@@ -86,7 +76,18 @@
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
-      <pattern value="^\QTestCapacity\E$" />
+      <pattern value="^\QTestLISTM\E$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go test SDR-Laboratoire1/test (1)" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="SDR-Laboratoire1" />
+      <working_directory value="$PROJECT_DIR$/test" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="SDR-Laboratoire1/test" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
       <method v="2" />
     </configuration>
     <configuration name="go test SDR-Laboratoire1/test" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
@@ -102,11 +103,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Go Build.go build SDR-Laboratoire1/main" />
-        <item itemvalue="Go Build.go build SDR-Laboratoire1/main/client" />
         <item itemvalue="Go Test.go test SDR-Laboratoire1/test" />
-        <item itemvalue="Go Test.TestCapacity in SDR-Laboratoire1/test" />
-        <item itemvalue="Go Test.Test in SDR-Laboratoire1/test" />
+        <item itemvalue="Go Test.TestADDOne in SDR-Laboratoire1/test" />
+        <item itemvalue="Go Test.go test SDR-Laboratoire1/test (1)" />
+        <item itemvalue="Go Test.TestLISTM in SDR-Laboratoire1/test" />
+        <item itemvalue="Go Build.go build SDR-Laboratoire1/main" />
       </list>
     </recent_temporary>
   </component>
@@ -136,10 +137,10 @@
     <MESSAGE value="merging" />
     <MESSAGE value="fix convert to int" />
     <MESSAGE value="list of posts" />
-    <MESSAGE value="update" />
     <MESSAGE value="comments" />
     <MESSAGE value="capacity test" />
-    <option name="LAST_COMMIT_MESSAGE" value="capacity test" />
+    <MESSAGE value="update" />
+    <option name="LAST_COMMIT_MESSAGE" value="update" />
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>

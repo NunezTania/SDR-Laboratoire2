@@ -17,13 +17,13 @@ import (
 
 const (
 	HOST = "localhost"
-	PORT = "5556"
+	PORT = "5557"
 	TYPE = "tcp"
 )
 
 // Run the main function of the program client
 func Run() {
-	helpMenu()
+	HelpMenu()
 	conn, err := net.Dial(TYPE, HOST+":"+PORT)
 	if err != nil {
 		log.Fatal(err)
@@ -40,7 +40,7 @@ func Run() {
 
 		command = Scanner.Text()
 
-		if !processCommands(&command) {
+		if !ProcessCommands(&command) {
 			continue
 		}
 
@@ -67,8 +67,8 @@ func Run() {
 	}
 }
 
-// helpMenu displays all the commands that can be used by the user
-func helpMenu() {
+// HelpMenu displays all the commands that can be used by the user
+func HelpMenu() {
 	fmt.Println("Hello and Welcome to the Event Manager")
 	fmt.Println("Here is a list of possible commands:")
 	fmt.Println("1. CREATE")
@@ -80,8 +80,8 @@ func helpMenu() {
 	fmt.Println("7. QUIT")
 }
 
-// getUserAnswer returns the answer of the user
-func getUserAnswer() string {
+// GetUserAnswer returns the answer of the user
+func GetUserAnswer() string {
 	var answer string
 	Scanner := bufio.NewScanner(os.Stdin)
 	Scanner.Scan()
@@ -92,8 +92,8 @@ func getUserAnswer() string {
 	return answer
 }
 
-// authentificationProcess returns the login and the password of the user
-func authentificationProcess() string {
+// AuthentificationProcess returns the login and the password of the user
+func AuthentificationProcess() string {
 	fmt.Println("Please enter your username:")
 	var username string
 	Scanner := bufio.NewScanner(os.Stdin)
@@ -113,22 +113,22 @@ func authentificationProcess() string {
 	return username + " " + password
 }
 
-// processCommands returns true if the command is valid
-func processCommands(command *string) bool {
+// ProcessCommands returns true if the command is valid
+func ProcessCommands(command *string) bool {
 	switch *command {
 	case "CREATE":
-		return processCreate(command)
+		return ProcessCreate(command)
 	case "CLOSE":
-		return processClose(command)
+		return ProcessClose(command)
 	case "ADD":
-		return processAdd(command)
+		return ProcessAdd(command)
 	case "LISTM":
 		*command += " "
 		return true
 	case "LISTP":
-		return processList(command)
+		return ProcessList(command)
 	case "LISTU":
-		return processList(command)
+		return ProcessList(command)
 	case "QUIT":
 		*command += " "
 		return true
@@ -138,22 +138,22 @@ func processCommands(command *string) bool {
 	}
 }
 
-// processCreate process the creation of a new event returns true if the command is valid
-func processCreate(command *string) bool {
-	login := authentificationProcess()
+// ProcessCreate process the creation of a new event returns true if the command is valid
+func ProcessCreate(command *string) bool {
+	login := AuthentificationProcess()
 	fmt.Println("Enter the name of the event:")
-	eventName := getUserAnswer()
+	eventName := GetUserAnswer()
 	fmt.Println("Enter the posts:")
-	posts := getUserAnswer()
-	if !checkPosts(posts) || eventName == "" {
+	posts := GetUserAnswer()
+	if !CheckPosts(posts) || eventName == "" {
 		return false
 	}
 	*command += " " + login + " " + eventName + " " + posts
 	return true
 }
 
-// checkPosts verify that the posts created are valid and returns true if they are
-func checkPosts(command string) bool {
+// CheckPosts verify that the posts created are valid and returns true if they are
+func CheckPosts(command string) bool {
 	posts := strings.Split(command, " ")
 
 	// check that there is at least 2 words
@@ -176,11 +176,11 @@ func checkPosts(command string) bool {
 	return true
 }
 
-// processClose process the closure of an event returns true if the command is valid
-func processClose(command *string) bool {
-	login := authentificationProcess()
+// ProcessClose process the closure of an event returns true if the command is valid
+func ProcessClose(command *string) bool {
+	login := AuthentificationProcess()
 	fmt.Println("Enter the event id")
-	eventId := getUserAnswer()
+	eventId := GetUserAnswer()
 	if !isNumber(eventId) {
 		return false
 	}
@@ -194,13 +194,13 @@ func isNumber(x string) bool {
 	return err == nil
 }
 
-// processAdd process the addition of a staff in an event returns true if the command is valid
-func processAdd(command *string) bool {
-	login := authentificationProcess()
+// ProcessAdd process the addition of a staff in an event returns true if the command is valid
+func ProcessAdd(command *string) bool {
+	login := AuthentificationProcess()
 	fmt.Println("Enter the event id:")
-	eventId := getUserAnswer()
+	eventId := GetUserAnswer()
 	fmt.Println("Enter the post id:")
-	postId := getUserAnswer()
+	postId := GetUserAnswer()
 	if !isNumber(eventId) || !isNumber(postId) {
 		return false
 	}
@@ -208,10 +208,10 @@ func processAdd(command *string) bool {
 	return true
 }
 
-// processList process the listing command returns true if the command is valid
-func processList(command *string) bool {
+// ProcessList process the listing command returns true if the command is valid
+func ProcessList(command *string) bool {
 	fmt.Println("Enter the event id:")
-	eventId := getUserAnswer()
+	eventId := GetUserAnswer()
 	if !isNumber(eventId) {
 		return false
 	}
