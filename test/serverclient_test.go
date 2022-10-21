@@ -16,22 +16,22 @@ const (
 	TYPE = "tcp"
 )
 
-func Test(t *testing.T) {
-	TestLISTM(t)
-	TestFalseCmd(t)
-	TestADDOne(t)
-	TestADDTwo(t)
-	TestCapacity(t)
+var setup = false
+
+func setUp() {
+	if !setup {
+		go server.Run()
+		setup = true
+		conn, err = net.Dial(TYPE, HOST+":"+PORT)
+	}
 }
+
+var conn net.Conn
+var err error
 
 func TestLISTM(t *testing.T) {
 	fmt.Println("CREATE an event and do LISTM, check that the new event is there")
-	go server.Run()
-	conn, err := net.Dial(TYPE, HOST+":"+PORT)
-	if err != nil {
-		log.Fatal(err)
-	}
-
+	setUp()
 	// Create a new event
 	bufferClient := make([]byte, 1024)
 	cmdCreateEvent := "CREATE Lili 1234 FestiNeuch PostOne 2 PostTwo 4"
@@ -69,12 +69,7 @@ func TestLISTM(t *testing.T) {
 
 func TestFalseCmd(t *testing.T) {
 	fmt.Println("Test")
-	go server.Run()
-	conn, err := net.Dial(TYPE, HOST+":"+PORT)
-	if err != nil {
-		log.Fatal(err)
-	}
-
+	setUp()
 	// write the command LISTX
 	bufferClientIn := make([]byte, 1024)
 	_, errW := conn.Write([]byte("LISTX "))
@@ -95,12 +90,7 @@ func TestFalseCmd(t *testing.T) {
 
 func TestADDOne(t *testing.T) {
 	fmt.Println("CREATE an event, ADD a staff, LISTU and check that the staff was added to the event")
-	go server.Run()
-	conn, err := net.Dial(TYPE, HOST+":"+PORT)
-	if err != nil {
-		log.Fatal(err)
-	}
-
+	setUp()
 	// Create a new event
 	bufferClient := make([]byte, 1024)
 	cmdCreateEvent := "CREATE Lili 1234 FestiNeuch PostOne 2 PostTwo 4"
@@ -144,13 +134,7 @@ func TestADDOne(t *testing.T) {
 
 func TestADDTwo(t *testing.T) {
 	fmt.Println("ADD a staff to an event he already is in, check that the users is on the new post and was erase from the old post")
-
-	go server.Run()
-	conn, err := net.Dial(TYPE, HOST+":"+PORT)
-	if err != nil {
-		log.Fatal(err)
-	}
-
+	setUp()
 	// List user in even 1
 	bufferClient := make([]byte, 1024)
 	cmdAddUser := "LISTU 1"
@@ -169,7 +153,7 @@ func TestADDTwo(t *testing.T) {
 	if strings.Compare(string(bufferClient), expected) != 0 {
 		_ = fmt.Errorf("Expected: %s, got: %s", expected, string(bufferClient))
 	}
-
+	setUp()
 	// Add user Lili to an event where she already is
 	bufferClient = make([]byte, 1024)
 	cmdAddUser = "ADD Lili 1234 1 1"
@@ -202,12 +186,7 @@ func TestADDTwo(t *testing.T) {
 
 func TestCapacity(t *testing.T) {
 	fmt.Println("CREATE an event with a post capacity of 1, ADD a person, answer = the person was added, ADD an other person, the answer = \"Could not add user to post because post is full\"")
-	go server.Run()
-	conn, err := net.Dial(TYPE, HOST+":"+PORT)
-	if err != nil {
-		log.Fatal(err)
-	}
-
+	setUp()
 	// Create a new event
 	bufferClient := make([]byte, 1024)
 	cmdCreateEvent := "CREATE Willi 1234 PartySound Vente 1"
@@ -222,7 +201,67 @@ func TestCapacity(t *testing.T) {
 	}
 
 	// Add a staff
+}
 
+func TestCloseWithSuccessfulAuth(t *testing.T) {
+	fmt.Println("CLOSE an event with a successful authentification")
+	setUp()
+	bufferClient := make([]byte, 1024)
+	cmdAddUser := "CLOSE Bob 1234 1"
+	_, errW := conn.Write([]byte(cmdAddUser))
+	if errW != nil {
+		log.Fatal(errW)
+	}
+	_, errR := conn.Read(bufferClient)
+	bufferClient = bytes.Trim(bufferClient, "\x00")
+	if errR != nil {
+		log.Fatal(errR)
+	}
+	expected := "Event closed"
+	if strings.Compare(string(bufferClient), expected) != 0 {
+		_ = fmt.Errorf("Expected: %s, got: %s", expected, string(bufferClient))
+	}
+}
+
+func TestCloseWithUnsuccessfulAuth(t *testing.T) {
+	fmt.Println("CLOSE an event with an unsuccessful authentification")
+	setUp()
+	bufferClient := make([]byte, 1024)
+	cmdAddUser := "CLOSE T 1234 1"
+	_, errW := conn.Write([]byte(cmdAddUser))
+	if errW != nil {
+		log.Fatal(errW)
+	}
+	_, errR := conn.Read(bufferClient)
+	bufferClient = bytes.Trim(bufferClient, "\x00")
+	if errR != nil {
+		log.Fatal(errR)
+	}
+	expected := "Event couldn't be closed"
+	if strings.Compare(string(bufferClient), expected) != 0 {
+		_ = fmt.Errorf("Expected: %s, got: %s", expected, string(bufferClient))
+	}
+}
+
+func TestCreateEventWithUnsuccessfulAuth(t *testing.T) {
+	fmt.Println("CREATE an event with an unsuccessful authentification")
+	setUp()
+
+	bufferClient := make([]byte, 1024)
+	cmdAddUser := "CREATE Anon pwd PartySound Vente 1"
+	_, errW := conn.Write([]byte(cmdAddUser))
+	if errW != nil {
+		log.Fatal(errW)
+	}
+	_, errR := conn.Read(bufferClient)
+	bufferClient = bytes.Trim(bufferClient, "\x00")
+	if errR != nil {
+		log.Fatal(errR)
+	}
+	expected := "Authentication failed"
+	if strings.Compare(string(bufferClient), expected) != 0 {
+		_ = fmt.Errorf("Expected: %s, got: %s", expected, string(bufferClient))
+	}
 }
 
 // Test idea
@@ -237,8 +276,8 @@ func TestCapacity(t *testing.T) {
 
 // 4. CREATE an event with a post capacity of 1, ADD a person, answer = the person was added, ADD an other person, the answer = "Could not add user to post because post is full"
 
-// 5. CLOSE an event with the authentification of the owner, answer should be = "Event closed"
+// DONE 5. CLOSE an event with the authentification of the owner, answer should be = "Event closed"
 
-// 6. CLOSE an event with the authentification of someone else than the owner = "Event couldn't be closed"
+// DONE 6. CLOSE an event with the authentification of someone else than the owner = "Event couldn't be closed"
 
 // 7. CREATE an event with the wrong authentification, answer should be = "Authentication failed"
