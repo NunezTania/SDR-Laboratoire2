@@ -10,7 +10,7 @@ Afin d'utiliser notre programme, il faut cloner le repository github puis lancer
 
 Pour ce faire, ouvrez un terminal à la racine du projet. Lancez le serveur à l'aide de la commande 
 ```go run ./main/main.go server```.
-Lancez le client à l'aide de la commande ```go run ./main/main.go client```
+Lancez le client à l'aide de la commande ```go run ./main/main.go client```.
 
 Afin d'arrêter le client, il vous suffit d'entrer la commande ```QUIT``` lors de son exécution.
 Afin d'arrêter le server, il faut effectuer un CTRL+C puisqu'il consiste en une boucle infinie à l'écoute de connexions
@@ -33,9 +33,14 @@ Notre application permet de faire les actions suivantes :
 - Quitter l'application
 
 ### Fonctionnalités non réalisées
+
 Pour ce travail, il était demandé de charger les utilisateurs et événements depuis un fichier de configuration. Notre
 programme possède ces données directement dans la classe dataReaderWriter sous forme de tableau d'utilisateur et
 d'événements.
 Concernant la possibilité de tester l'accès concurrent aux données manuellement, nous l'avons fait en utilisant des 
 breakpoints placés au point critique (par exemple, lorsque quelqu'un crée un event) puis en exécutant un deuxième client
-essayant d'effectuer une lecture ou écriture.
+essayant d'effectuer une lecture ou écriture. Il est possible d'ajouter un ``sleep(x)`` dans le dataReaderWriter afin de
+bloquer le processus le temps de lancer un autre client et d'essayer d'accéder aux données.
+
+Nous n'avons également pas testé le lancement du server avec un autre hôte que localhost, dès lors la connexion depuis
+un autre ordinateur peut ne pas être fonctionnel.
