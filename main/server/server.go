@@ -54,7 +54,6 @@ func Run() {
 	}
 	fmt.Println("Server is listening on port 8080")
 	defer listen.Close()
-	createUsersAndEvents()
 	for {
 		conn, err := listen.Accept()
 		if err != nil {
@@ -100,31 +99,4 @@ func askDataRW(commandParameters []byte) string {
 	clientChannel <- commandParameters
 	response := <-clientChannel
 	return string(response)
-}
-
-// createUsersAndEvents creates some users and some events
-func createUsersAndEvents() {
-	// creation of users
-	users = append(users, User{"Bob", "1234"})
-	users = append(users, User{"Lea", "1234"})
-	users = append(users, User{"Leo", "1234"})
-	users = append(users, User{"Willi", "1234"})
-	users = append(users, User{"Lili", "1234"})
-	users = append(users, User{"T", "1234"})
-	// creation of posts
-	posts = append(posts, Post{postCounter, "Bar à bière", 3, 0, users[0:1]})
-	postCounter++
-	posts = append(posts, Post{postCounter, "Securité", 2, 0, users[2:4]})
-	postCounter++
-	posts = append(posts, Post{postCounter, "Vente de ticket", 5, 1, users[0:1]})
-	postCounter++
-	posts = append(posts, Post{postCounter, "Logistique", 1, 1, users[2:4]})
-	postCounter++
-	posts = append(posts, Post{postCounter, "Securité", 2, 1, users[4:5]})
-	postCounter++
-	// creation of events
-	events = append(events, Event{eventCounter, "Festival de la musique", users[0], true, posts[0:2]})
-	eventCounter++
-	events = append(events, Event{eventCounter, "Festival de la bière", users[0], true, posts[2:5]})
-	eventCounter++
 }
