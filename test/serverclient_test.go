@@ -57,9 +57,9 @@ func TestLISTM(t *testing.T) {
 		log.Fatal(errR)
 	}
 
-	expected := "Event's id: 0, Event's name: Festival de la musique, Owner: Bob, is open:true\n" +
+	expected := fmt.Sprintln("Event's id: 0, Event's name: Festival de la musique, Owner: Bob, is open:true\n" +
 		"Event's id: 1, Event's name: Festival de la bière, Owner: Bob, is open:true\n" +
-		"Event's id: 2, Event's name: FestiNeuch, Owner: Lili, is open:true\n"
+		"Event's id: 2, Event's name: FestiNeuch, Owner: Lili, is open:true")
 	if strings.Compare(string(bufferClientIn),
 		expected) != 0 {
 		log.Fatal(fmt.Errorf("Expected: %s, got: %s", expected, string(bufferClientIn)))
@@ -148,12 +148,13 @@ func TestADDTwo(t *testing.T) {
 		log.Fatal(errR)
 	}
 
-	expected := "Festival de la bière     |Vente de ticket 0   |Logistique 1        |Securité 2          |" +
-		"\nnbInscrit                |1                   |2                   |1                   |" +
-		"\nBob                      |x                   |                    |                    |" +
-		"\nLeo                      |                    |x                   |                    |" +
-		"\nWilli                    |                    |x                   |                    |" +
-		"\nLili                     |                    |                    |x                   |\n"
+	expected := fmt.Sprintln(
+		"Festival de la bière     |Vente de ticket 0   |Logistique 1        |Securité 2          |" +
+			"\nnbInscrit                |1                   |2                   |1                   |" +
+			"\nBob                      |x                   |                    |                    |" +
+			"\nLeo                      |                    |x                   |                    |" +
+			"\nWilli                    |                    |x                   |                    |" +
+			"\nLili                     |                    |                    |x                   |")
 
 	if strings.Compare(string(bufferClient), expected) != 0 {
 		log.Fatal(fmt.Errorf("Expected:\n%s\ngot:\n%s", expected, string(bufferClient)))
@@ -181,12 +182,12 @@ func TestADDTwo(t *testing.T) {
 	if errR != nil {
 		log.Fatal(errR)
 	}
-	expected = "Festival de la bière     |Vente de ticket 0   |Logistique 1        |Securité 2          |" +
+	expected = fmt.Sprintln("Festival de la bière     |Vente de ticket 0   |Logistique 1        |Securité 2          |" +
 		"\nnbInscrit                |1                   |3                   |0                   |" +
 		"\nBob                      |x                   |                    |                    |" +
 		"\nLeo                      |                    |x                   |                    |" +
 		"\nWilli                    |                    |x                   |                    |" +
-		"\nLili                     |                    |x                   |                    |\n"
+		"\nLili                     |                    |x                   |                    |")
 	if strings.Compare(string(bufferClient), expected) != 0 {
 		log.Fatal(fmt.Errorf("Expected: %s\n got:\n %s", expected, string(bufferClient)))
 	}
