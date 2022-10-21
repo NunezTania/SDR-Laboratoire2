@@ -1,3 +1,6 @@
+// The client package contains the client of the program.
+// It is used to communicate with the server.
+// And can be used to create, close, add and list events.
 package main
 
 import (

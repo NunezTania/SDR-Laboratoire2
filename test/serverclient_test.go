@@ -1,3 +1,6 @@
+// The test package contains the tests of the program.
+// It acts as a client and sends commands to the server.
+// The server will then process the commands and send back the result.
 package test
 
 import (

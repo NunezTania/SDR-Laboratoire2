@@ -1,3 +1,6 @@
+// The package dataRW contains the functions to read and write data
+// It allows to create events, close events, list events and add users to posts
+// All of these actions are concurrency safe
 package dataRW
 
 import (
