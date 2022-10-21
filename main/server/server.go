@@ -7,8 +7,10 @@ package server
 import (
 	"SDR-Laboratoire1/main/dataRW"
 	"fmt"
+	"gopkg.in/yaml.v3"
 	"log"
 	"net"
+	"os"
 )
 
 const (
@@ -19,6 +21,12 @@ const (
 
 var eventCounter = 0
 var postCounter = 0
+
+type conf struct {
+	NServ int    `yaml:"nServ"`
+	Port  int    `yaml:"port"`
+	Host  string `yaml:"host"`
+}
 
 type Event struct {
 	id     int
@@ -99,4 +107,20 @@ func AskDataRW(commandParameters []byte) string {
 	clientChannel <- commandParameters
 	response := <-clientChannel
 	return string(response)
+}
+
+func ReadConfigFile() conf {
+	yamlFile, err := os.ReadFile("./main/server/config.yaml")
+	if err != nil {
+		log.Printf("yamlFile.Get err   #%v ", err)
+	}
+	var c conf
+	err = yaml.Unmarshal(yamlFile, &c)
+	if err != nil {
+		log.Fatalf("Unmarshal: %v", err)
+	}
+	if err != nil {
+		log.Fatal(err)
+	}
+	return c
 }
