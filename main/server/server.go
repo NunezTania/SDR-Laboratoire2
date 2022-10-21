@@ -1,8 +1,9 @@
+package server
+
 // The server package contains the server of the program.
 // It is used to communicate with the client.
 // And can be used to create, close, add and list events.
 // In order to manage data, it uses the dataRW package.
-package main
 
 import (
 	"SDR-Laboratoire1/main/dataRW"
@@ -13,7 +14,7 @@ import (
 
 const (
 	HOST = "localhost"
-	PORT = "8080"
+	PORT = "5555"
 	TYPE = "tcp"
 )
 
@@ -45,8 +46,8 @@ var events []Event
 var posts []Post
 var users []User
 
-// main function of the server
-func main() {
+// Run function of the server
+func Run() {
 	go dataRW.HandleRWActions()
 	listen, err := net.Listen(TYPE, HOST+":"+PORT)
 	if err != nil {
