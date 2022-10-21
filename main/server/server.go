@@ -45,7 +45,7 @@ var events []Event
 var posts []Post
 var users []User
 
-// Run function of the server
+// Run the main function of the server
 func Run() {
 	go dataRW.HandleRWActions()
 	listen, err := net.Listen(TYPE, HOST+":"+PORT)

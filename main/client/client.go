@@ -21,7 +21,7 @@ const (
 	TYPE = "tcp"
 )
 
-// Run function of the program client
+// Run the main function of the program client
 func Run() {
 	helpMenu()
 	conn, err := net.Dial(TYPE, HOST+":"+PORT)

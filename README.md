@@ -1,6 +1,6 @@
 # Programmation répartie 
 ## Laboratoire 1
-### Auteurs 
+### Auteures 
 Tania Nunez, Magali Egger
 ### Introduction
 Ce laboratoire concerne le développement d'une petite application client/server permettant la 
