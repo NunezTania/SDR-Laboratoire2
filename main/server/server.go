@@ -2,7 +2,7 @@
 // It is used to communicate with the client.
 // And can be used to create, close, add and list events.
 // In order to manage data, it uses the dataRW package.
-package server
+package main
 
 import (
 	"SDR-Laboratoire1/main/dataRW"
@@ -11,7 +11,20 @@ import (
 	"log"
 	"net"
 	"os"
+	"strconv"
 )
+
+type conf struct {
+	NServ int    `yaml:"nServ"`
+	Port  int    `yaml:"port"`
+	Host  string `yaml:"host"`
+	Type  string `yaml:"type"`
+}
+
+// create an attribute number for the server
+var serverNumber int
+
+/*
 
 const (
 	HOST = "localhost"
@@ -21,12 +34,6 @@ const (
 
 var eventCounter = 0
 var postCounter = 0
-
-type conf struct {
-	NServ int    `yaml:"nServ"`
-	Port  int    `yaml:"port"`
-	Host  string `yaml:"host"`
-}
 
 type Event struct {
 	id     int
@@ -52,15 +59,27 @@ type User struct {
 var events []Event
 var posts []Post
 var users []User
+*/
+
+func main() {
+	number, _ := strconv.Atoi(os.Args[1])
+	Run(number)
+}
 
 // Run the main function of the server
-func Run() {
+func Run(number int) {
+	serverNumber = number
+
 	go dataRW.HandleRWActions()
-	listen, err := net.Listen(TYPE, HOST+":"+PORT)
+
+	// use the yaml file to get the configuration
+	config := ReadConfigFile()
+	listen, err := net.Listen(config.Type, config.Host+":"+strconv.Itoa(config.Port))
+
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("Server is listening on port 8080")
+	fmt.Println("Server is listening")
 	defer listen.Close()
 	for {
 		conn, err := listen.Accept()
@@ -110,7 +129,7 @@ func AskDataRW(commandParameters []byte) string {
 }
 
 func ReadConfigFile() conf {
-	yamlFile, err := os.ReadFile("./main/server/config.yaml")
+	yamlFile, err := os.ReadFile("./config.yaml")
 	if err != nil {
 		log.Printf("yamlFile.Get err   #%v ", err)
 	}
