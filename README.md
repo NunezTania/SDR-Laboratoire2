@@ -32,6 +32,17 @@ Notre application permet de faire les actions suivantes :
 - Fermer un événement (nécessite d'être authentifié)
 - Quitter l'application
 
+### Explications des commandes 
+L'utilisateur peut entrer les commandes suivantes :
+- ```ADD``` : permet à un utilisateur de s'inscrire à un poste dans un événement. Cette commande nécessite une authentification, ainsi que de préciser le numéro de la manifestation et le numéro du poste.
+- ```LISTM``` : permet de lister les manifestations.
+- ```LISTP``` : permet de lister les postes d'une manifestation donnée, en précisant le numéro de la manifestation.
+- ```LISTU``` : permet de lister les bénévoles ainsi que les postes auquel ils appartiennent d'un événement donné. Il est nécessaire de préciser le numéro de la manifestation.
+- ```CREATE``` : permet de créer un événement. Cette commande nécessite une authentification, ainsi que de préciser le nom de la manifestation, le nom de chaque poste suivie de sa capacité.
+- ```CLOSE``` : permet de fermer un événement. Cette commande nécessite une authentification et de préciser le numéro de la manifestation.
+
+
+
 ### Fonctionnalités non réalisées
 
 Pour ce travail, il était demandé de charger les utilisateurs et événements depuis un fichier de configuration. Notre

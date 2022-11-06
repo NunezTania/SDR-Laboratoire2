@@ -21,6 +21,10 @@ const (
 	TYPE = "tcp"
 )
 
+func main() {
+	Run()
+}
+
 // Run the main function of the program client
 func Run() {
 	HelpMenu()
