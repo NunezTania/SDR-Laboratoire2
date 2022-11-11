@@ -4,9 +4,11 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="96597984-09df-44c3-a8c1-1f54c5238989" name="Changes" comment="update readme and add file progress">
-      <change afterPath="$PROJECT_DIR$/main/server/Lamport.go" afterDir="false" />
+    <list default="true" id="96597984-09df-44c3-a8c1-1f54c5238989" name="Changes" comment="add of lamport clock">
+      <change afterPath="$PROJECT_DIR$/main/server/network.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/server/Lamport.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/server/lamportClock.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/server/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/server/server.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -47,7 +49,8 @@
     "go.import.settings.migrated": "true",
     "go.sdk.automatically.set": "true",
     "last_opened_file_path": "C:/Users/magal",
-    "nodejs_package_manager_path": "npm"
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.lookFeel"
   }
 }]]></component>
   <component name="RunManager" selected="Go Build.go build SDR-Laboratoire1/main/server">
@@ -147,7 +150,8 @@
     <MESSAGE value="update" />
     <MESSAGE value="add the number for each server" />
     <MESSAGE value="update readme and add file progress" />
-    <option name="LAST_COMMIT_MESSAGE" value="update readme and add file progress" />
+    <MESSAGE value="add of lamport clock" />
+    <option name="LAST_COMMIT_MESSAGE" value="add of lamport clock" />
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>

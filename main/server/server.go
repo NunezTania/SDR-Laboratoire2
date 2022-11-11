@@ -59,12 +59,13 @@ type User struct {
 var events []Event
 var posts []Post
 var users []User
-*/
+
 
 func main() {
 	number, _ := strconv.Atoi(os.Args[1])
 	Run(number)
 }
+*/
 
 // Run the main function of the server
 func Run(number int) {
