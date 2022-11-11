@@ -7,10 +7,8 @@ package main
 import (
 	"SDR-Laboratoire1/main/dataRW"
 	"fmt"
-	"gopkg.in/yaml.v3"
 	"log"
 	"net"
-	"os"
 	"strconv"
 )
 
@@ -73,13 +71,15 @@ func Run(number int) {
 
 	go dataRW.HandleRWActions()
 
+	// todo change to listen client
 	// use the yaml file to get the configuration
-	config := ReadConfigFile()
+	//config := ReadConfigFile()
 	listen, err := net.Listen(config.Type, config.Host+":"+strconv.Itoa(config.Port))
 
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	fmt.Println("Server is listening")
 	defer listen.Close()
 	for {
@@ -127,20 +127,4 @@ func AskDataRW(commandParameters []byte) string {
 	clientChannel <- commandParameters
 	response := <-clientChannel
 	return string(response)
-}
-
-func ReadConfigFile() conf {
-	yamlFile, err := os.ReadFile("./config.yaml")
-	if err != nil {
-		log.Printf("yamlFile.Get err   #%v ", err)
-	}
-	var c conf
-	err = yaml.Unmarshal(yamlFile, &c)
-	if err != nil {
-		log.Fatalf("Unmarshal: %v", err)
-	}
-	if err != nil {
-		log.Fatal(err)
-	}
-	return c
 }
