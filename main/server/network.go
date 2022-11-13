@@ -9,14 +9,6 @@ import (
 	"strings"
 )
 
-// this class is used to manage the communication between all the servers
-// it uses the Lamport clock to manage the time
-// the critical section is the dataRW package
-
-// the server need to send a request if the want to enter in critical section
-// the server need to send a release if the want to leave the critical section
-// the server will send a acknowledgement ACK if it receive a request
-
 type conf struct {
 	NServ int    `yaml:"nServ"`
 	Port  int    `yaml:"port"`
@@ -29,8 +21,7 @@ var err error
 var nbServ int
 var id int
 
-// init the Lamport clock
-func initialisation(identifier int) {
+func Initialisation(identifier int) {
 	id = identifier
 	config := ReadConfigFile()
 	nbServ = config.NServ
@@ -51,19 +42,31 @@ func initialisation(identifier int) {
 }
 
 func handleMessage(buf []byte) {
-	var request = strToMessage(string(buf))
-	if request.rType == "req" {
-		clock = clock.Update(request.time)
-		var r = Request{"ack", clock, id}
-		SendMessageTo(request.id, r)
-		// todo add the new message in the mutex array
+	var msg = strToMessage(string(buf))
+	if msg.rType == "req" {
+		clock = clock.Update(msg.time)
+		NoteNewMessage(msg, msg.id)
+		var r = Message{"ack", clock, id}
+		SendMessageTo(msg.id, r)
 
-	} else if request.rType == "rel" {
-		clock = clock.Update(request.time)
+	} else if msg.rType == "rel" {
+		clock = clock.Update(msg.time)
+		NoteNewMessage(msg, msg.id)
 
-	} else if request.rType == "ack" {
-		// todo
+	} else if msg.rType == "ack" {
+		clock = clock.Update(msg.time)
+		NoteNewMessage(msg, msg.id)
 	}
+}
+
+func sendRequests(clock Lamport) {
+	var request = Message{"req", clock, id}
+	SendToAll(request)
+}
+
+func sendReleases(clock Lamport) {
+	var request = Message{"rel", clock, id}
+	SendToAll(request)
 }
 
 func ReadConfigFile() conf {
@@ -82,8 +85,8 @@ func ReadConfigFile() conf {
 	return c
 }
 
-func strToMessage(str string) Request {
-	var request Request
+func strToMessage(str string) Message {
+	var request Message
 	var args = strings.Split(str, " ")
 	request.rType = args[0]
 	request.time = strToLamport(args[1])
@@ -91,11 +94,11 @@ func strToMessage(str string) Request {
 	return request
 }
 
-func MessageToStr(request Request) string {
+func MessageToStr(request Message) string {
 	return request.rType + " " + strconv.Itoa(request.time.counterTime) + " " + strconv.Itoa(request.id)
 }
 
-func SendMessageTo(id int, request Request) {
+func SendMessageTo(id int, request Message) {
 	msg := MessageToStr(request)
 	var currConn net.Conn
 	currConn, err = net.Dial("tcp", "localhost:"+strconv.Itoa(8000+id))
@@ -106,7 +109,7 @@ func SendMessageTo(id int, request Request) {
 	_, err = currConn.Write([]byte(msg))
 }
 
-func SendToAll(request Request) {
+func SendToAll(request Message) {
 	for i := 0; i < nbServ; i++ {
 		if i != id {
 			SendMessageTo(i, request)

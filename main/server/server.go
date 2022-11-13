@@ -9,20 +9,12 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"os"
 	"strconv"
 )
 
-type conf struct {
-	NServ int    `yaml:"nServ"`
-	Port  int    `yaml:"port"`
-	Host  string `yaml:"host"`
-	Type  string `yaml:"type"`
-}
-
-// create an attribute number for the server
-var serverNumber int
-
-/*
+var srvNumber int
+var countSrv = 0
 
 const (
 	HOST = "localhost"
@@ -30,51 +22,26 @@ const (
 	TYPE = "tcp"
 )
 
-var eventCounter = 0
-var postCounter = 0
-
-type Event struct {
-	id     int
-	name   string
-	owner  User
-	isOpen bool
-	posts  []Post
-}
-
-type Post struct {
-	id       int
-	name     string
-	capacity int
-	eventId  int
-	staff    []User
-}
-
-type User struct {
-	name     string
-	password string
-}
-
-var events []Event
-var posts []Post
-var users []User
-
-
 func main() {
-	number, _ := strconv.Atoi(os.Args[1])
-	Run(number)
+	// check if an argument is given
+	if len(os.Args) < 2 {
+		srvNumber = countSrv
+		countSrv++
+	} else {
+		srvNumber, _ = strconv.Atoi(os.Args[1])
+	}
+	Launch()
 }
-*/
 
-// Run the main function of the server
-func Run(number int) {
-	serverNumber = number
+// Launch the main function of the server
+func Launch() {
+
+	Initialisation(srvNumber)
+	// todo doit attendre que les autres serveurs soient prêts
 
 	go dataRW.HandleRWActions()
 
-	// todo change to listen client
-	// use the yaml file to get the configuration
-	//config := ReadConfigFile()
-	listen, err := net.Listen(config.Type, config.Host+":"+strconv.Itoa(config.Port))
+	listen, err := net.Listen(TYPE, HOST+":"+PORT)
 
 	if err != nil {
 		log.Fatal(err)

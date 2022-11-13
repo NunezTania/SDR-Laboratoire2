@@ -4,10 +4,9 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="96597984-09df-44c3-a8c1-1f54c5238989" name="Changes" comment="some changes">
-      <change afterPath="$PROJECT_DIR$/main/server/mutex.go" afterDir="false" />
+    <list default="true" id="96597984-09df-44c3-a8c1-1f54c5238989" name="Changes" comment="avancement">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main/server/lamportClock.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/server/lamportClock.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/server/mutex.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/server/mutex.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main/server/network.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/server/network.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main/server/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/server/server.go" afterDir="false" />
     </list>
@@ -153,7 +152,8 @@
     <MESSAGE value="update readme and add file progress" />
     <MESSAGE value="add of lamport clock" />
     <MESSAGE value="some changes" />
-    <option name="LAST_COMMIT_MESSAGE" value="some changes" />
+    <MESSAGE value="avancement" />
+    <option name="LAST_COMMIT_MESSAGE" value="avancement" />
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>
