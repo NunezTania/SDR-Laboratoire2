@@ -9,12 +9,8 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"os"
 	"strconv"
 )
-
-var srvNumber int
-var countSrv = 0
 
 const (
 	HOST = "localhost"
@@ -22,26 +18,33 @@ const (
 	TYPE = "tcp"
 )
 
+var Identifier int
+
 func main() {
-	// check if an argument is given
-	if len(os.Args) < 2 {
-		srvNumber = countSrv
-		countSrv++
-	} else {
-		srvNumber, _ = strconv.Atoi(os.Args[1])
+	numberServer := 2
+
+	for i := 0; i < numberServer; i++ {
+		go Launch(i)
 	}
-	Launch()
+	for {
+	}
 }
 
-// Launch the main function of the server
-func Launch() {
+func Launch(idServer int) {
+	fmt.Println("id from launch : ", idServer)
+	Identifier = idServer
+	//WaitForEveryBody()
+	StartClock()
+	go RunBtwServer()
+	go RunBtwClient()
+}
 
-	Initialisation(srvNumber)
-	// todo doit attendre que les autres serveurs soient prêts
+func RunBtwClient() {
 
 	go dataRW.HandleRWActions()
-
-	listen, err := net.Listen(TYPE, HOST+":"+PORT)
+	port := strconv.Itoa(5557 + Identifier)
+	fmt.Println("port : ", port)
+	listen, err := net.Listen(TYPE, HOST+":"+port)
 
 	if err != nil {
 		log.Fatal(err)
@@ -89,9 +92,23 @@ func HandleRequest(conn net.Conn) {
 
 // AskDataRW asks the dataRW to treat the command
 func AskDataRW(commandParameters []byte) string {
+	waitForSC()
 	clientChannel := make(chan []byte)
 	dataRW.DataChannel <- clientChannel
 	clientChannel <- commandParameters
 	response := <-clientChannel
+	leaveSC()
+	if dataRW.DataModified {
+		SendDataSyncToAll(commandParameters)
+	}
 	return string(response)
+}
+
+func waitForSC() {
+	AskForSC()
+	<-ChannelSc
+}
+
+func leaveSC() {
+	FreeSC()
 }

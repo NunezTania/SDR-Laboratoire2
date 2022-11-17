@@ -11,6 +11,7 @@ import (
 )
 
 var DataChannel = make(chan chan []byte)
+var DataModified = false
 
 type Event struct {
 	id     int
@@ -242,18 +243,25 @@ func ListUsers(slice []string) string {
 func ProcessCommand(commandParameters []string) string {
 	switch commandParameters[0] {
 	case "CREATE":
+		DataModified = true
 		return CreateEvent(commandParameters[1:])
 	case "CLOSE":
+		DataModified = true
 		return CloseEvent(commandParameters[1:])
 	case "ADD":
+		DataModified = true
 		return AddBenevole(commandParameters[1:])
 	case "LISTM":
+		DataModified = false
 		return ListEvents()
 	case "LISTP":
+		DataModified = false
 		return ListPosts(commandParameters[1:])
 	case "LISTU":
+		DataModified = false
 		return ListUsers(commandParameters[1:])
 	case "QUIT":
+		DataModified = false
 		return "q"
 	default:
 		return "Command not found"

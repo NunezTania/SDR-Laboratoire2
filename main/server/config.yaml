@@ -1,4 +1,4 @@
 nServ: 3
-port: 8000
+port: 6060
 host: "localhost"
 type: "tcp"
