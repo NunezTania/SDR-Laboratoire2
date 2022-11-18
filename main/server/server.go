@@ -18,10 +18,8 @@ const (
 	TYPE = "tcp"
 )
 
-var Identifier int
-
 func main() {
-	numberServer := 2
+	numberServer := 3
 
 	for i := 0; i < numberServer; i++ {
 		go Launch(i)
@@ -32,17 +30,16 @@ func main() {
 
 func Launch(idServer int) {
 	fmt.Println("id from launch : ", idServer)
-	Identifier = idServer
-	//WaitForEveryBody()
+	WaitForEveryBody(idServer)
 	StartClock()
-	go RunBtwServer()
-	go RunBtwClient()
+	go RunBtwServer(idServer)
+	go RunBtwClient(idServer)
 }
 
-func RunBtwClient() {
+func RunBtwClient(id int) {
 
 	go dataRW.HandleRWActions()
-	port := strconv.Itoa(5557 + Identifier)
+	port := strconv.Itoa(5557 + id)
 	fmt.Println("port : ", port)
 	listen, err := net.Listen(TYPE, HOST+":"+port)
 
@@ -57,18 +54,18 @@ func RunBtwClient() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		go HandleRequest(conn)
+		go HandleRequest(conn, id)
 	}
 }
 
 // HandleRequest handles the requests from the clients
-func HandleRequest(conn net.Conn) {
+func HandleRequest(conn net.Conn, id int) {
 	buf := make([]byte, 1024)
 	_, err := conn.Read(buf)
 	if err != nil {
 		log.Fatal(err)
 	}
-	for commandTreatment := AskDataRW(buf); commandTreatment != "q"; commandTreatment = AskDataRW(buf) {
+	for commandTreatment := AskDataRW(buf, id); commandTreatment != "q"; commandTreatment = AskDataRW(buf, id) {
 		fmt.Println("Handling request")
 		_, err := conn.Write([]byte(commandTreatment))
 		if err != nil {
@@ -91,24 +88,24 @@ func HandleRequest(conn net.Conn) {
 }
 
 // AskDataRW asks the dataRW to treat the command
-func AskDataRW(commandParameters []byte) string {
-	waitForSC()
+func AskDataRW(commandParameters []byte, id int) string {
+	waitForSC(id)
 	clientChannel := make(chan []byte)
 	dataRW.DataChannel <- clientChannel
 	clientChannel <- commandParameters
 	response := <-clientChannel
-	leaveSC()
+	leaveSC(id)
 	if dataRW.DataModified {
-		SendDataSyncToAll(commandParameters)
+		SendDataSyncToAll(commandParameters, id)
 	}
 	return string(response)
 }
 
-func waitForSC() {
-	AskForSC()
+func waitForSC(id int) {
+	AskForSC(id)
 	<-ChannelSc
 }
 
-func leaveSC() {
-	FreeSC()
+func leaveSC(id int) {
+	FreeSC(id)
 }

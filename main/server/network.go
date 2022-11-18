@@ -21,14 +21,14 @@ type conf struct {
 var err error
 var nbServ int
 
-func RunBtwServer() {
+func RunBtwServer(id int) {
 	config := ReadConfigFile()
 	nbServ = config.NServ
-	listenConn, err := net.Listen(config.Type, config.Host+":"+strconv.Itoa(config.Port+Identifier))
+	listenConn, err := net.Listen(config.Type, config.Host+":"+strconv.Itoa(config.Port+id))
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("id in run btw server", Identifier)
+	fmt.Println("id in run btw server", id)
 
 	for {
 		conn, err := listenConn.Accept()
@@ -37,11 +37,11 @@ func RunBtwServer() {
 		}
 		buf := make([]byte, 1024)
 		_, err = conn.Read(buf)
-		go handleMessage(buf)
+		go handleMessage(buf, id)
 	}
 }
 
-func handleMessage(buf []byte) {
+func handleMessage(buf []byte, id int) {
 
 	var res = strings.Split(string(buf), " ")
 
@@ -53,29 +53,29 @@ func handleMessage(buf []byte) {
 		var msg = strToMessage(string(buf))
 		if msg.rType == "req" {
 			clock = clock.Update(msg.time)
-			NoteNewMessage(msg, msg.id)
-			var r = Message{"ack", clock, Identifier}
+			NoteNewMessage(msg, msg.id, id)
+			var r = Message{"ack", clock, id}
 			SendMessageTo(msg.id, r)
 
 		} else if msg.rType == "rel" {
 			clock = clock.Update(msg.time)
-			NoteNewMessage(msg, msg.id)
+			NoteNewMessage(msg, msg.id, id)
 
 		} else if msg.rType == "ack" {
 			clock = clock.Update(msg.time)
-			NoteNewMessage(msg, msg.id)
+			NoteNewMessage(msg, msg.id, id)
 		}
 	}
 }
 
-func sendRequests(clock Lamport) {
-	var request = Message{"req", clock, Identifier}
-	SendToAll(request)
+func sendRequests(clock Lamport, id int) {
+	var request = Message{"req", clock, id}
+	SendToAll(request, id)
 }
 
-func sendReleases(clock Lamport) {
-	var request = Message{"rel", clock, Identifier}
-	SendToAll(request)
+func sendReleases(clock Lamport, id int) {
+	var request = Message{"rel", clock, id}
+	SendToAll(request, id)
 }
 
 func ReadConfigFile() conf {
@@ -110,8 +110,8 @@ func MessageToStr(request Message) string {
 func SendMessageTo(id int, request Message) {
 	msg := MessageToStr(request)
 	var currConn net.Conn
-	currConn, err = net.Dial("tcp", "localhost:"+strconv.Itoa(6060+id))
-	defer currConn.Close()
+	currConn, err = net.Dial("tcp", "localhost:"+strconv.Itoa(2500+id))
+	//defer currConn.Close()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -120,7 +120,7 @@ func SendMessageTo(id int, request Message) {
 
 func SendDataSyncTo(id int, data []byte) {
 	var currConn net.Conn
-	currConn, err = net.Dial("tcp", "localhost:"+strconv.Itoa(6060+id))
+	currConn, err = net.Dial("tcp", "localhost:"+strconv.Itoa(2500+id))
 	defer currConn.Close()
 	if err != nil {
 		log.Fatal(err)
@@ -128,33 +128,33 @@ func SendDataSyncTo(id int, data []byte) {
 	_, err = currConn.Write(data)
 }
 
-func SendToAll(request Message) {
+func SendToAll(request Message, id int) {
 	for i := 0; i < nbServ; i++ {
-		if i != Identifier {
+		if i != id {
 			SendMessageTo(i, request)
 		}
 	}
 }
 
-func SendDataSyncToAll(command []byte) {
+func SendDataSyncToAll(command []byte, id int) {
 	msg := append([]byte("data "), command...)
 	for i := 0; i < nbServ; i++ {
-		if i != Identifier {
+		if i != id {
 			SendDataSyncTo(i, msg)
 		}
 	}
 }
 
-func WaitForEveryBody() {
+func WaitForEveryBody(id int) {
 	fmt.Println("Waiting for every body to be ready")
-	fmt.Println("my id is ", Identifier)
+	fmt.Println("my id is ", id)
 	msg := "ready"
 	var listenConn net.Listener
 
 	for i := 0; i < nbServ; i++ {
-		if i != Identifier {
+		if i != id {
 			listenConn, err := net.Dial("tcp", "localhost:"+strconv.Itoa(8000+i))
-			defer listenConn.Close()
+			//defer listenConn.Close()
 			if err != nil {
 				log.Fatal(err)
 			}

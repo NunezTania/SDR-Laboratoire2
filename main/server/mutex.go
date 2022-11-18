@@ -14,35 +14,36 @@ var msgArray []Message
 
 func StartClock() {
 	clock.NewLamport()
+	msgArray = make([]Message, ReadConfigFile().NServ)
 }
 
-func AskForSC() {
+func AskForSC(id int) {
 	clock.Increment()
-	sendRequests(clock)
-	msgArray[Identifier] = Message{"req", clock, Identifier}
+	sendRequests(clock, id)
+	msgArray[id] = Message{"req", clock, id}
 
 }
 
-func FreeSC() {
+func FreeSC(id int) {
 	clock.Increment()
-	sendReleases(clock)
-	msgArray[Identifier] = Message{"rel", clock, Identifier}
+	sendReleases(clock, id)
+	msgArray[id] = Message{"rel", clock, id}
 	inSC = false
 }
 
-func NoteNewMessage(message Message, index int) {
+func NoteNewMessage(message Message, index int, id int) {
 	msgArray[index] = message
-	checkSCAvailable()
+	checkSCAvailable(id)
 	if inSC {
 		ChannelSc <- "SC"
 	}
 }
 
 // todo verify is function is correct
-func checkSCAvailable() {
+func checkSCAvailable(id int) {
 	for _, msg := range msgArray {
-		if msg.id != Identifier {
-			if &msg == nil || (msg.rType == "req" && msg.time.counterTime < msgArray[Identifier].time.counterTime && msgArray[Identifier].rType == "req") {
+		if msg.id != id {
+			if &msg == nil || (msg.rType == "req" && msg.time.counterTime < msgArray[id].time.counterTime && msgArray[id].rType == "req") {
 				inSC = false
 				return
 			}
