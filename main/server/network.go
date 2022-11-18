@@ -28,7 +28,6 @@ func RunBtwServer(id int) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("id in run btw server", id)
 
 	for {
 		conn, err := listenConn.Accept()
@@ -56,6 +55,7 @@ func handleMessage(buf []byte, id int) {
 			NoteNewMessage(msg, msg.id, id)
 			var r = Message{"ack", clock, id}
 			SendMessageTo(msg.id, r)
+			fmt.Println("I'm id = ", id, " and I sent an ack to ", msg.id, " with clock ", clock.counterTime)
 
 		} else if msg.rType == "rel" {
 			clock = clock.Update(msg.time)
@@ -146,8 +146,7 @@ func SendDataSyncToAll(command []byte, id int) {
 }
 
 func WaitForEveryBody(id int) {
-	fmt.Println("Waiting for every body to be ready")
-	fmt.Println("my id is ", id)
+	fmt.Println("I'm id = ", id, " and im Waiting for every body to be ready")
 	msg := "ready"
 	var listenConn net.Listener
 
@@ -171,5 +170,4 @@ func WaitForEveryBody(id int) {
 		buf := make([]byte, 1024)
 		_, err = conn.Read(buf)
 	}
-	fmt.Println("Everybody is ready")
 }

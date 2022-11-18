@@ -22,14 +22,13 @@ func main() {
 	numberServer := 3
 
 	for i := 0; i < numberServer; i++ {
-		go Launch(i)
+		Launch(i)
 	}
 	for {
 	}
 }
 
 func Launch(idServer int) {
-	fmt.Println("id from launch : ", idServer)
 	WaitForEveryBody(idServer)
 	StartClock()
 	go RunBtwServer(idServer)
@@ -40,7 +39,6 @@ func RunBtwClient(id int) {
 
 	go dataRW.HandleRWActions()
 	port := strconv.Itoa(5557 + id)
-	fmt.Println("port : ", port)
 	listen, err := net.Listen(TYPE, HOST+":"+port)
 
 	if err != nil {

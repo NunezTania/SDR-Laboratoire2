@@ -4,11 +4,8 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="96597984-09df-44c3-a8c1-1f54c5238989" name="Changes" comment="more stuff">
+    <list default="true" id="96597984-09df-44c3-a8c1-1f54c5238989" name="Changes" comment="server communication works">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main/client/client.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/client/client.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main/main.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/main/server/config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/main/server/config.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main/server/mutex.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/server/mutex.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main/server/network.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/server/network.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main/server/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/server/server.go" afterDir="false" />
@@ -158,7 +155,8 @@
     <MESSAGE value="avancement" />
     <MESSAGE value="class mutex" />
     <MESSAGE value="more stuff" />
-    <option name="LAST_COMMIT_MESSAGE" value="more stuff" />
+    <MESSAGE value="server communication works" />
+    <option name="LAST_COMMIT_MESSAGE" value="server communication works" />
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>
