@@ -1,0 +1,209 @@
+Index: main/main.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package main\r\n\r\nfunc main() {\r\n\t/*\r\n\t\tfmt.Println(server.ReadConfigFile())\r\n\r\n\t\targs := os.Args[1:]\r\n\t\tif len(args) < 1 {\r\n\t\t\tlog.Fatal(\"Missing program to execute argument.\\n Try adding client or server to go run command. Ex: go run main.go client\")\r\n\t\t}\r\n\t\tif strings.Compare(args[0], \"client\") == 0 {\r\n\t\t\tclient.Run()\r\n\t\t} else if strings.Compare(args[0], \"server\") == 0 {\r\n\t\t\t//server.Run()\r\n\t\t}\r\n\r\n\t*/\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/main/main.go b/main/main.go
+--- a/main/main.go	(revision d807e7c6d73463942861762cece93889f4d2aee1)
++++ b/main/main.go	(date 1668620858070)
+@@ -1,18 +1,2 @@
+ package main
+ 
+-func main() {
+-	/*
+-		fmt.Println(server.ReadConfigFile())
+-
+-		args := os.Args[1:]
+-		if len(args) < 1 {
+-			log.Fatal("Missing program to execute argument.\n Try adding client or server to go run command. Ex: go run main.go client")
+-		}
+-		if strings.Compare(args[0], "client") == 0 {
+-			client.Run()
+-		} else if strings.Compare(args[0], "server") == 0 {
+-			//server.Run()
+-		}
+-
+-	*/
+-}
+Index: main/server/server.go
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>// Package server contains the server of the program.\r\n// It is used to communicate with the client.\r\n// And can be used to create, close, add and list events.\r\n// In order to manage data, it uses the dataRW package.\r\npackage main\r\n\r\nimport (\r\n\t\"SDR-Laboratoire1/main/dataRW\"\r\n\t\"fmt\"\r\n\t\"gopkg.in/yaml.v3\"\r\n\t\"log\"\r\n\t\"net\"\r\n\t\"os\"\r\n\t\"strconv\"\r\n)\r\n\r\ntype conf struct {\r\n\tNServ int    `yaml:\"nServ\"`\r\n\tPort  int    `yaml:\"port\"`\r\n\tHost  string `yaml:\"host\"`\r\n\tType  string `yaml:\"type\"`\r\n}\r\n\r\n// create an attribute number for the server\r\nvar serverNumber int\r\n\r\n/*\r\n\r\nconst (\r\n\tHOST = \"localhost\"\r\n\tPORT = \"5557\"\r\n\tTYPE = \"tcp\"\r\n)\r\n\r\nvar eventCounter = 0\r\nvar postCounter = 0\r\n\r\ntype Event struct {\r\n\tid     int\r\n\tname   string\r\n\towner  User\r\n\tisOpen bool\r\n\tposts  []Post\r\n}\r\n\r\ntype Post struct {\r\n\tid       int\r\n\tname     string\r\n\tcapacity int\r\n\teventId  int\r\n\tstaff    []User\r\n}\r\n\r\ntype User struct {\r\n\tname     string\r\n\tpassword string\r\n}\r\n\r\nvar events []Event\r\nvar posts []Post\r\nvar users []User\r\n\r\n\r\nfunc main() {\r\n\tnumber, _ := strconv.Atoi(os.Args[1])\r\n\tRun(number)\r\n}\r\n*/\r\n\r\n// Run the main function of the server\r\nfunc Run(number int) {\r\n\tserverNumber = number\r\n\r\n\tgo dataRW.HandleRWActions()\r\n\r\n\t// use the yaml file to get the configuration\r\n\tconfig := ReadConfigFile()\r\n\tlisten, err := net.Listen(config.Type, config.Host+\":\"+strconv.Itoa(config.Port))\r\n\r\n\tif err != nil {\r\n\t\tlog.Fatal(err)\r\n\t}\r\n\tfmt.Println(\"Server is listening\")\r\n\tdefer listen.Close()\r\n\tfor {\r\n\t\tconn, err := listen.Accept()\r\n\t\tif err != nil {\r\n\t\t\tlog.Fatal(err)\r\n\t\t}\r\n\t\tgo HandleRequest(conn)\r\n\t}\r\n}\r\n\r\n// HandleRequest handles the requests from the clients\r\nfunc HandleRequest(conn net.Conn) {\r\n\tbuf := make([]byte, 1024)\r\n\t_, err := conn.Read(buf)\r\n\tif err != nil {\r\n\t\tlog.Fatal(err)\r\n\t}\r\n\tfor commandTreatment := AskDataRW(buf); commandTreatment != \"q\"; commandTreatment = AskDataRW(buf) {\r\n\t\tfmt.Println(\"Handling request\")\r\n\t\t_, err := conn.Write([]byte(commandTreatment))\r\n\t\tif err != nil {\r\n\t\t\treturn\r\n\t\t}\r\n\t\tbuf = make([]byte, 1024)\r\n\t\t_, err = conn.Read(buf)\r\n\t\tif err != nil {\r\n\t\t\treturn\r\n\t\t}\r\n\t}\r\n\t_, writeErr := conn.Write([]byte(\"Bye\"))\r\n\tif writeErr != nil {\r\n\t\tlog.Fatal(writeErr)\r\n\t}\r\n\tcloseErr := conn.Close()\r\n\tif closeErr != nil {\r\n\t\tlog.Fatal(closeErr)\r\n\t}\r\n}\r\n\r\n// AskDataRW asks the dataRW to treat the command\r\nfunc AskDataRW(commandParameters []byte) string {\r\n\tclientChannel := make(chan []byte)\r\n\tdataRW.DataChannel <- clientChannel\r\n\tclientChannel <- commandParameters\r\n\tresponse := <-clientChannel\r\n\treturn string(response)\r\n}\r\n\r\nfunc ReadConfigFile() conf {\r\n\tyamlFile, err := os.ReadFile(\"./config.yaml\")\r\n\tif err != nil {\r\n\t\tlog.Printf(\"yamlFile.Get err   #%v \", err)\r\n\t}\r\n\tvar c conf\r\n\terr = yaml.Unmarshal(yamlFile, &c)\r\n\tif err != nil {\r\n\t\tlog.Fatalf(\"Unmarshal: %v\", err)\r\n\t}\r\n\tif err != nil {\r\n\t\tlog.Fatal(err)\r\n\t}\r\n\treturn c\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/main/server/server.go b/main/server/server.go
+--- a/main/server/server.go	(revision d807e7c6d73463942861762cece93889f4d2aee1)
++++ b/main/server/server.go	(date 1668620986918)
+@@ -24,6 +24,10 @@
+ // create an attribute number for the server
+ var serverNumber int
+ 
++func main() {
++	fmt.Println(ReadConfigFile())
++}
++
+ /*
+ 
+ const (
+@@ -130,7 +134,7 @@
+ }
+ 
+ func ReadConfigFile() conf {
+-	yamlFile, err := os.ReadFile("./config.yaml")
++	yamlFile, err := os.ReadFile("./main/server/config.yaml")
+ 	if err != nil {
+ 		log.Printf("yamlFile.Get err   #%v ", err)
+ 	}
+Index: go.sum
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>golang.org/x/sys v0.1.0 h1:kunALQeHf1/185U1i0GOB/fy1IPRDDpuoOOqRReG57U=\r\ngolang.org/x/sys v0.1.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=\r\ngolang.org/x/term v0.1.0 h1:g6Z6vPFA9dYBAF7DWcH6sCcOntplXsDKcliusYijMlw=\r\ngolang.org/x/term v0.1.0/go.mod h1:jbD1KX2456YbFQfuXm/mYQcufACuNUgVhRMnK/tPxf8=\r\ngopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405 h1:yhCVgyC4o1eVCa2tZl7eS0r+SDo693bJlVdllGtEeKM=\r\ngopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=\r\ngopkg.in/yaml.v3 v3.0.1 h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=\r\ngopkg.in/yaml.v3 v3.0.1/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/go.sum b/go.sum
+--- a/go.sum	(revision d807e7c6d73463942861762cece93889f4d2aee1)
++++ b/go.sum	(date 1668174854396)
+@@ -2,6 +2,11 @@
+ golang.org/x/sys v0.1.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
+ golang.org/x/term v0.1.0 h1:g6Z6vPFA9dYBAF7DWcH6sCcOntplXsDKcliusYijMlw=
+ golang.org/x/term v0.1.0/go.mod h1:jbD1KX2456YbFQfuXm/mYQcufACuNUgVhRMnK/tPxf8=
++gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
++gopkg.in/yaml.v2 v2.4.0 h1:D8xgwECY7CYvx+Y2n4sBz93Jn9JRvxdiyyo8CTfuKaY=
++gopkg.in/yaml.v2 v2.4.0/go.mod h1:RDklbk79AGWmwhnvt/jBztapEOGDOx6ZbXqjP6csGnQ=
++gopkg.in/yaml.v3 v3.0.1 h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=
++gopkg.in/yaml.v3 v3.0.1/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
+ gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405 h1:yhCVgyC4o1eVCa2tZl7eS0r+SDo693bJlVdllGtEeKM=
+ gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
+ gopkg.in/yaml.v3 v3.0.1 h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=
+Index: go.mod
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>module SDR-Laboratoire1\r\n\r\ngo 1.19\r\n\r\nrequire (\r\n\tgolang.org/x/term v0.1.0\r\n\tgopkg.in/yaml.v3 v3.0.1\r\n)\r\n\r\nrequire golang.org/x/sys v0.1.0 // indirect\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/go.mod b/go.mod
+--- a/go.mod	(revision d807e7c6d73463942861762cece93889f4d2aee1)
++++ b/go.mod	(date 1668174854411)
+@@ -7,4 +7,8 @@
+ 	gopkg.in/yaml.v3 v3.0.1
+ )
+ 
+-require golang.org/x/sys v0.1.0 // indirect
++require (
++	golang.org/x/sys v0.1.0 // indirect
++	gopkg.in/yaml.v2 v2.4.0 // indirect
++	gopkg.in/yaml.v3 v3.0.1 // indirect
++)
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"AutoImportSettings\">\r\n    <option name=\"autoReloadType\" value=\"ALL\" />\r\n  </component>\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"96597984-09df-44c3-a8c1-1f54c5238989\" name=\"Changes\" comment=\"add of lamport clock\">\r\n      <change afterPath=\"$PROJECT_DIR$/main/server/network.go\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/main/server/Lamport.go\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/main/server/lamportClock.go\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/main/server/server.go\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/main/server/server.go\" afterDir=\"false\" />\r\n    </list>\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"FileTemplateManagerImpl\">\r\n    <option name=\"RECENT_TEMPLATES\">\r\n      <list>\r\n        <option value=\"Go File\" />\r\n      </list>\r\n    </option>\r\n  </component>\r\n  <component name=\"GOROOT\" url=\"file://$PROJECT_DIR$/../../../../../Program Files/Go\" />\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"MarkdownSettingsMigration\">\r\n    <option name=\"stateVersion\" value=\"1\" />\r\n  </component>\r\n  <component name=\"ProjectId\" id=\"2G7jD0jL5rXIAGHbUuzLXUBTNRN\" />\r\n  <component name=\"ProjectLevelVcsManager\" settingsEditedManually=\"true\" />\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\"><![CDATA[{\r\n  \"keyToString\": {\r\n    \"DefaultGoTemplateProperty\": \"Go File\",\r\n    \"RunOnceActivity.OpenProjectViewOnStart\": \"true\",\r\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\r\n    \"RunOnceActivity.go.format.on.save.advertiser.fired\": \"true\",\r\n    \"RunOnceActivity.go.formatter.settings.were.checked\": \"true\",\r\n    \"RunOnceActivity.go.migrated.go.modules.settings\": \"true\",\r\n    \"RunOnceActivity.go.modules.go.list.on.any.changes.was.set\": \"true\",\r\n    \"RunOnceActivity.go.watchers.conflict.with.on.save.actions.check.performed\": \"true\",\r\n    \"WebServerToolWindowFactoryState\": \"false\",\r\n    \"go.import.settings.migrated\": \"true\",\r\n    \"go.sdk.automatically.set\": \"true\",\r\n    \"last_opened_file_path\": \"C:/Users/magal\",\r\n    \"nodejs_package_manager_path\": \"npm\",\r\n    \"settings.editor.selected.configurable\": \"preferences.lookFeel\"\r\n  }\r\n}]]></component>\r\n  <component name=\"RunManager\" selected=\"Go Build.go build SDR-Laboratoire1/main/server\">\r\n    <configuration name=\"go build SDR-Laboratoire1/main/server\" type=\"GoApplicationRunConfiguration\" factoryName=\"Go Application\" temporary=\"true\" nameIsGenerated=\"true\">\r\n      <module name=\"SDR-Laboratoire1\" />\r\n      <working_directory value=\"$PROJECT_DIR$\" />\r\n      <kind value=\"PACKAGE\" />\r\n      <package value=\"SDR-Laboratoire1/main/server\" />\r\n      <directory value=\"$PROJECT_DIR$\" />\r\n      <filePath value=\"$PROJECT_DIR$/main/server/server.go\" />\r\n      <method v=\"2\" />\r\n    </configuration>\r\n    <configuration name=\"TestADDOne in SDR-Laboratoire1/test\" type=\"GoTestRunConfiguration\" factoryName=\"Go Test\" temporary=\"true\" nameIsGenerated=\"true\">\r\n      <module name=\"SDR-Laboratoire1\" />\r\n      <working_directory value=\"$PROJECT_DIR$/test\" />\r\n      <root_directory value=\"$PROJECT_DIR$\" />\r\n      <kind value=\"PACKAGE\" />\r\n      <package value=\"SDR-Laboratoire1/test\" />\r\n      <directory value=\"$PROJECT_DIR$\" />\r\n      <filePath value=\"$PROJECT_DIR$\" />\r\n      <framework value=\"gotest\" />\r\n      <pattern value=\"^\\QTestADDOne\\E$\" />\r\n      <method v=\"2\" />\r\n    </configuration>\r\n    <configuration name=\"TestLISTM in SDR-Laboratoire1/test\" type=\"GoTestRunConfiguration\" factoryName=\"Go Test\" temporary=\"true\" nameIsGenerated=\"true\">\r\n      <module name=\"SDR-Laboratoire1\" />\r\n      <working_directory value=\"$PROJECT_DIR$/test\" />\r\n      <root_directory value=\"$PROJECT_DIR$\" />\r\n      <kind value=\"PACKAGE\" />\r\n      <package value=\"SDR-Laboratoire1/test\" />\r\n      <directory value=\"$PROJECT_DIR$\" />\r\n      <filePath value=\"$PROJECT_DIR$\" />\r\n      <framework value=\"gotest\" />\r\n      <pattern value=\"^\\QTestLISTM\\E$\" />\r\n      <method v=\"2\" />\r\n    </configuration>\r\n    <configuration name=\"go test SDR-Laboratoire1/test (1)\" type=\"GoTestRunConfiguration\" factoryName=\"Go Test\" temporary=\"true\" nameIsGenerated=\"true\">\r\n      <module name=\"SDR-Laboratoire1\" />\r\n      <working_directory value=\"$PROJECT_DIR$/test\" />\r\n      <root_directory value=\"$PROJECT_DIR$\" />\r\n      <kind value=\"PACKAGE\" />\r\n      <package value=\"SDR-Laboratoire1/test\" />\r\n      <directory value=\"$PROJECT_DIR$\" />\r\n      <filePath value=\"$PROJECT_DIR$\" />\r\n      <framework value=\"gotest\" />\r\n      <method v=\"2\" />\r\n    </configuration>\r\n    <configuration name=\"go test SDR-Laboratoire1/test\" type=\"GoTestRunConfiguration\" factoryName=\"Go Test\" temporary=\"true\" nameIsGenerated=\"true\">\r\n      <module name=\"SDR-Laboratoire1\" />\r\n      <working_directory value=\"$PROJECT_DIR$/test\" />\r\n      <root_directory value=\"$PROJECT_DIR$\" />\r\n      <kind value=\"PACKAGE\" />\r\n      <package value=\"SDR-Laboratoire1/test\" />\r\n      <directory value=\"$PROJECT_DIR$\" />\r\n      <filePath value=\"$PROJECT_DIR$\" />\r\n      <framework value=\"gotest\" />\r\n      <method v=\"2\" />\r\n    </configuration>\r\n    <recent_temporary>\r\n      <list>\r\n        <item itemvalue=\"Go Build.go build SDR-Laboratoire1/main/server\" />\r\n        <item itemvalue=\"Go Test.go test SDR-Laboratoire1/test\" />\r\n        <item itemvalue=\"Go Test.TestADDOne in SDR-Laboratoire1/test\" />\r\n        <item itemvalue=\"Go Test.go test SDR-Laboratoire1/test (1)\" />\r\n        <item itemvalue=\"Go Test.TestLISTM in SDR-Laboratoire1/test\" />\r\n      </list>\r\n    </recent_temporary>\r\n  </component>\r\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"application-level\" UseSingleDictionary=\"true\" transferred=\"true\" />\r\n  <component name=\"TypeScriptGeneratedFilesManager\">\r\n    <option name=\"version\" value=\"3\" />\r\n  </component>\r\n  <component name=\"Vcs.Log.Tabs.Properties\">\r\n    <option name=\"TAB_STATES\">\r\n      <map>\r\n        <entry key=\"MAIN\">\r\n          <value>\r\n            <State />\r\n          </value>\r\n        </entry>\r\n      </map>\r\n    </option>\r\n  </component>\r\n  <component name=\"VcsManagerConfiguration\">\r\n    <MESSAGE value=\"process of cmd CREATE\" />\r\n    <MESSAGE value=\"process all cmd\" />\r\n    <MESSAGE value=\"almost there\" />\r\n    <MESSAGE value=\"todo update\" />\r\n    <MESSAGE value=\"add benevole OK\" />\r\n    <MESSAGE value=\"bug fixed\" />\r\n    <MESSAGE value=\"rien ne vas plus\" />\r\n    <MESSAGE value=\"merging\" />\r\n    <MESSAGE value=\"fix convert to int\" />\r\n    <MESSAGE value=\"list of posts\" />\r\n    <MESSAGE value=\"comments\" />\r\n    <MESSAGE value=\"capacity test\" />\r\n    <MESSAGE value=\"update\" />\r\n    <MESSAGE value=\"add the number for each server\" />\r\n    <MESSAGE value=\"update readme and add file progress\" />\r\n    <MESSAGE value=\"add of lamport clock\" />\r\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"add of lamport clock\" />\r\n  </component>\r\n  <component name=\"VgoProject\">\r\n    <settings-migrated>true</settings-migrated>\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision d807e7c6d73463942861762cece93889f4d2aee1)
++++ b/.idea/workspace.xml	(date 1668773945944)
+@@ -4,10 +4,11 @@
+     <option name="autoReloadType" value="ALL" />
+   </component>
+   <component name="ChangeListManager">
+-    <list default="true" id="96597984-09df-44c3-a8c1-1f54c5238989" name="Changes" comment="add of lamport clock">
+-      <change afterPath="$PROJECT_DIR$/main/server/network.go" afterDir="false" />
++    <list default="true" id="96597984-09df-44c3-a8c1-1f54c5238989" name="Changes" comment="update">
+       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+-      <change beforePath="$PROJECT_DIR$/main/server/Lamport.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/server/lamportClock.go" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
++      <change beforePath="$PROJECT_DIR$/main/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/main.go" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/main/server/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/server/server.go" afterDir="false" />
+     </list>
+     <option name="SHOW_DIALOG" value="false" />
+@@ -22,7 +23,7 @@
+       </list>
+     </option>
+   </component>
+-  <component name="GOROOT" url="file://$PROJECT_DIR$/../../../../../Program Files/Go" />
++  <component name="GOROOT" url="file://$PROJECT_DIR$/../../../../Program Files/Go" />
+   <component name="Git.Settings">
+     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+   </component>
+@@ -35,29 +36,38 @@
+     <option name="hideEmptyMiddlePackages" value="true" />
+     <option name="showLibraryContents" value="true" />
+   </component>
+-  <component name="PropertiesComponent"><![CDATA[{
+-  "keyToString": {
+-    "DefaultGoTemplateProperty": "Go File",
+-    "RunOnceActivity.OpenProjectViewOnStart": "true",
+-    "RunOnceActivity.ShowReadmeOnStart": "true",
+-    "RunOnceActivity.go.format.on.save.advertiser.fired": "true",
+-    "RunOnceActivity.go.formatter.settings.were.checked": "true",
+-    "RunOnceActivity.go.migrated.go.modules.settings": "true",
+-    "RunOnceActivity.go.modules.go.list.on.any.changes.was.set": "true",
+-    "RunOnceActivity.go.watchers.conflict.with.on.save.actions.check.performed": "true",
+-    "WebServerToolWindowFactoryState": "false",
+-    "go.import.settings.migrated": "true",
+-    "go.sdk.automatically.set": "true",
+-    "last_opened_file_path": "C:/Users/magal",
+-    "nodejs_package_manager_path": "npm",
+-    "settings.editor.selected.configurable": "preferences.lookFeel"
++  <component name="PropertiesComponent">{
++  &quot;keyToString&quot;: {
++    &quot;DefaultGoTemplateProperty&quot;: &quot;Go File&quot;,
++    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
++    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
++    &quot;RunOnceActivity.go.format.on.save.advertiser.fired&quot;: &quot;true&quot;,
++    &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
++    &quot;RunOnceActivity.go.migrated.go.modules.settings&quot;: &quot;true&quot;,
++    &quot;RunOnceActivity.go.modules.go.list.on.any.changes.was.set&quot;: &quot;true&quot;,
++    &quot;RunOnceActivity.go.watchers.conflict.with.on.save.actions.check.performed&quot;: &quot;true&quot;,
++    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
++    &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
++    &quot;go.sdk.automatically.set&quot;: &quot;true&quot;,
++    &quot;last_opened_file_path&quot;: &quot;C:/Users/FNGUSER004&quot;,
++    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
++    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;
+   }
+-}]]></component>
++}</component>
+   <component name="RunManager" selected="Go Build.go build SDR-Laboratoire1/main/server">
++    <configuration default="true" type="GoApplicationRunConfiguration" factoryName="Go Application">
++      <module name="SDR-Laboratoire1" />
++      <working_directory value="$PROJECT_DIR$" />
++      <go_parameters value="-i" />
++      <kind value="FILE" />
++      <directory value="$PROJECT_DIR$" />
++      <filePath value="$PROJECT_DIR$" />
++      <method v="2" />
++    </configuration>
+     <configuration name="go build SDR-Laboratoire1/main/server" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+       <module name="SDR-Laboratoire1" />
+       <working_directory value="$PROJECT_DIR$" />
+-      <kind value="PACKAGE" />
++      <kind value="FILE" />
+       <package value="SDR-Laboratoire1/main/server" />
+       <directory value="$PROJECT_DIR$" />
+       <filePath value="$PROJECT_DIR$/main/server/server.go" />
+@@ -85,6 +95,16 @@
+       <filePath value="$PROJECT_DIR$" />
+       <framework value="gotest" />
+       <pattern value="^\QTestLISTM\E$" />
++      <method v="2" />
++    </configuration>
++    <configuration default="true" type="GoTestRunConfiguration" factoryName="Go Test">
++      <module name="SDR-Laboratoire1" />
++      <working_directory value="$PROJECT_DIR$" />
++      <go_parameters value="-i" />
++      <kind value="DIRECTORY" />
++      <directory value="$PROJECT_DIR$" />
++      <filePath value="$PROJECT_DIR$" />
++      <framework value="gotest" />
+       <method v="2" />
+     </configuration>
+     <configuration name="go test SDR-Laboratoire1/test (1)" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">

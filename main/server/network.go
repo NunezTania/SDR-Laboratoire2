@@ -1,26 +1,71 @@
 package main
 
 import (
-	"SDR-Laboratoire1/main/dataRW"
 	"fmt"
-	"gopkg.in/yaml.v3"
 	"log"
 	"net"
-	"os"
 	"strconv"
 	"strings"
 )
 
-type conf struct {
-	NServ int    `yaml:"nServ"`
-	Port  int    `yaml:"port"`
-	Host  string `yaml:"host"`
-	Type  string `yaml:"type"`
+func NetworkProcess(id int, conns *[]net.Conn, chanMutexNetwork chan Message, chanNetworkMutex chan Message, done chan bool) {
+	/*conf := ReadConfigFile()
+	// Init connexions with other network processes
+	connections := make([]net.Conn, nbServ)
+	connections[id] = nil
+	for i := 0; i < nbServ; i++ {
+		if i != id {
+			connections[i], err = net.Dial("tcp", "localhost:"+strconv.Itoa(conf.Port + i))
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
+	}*/
+	go handleCommunicationWithOtherProcesses(id, conns, chanNetworkMutex, done)
+	go handleCommunicationWithMutexProcess(id, conns, chanMutexNetwork, done)
+
 }
 
-var err error
-var nbServ int
+func handleCommunicationWithMutexProcess(id int, conns *[]net.Conn, chanMutexNetwork chan Message, done chan bool) {
+	for {
+		msg := <-chanMutexNetwork
+		fmt.Println("Message received from mutex process ", id)
+		// Si on reçoit un ACK depuis le processus mutex, on doit changer son id puisque celui passé est celui du processus
+		// auquel il faut envoyer le message
+		idTo := msg.id
+		if msg.rType == "ack" {
+			msg.id = id
+			SendMessageTo(msg, (*conns)[idTo])
+			return
+		}
+		// Si on reçoit un REQ ou un REL depuis le processus mutex, on doit envoyer le message à tous les autres processus
+		SendToAll(id, msg, conns)
+	}
+	done <- true
+}
 
+func handleCommunicationWithOtherProcesses(id int, conns *[]net.Conn, chanMutexNetwork chan Message, done chan bool) {
+	for i, conn := range *conns {
+		if i != id {
+			go handleCommunicationWith(conn, chanMutexNetwork, done)
+		}
+	}
+}
+
+func handleCommunicationWith(conn net.Conn, chanMutexNetwork chan Message, done chan bool) {
+	for {
+		buf := make([]byte, 1024)
+		_, err := conn.Read(buf)
+		if err != nil {
+			log.Fatal(err)
+		}
+		chanMutexNetwork <- strToMessage(string(buf))
+		fmt.Println("Message received from", conn.RemoteAddr())
+	}
+	done <- true
+}
+
+/*
 func RunBtwServer() {
 	config := ReadConfigFile()
 	nbServ = config.NServ
@@ -76,23 +121,7 @@ func sendRequests(clock Lamport) {
 func sendReleases(clock Lamport) {
 	var request = Message{"rel", clock, Identifier}
 	SendToAll(request)
-}
-
-func ReadConfigFile() conf {
-	yamlFile, error := os.ReadFile("./main/server/config.yaml")
-	if error != nil {
-		log.Printf("yamlFile.Get err   #%v ", error)
-	}
-	var c conf
-	error = yaml.Unmarshal(yamlFile, &c)
-	if error != nil {
-		log.Fatalf("Unmarshal: %v", error)
-	}
-	if error != nil {
-		log.Fatal(error)
-	}
-	return c
-}
+}*/
 
 func strToMessage(str string) Message {
 	var request Message
@@ -107,69 +136,34 @@ func MessageToStr(request Message) string {
 	return request.rType + " " + strconv.Itoa(request.time.counterTime) + " " + strconv.Itoa(request.id)
 }
 
-func SendMessageTo(id int, request Message) {
+func SendMessageTo(request Message, conn net.Conn) {
 	msg := MessageToStr(request)
-	var currConn net.Conn
-	currConn, err = net.Dial("tcp", "localhost:"+strconv.Itoa(6060+id))
-	defer currConn.Close()
+	_, err := conn.Write([]byte(msg))
 	if err != nil {
 		log.Fatal(err)
 	}
-	_, err = currConn.Write([]byte(msg))
 }
 
-func SendDataSyncTo(id int, data []byte) {
-	var currConn net.Conn
-	currConn, err = net.Dial("tcp", "localhost:"+strconv.Itoa(6060+id))
-	defer currConn.Close()
+func SendDataSyncTo(conn net.Conn, data []byte) {
+	_, err := conn.Write(data)
 	if err != nil {
 		log.Fatal(err)
 	}
-	_, err = currConn.Write(data)
 }
 
-func SendToAll(request Message) {
-	for i := 0; i < nbServ; i++ {
-		if i != Identifier {
-			SendMessageTo(i, request)
+func SendToAll(id int, request Message, conns *[]net.Conn) {
+	for i, conn := range *conns {
+		if i != id {
+			SendMessageTo(request, conn)
 		}
 	}
 }
 
-func SendDataSyncToAll(command []byte) {
+func SendDataSyncToAll(id int, conns *[]net.Conn, command []byte) {
 	msg := append([]byte("data "), command...)
-	for i := 0; i < nbServ; i++ {
-		if i != Identifier {
-			SendDataSyncTo(i, msg)
+	for i, conn := range *conns {
+		if i != id {
+			SendDataSyncTo(conn, msg)
 		}
 	}
-}
-
-func WaitForEveryBody() {
-	fmt.Println("Waiting for every body to be ready")
-	fmt.Println("my id is ", Identifier)
-	msg := "ready"
-	var listenConn net.Listener
-
-	for i := 0; i < nbServ; i++ {
-		if i != Identifier {
-			listenConn, err := net.Dial("tcp", "localhost:"+strconv.Itoa(8000+i))
-			defer listenConn.Close()
-			if err != nil {
-				log.Fatal(err)
-			}
-			_, err = listenConn.Write([]byte(msg))
-		}
-	}
-
-	for i := 0; i < nbServ-1; i++ {
-		conn, err := listenConn.Accept()
-		defer listenConn.Close()
-		if err != nil {
-			log.Fatal(err)
-		}
-		buf := make([]byte, 1024)
-		_, err = conn.Read(buf)
-	}
-	fmt.Println("Everybody is ready")
 }

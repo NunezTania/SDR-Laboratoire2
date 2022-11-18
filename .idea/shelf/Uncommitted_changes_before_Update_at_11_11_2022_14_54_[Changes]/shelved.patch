@@ -1,0 +1,58 @@
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"AutoImportSettings\">\r\n    <option name=\"autoReloadType\" value=\"ALL\" />\r\n  </component>\r\n  <component name=\"ChangeListManager\">\r\n    <list default=\"true\" id=\"96597984-09df-44c3-a8c1-1f54c5238989\" name=\"Changes\" comment=\"update readme and add file progress\">\r\n      <change afterPath=\"$PROJECT_DIR$/main/server/Lamport.go\" afterDir=\"false\" />\r\n      <change beforePath=\"$PROJECT_DIR$/.idea/workspace.xml\" beforeDir=\"false\" afterPath=\"$PROJECT_DIR$/.idea/workspace.xml\" afterDir=\"false\" />\r\n    </list>\r\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\r\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\r\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\r\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\r\n  </component>\r\n  <component name=\"FileTemplateManagerImpl\">\r\n    <option name=\"RECENT_TEMPLATES\">\r\n      <list>\r\n        <option value=\"Go File\" />\r\n      </list>\r\n    </option>\r\n  </component>\r\n  <component name=\"GOROOT\" url=\"file://$PROJECT_DIR$/../../../../../Program Files/Go\" />\r\n  <component name=\"Git.Settings\">\r\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\r\n  </component>\r\n  <component name=\"MarkdownSettingsMigration\">\r\n    <option name=\"stateVersion\" value=\"1\" />\r\n  </component>\r\n  <component name=\"ProjectId\" id=\"2G7jD0jL5rXIAGHbUuzLXUBTNRN\" />\r\n  <component name=\"ProjectLevelVcsManager\" settingsEditedManually=\"true\" />\r\n  <component name=\"ProjectViewState\">\r\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\r\n    <option name=\"showLibraryContents\" value=\"true\" />\r\n  </component>\r\n  <component name=\"PropertiesComponent\"><![CDATA[{\r\n  \"keyToString\": {\r\n    \"DefaultGoTemplateProperty\": \"Go File\",\r\n    \"RunOnceActivity.OpenProjectViewOnStart\": \"true\",\r\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\r\n    \"RunOnceActivity.go.format.on.save.advertiser.fired\": \"true\",\r\n    \"RunOnceActivity.go.formatter.settings.were.checked\": \"true\",\r\n    \"RunOnceActivity.go.migrated.go.modules.settings\": \"true\",\r\n    \"RunOnceActivity.go.modules.go.list.on.any.changes.was.set\": \"true\",\r\n    \"RunOnceActivity.go.watchers.conflict.with.on.save.actions.check.performed\": \"true\",\r\n    \"WebServerToolWindowFactoryState\": \"false\",\r\n    \"go.import.settings.migrated\": \"true\",\r\n    \"go.sdk.automatically.set\": \"true\",\r\n    \"last_opened_file_path\": \"C:/Users/magal\",\r\n    \"nodejs_package_manager_path\": \"npm\"\r\n  }\r\n}]]></component>\r\n  <component name=\"RunManager\" selected=\"Go Build.go build SDR-Laboratoire1/main/server\">\r\n    <configuration name=\"go build SDR-Laboratoire1/main/server\" type=\"GoApplicationRunConfiguration\" factoryName=\"Go Application\" temporary=\"true\" nameIsGenerated=\"true\">\r\n      <module name=\"SDR-Laboratoire1\" />\r\n      <working_directory value=\"$PROJECT_DIR$\" />\r\n      <kind value=\"PACKAGE\" />\r\n      <package value=\"SDR-Laboratoire1/main/server\" />\r\n      <directory value=\"$PROJECT_DIR$\" />\r\n      <filePath value=\"$PROJECT_DIR$/main/server/server.go\" />\r\n      <method v=\"2\" />\r\n    </configuration>\r\n    <configuration name=\"TestADDOne in SDR-Laboratoire1/test\" type=\"GoTestRunConfiguration\" factoryName=\"Go Test\" temporary=\"true\" nameIsGenerated=\"true\">\r\n      <module name=\"SDR-Laboratoire1\" />\r\n      <working_directory value=\"$PROJECT_DIR$/test\" />\r\n      <root_directory value=\"$PROJECT_DIR$\" />\r\n      <kind value=\"PACKAGE\" />\r\n      <package value=\"SDR-Laboratoire1/test\" />\r\n      <directory value=\"$PROJECT_DIR$\" />\r\n      <filePath value=\"$PROJECT_DIR$\" />\r\n      <framework value=\"gotest\" />\r\n      <pattern value=\"^\\QTestADDOne\\E$\" />\r\n      <method v=\"2\" />\r\n    </configuration>\r\n    <configuration name=\"TestLISTM in SDR-Laboratoire1/test\" type=\"GoTestRunConfiguration\" factoryName=\"Go Test\" temporary=\"true\" nameIsGenerated=\"true\">\r\n      <module name=\"SDR-Laboratoire1\" />\r\n      <working_directory value=\"$PROJECT_DIR$/test\" />\r\n      <root_directory value=\"$PROJECT_DIR$\" />\r\n      <kind value=\"PACKAGE\" />\r\n      <package value=\"SDR-Laboratoire1/test\" />\r\n      <directory value=\"$PROJECT_DIR$\" />\r\n      <filePath value=\"$PROJECT_DIR$\" />\r\n      <framework value=\"gotest\" />\r\n      <pattern value=\"^\\QTestLISTM\\E$\" />\r\n      <method v=\"2\" />\r\n    </configuration>\r\n    <configuration name=\"go test SDR-Laboratoire1/test (1)\" type=\"GoTestRunConfiguration\" factoryName=\"Go Test\" temporary=\"true\" nameIsGenerated=\"true\">\r\n      <module name=\"SDR-Laboratoire1\" />\r\n      <working_directory value=\"$PROJECT_DIR$/test\" />\r\n      <root_directory value=\"$PROJECT_DIR$\" />\r\n      <kind value=\"PACKAGE\" />\r\n      <package value=\"SDR-Laboratoire1/test\" />\r\n      <directory value=\"$PROJECT_DIR$\" />\r\n      <filePath value=\"$PROJECT_DIR$\" />\r\n      <framework value=\"gotest\" />\r\n      <method v=\"2\" />\r\n    </configuration>\r\n    <configuration name=\"go test SDR-Laboratoire1/test\" type=\"GoTestRunConfiguration\" factoryName=\"Go Test\" temporary=\"true\" nameIsGenerated=\"true\">\r\n      <module name=\"SDR-Laboratoire1\" />\r\n      <working_directory value=\"$PROJECT_DIR$/test\" />\r\n      <root_directory value=\"$PROJECT_DIR$\" />\r\n      <kind value=\"PACKAGE\" />\r\n      <package value=\"SDR-Laboratoire1/test\" />\r\n      <directory value=\"$PROJECT_DIR$\" />\r\n      <filePath value=\"$PROJECT_DIR$\" />\r\n      <framework value=\"gotest\" />\r\n      <method v=\"2\" />\r\n    </configuration>\r\n    <recent_temporary>\r\n      <list>\r\n        <item itemvalue=\"Go Build.go build SDR-Laboratoire1/main/server\" />\r\n        <item itemvalue=\"Go Test.go test SDR-Laboratoire1/test\" />\r\n        <item itemvalue=\"Go Test.TestADDOne in SDR-Laboratoire1/test\" />\r\n        <item itemvalue=\"Go Test.go test SDR-Laboratoire1/test (1)\" />\r\n        <item itemvalue=\"Go Test.TestLISTM in SDR-Laboratoire1/test\" />\r\n      </list>\r\n    </recent_temporary>\r\n  </component>\r\n  <component name=\"SpellCheckerSettings\" RuntimeDictionaries=\"0\" Folders=\"0\" CustomDictionaries=\"0\" DefaultDictionary=\"application-level\" UseSingleDictionary=\"true\" transferred=\"true\" />\r\n  <component name=\"TypeScriptGeneratedFilesManager\">\r\n    <option name=\"version\" value=\"3\" />\r\n  </component>\r\n  <component name=\"Vcs.Log.Tabs.Properties\">\r\n    <option name=\"TAB_STATES\">\r\n      <map>\r\n        <entry key=\"MAIN\">\r\n          <value>\r\n            <State />\r\n          </value>\r\n        </entry>\r\n      </map>\r\n    </option>\r\n  </component>\r\n  <component name=\"VcsManagerConfiguration\">\r\n    <MESSAGE value=\"process of cmd CREATE\" />\r\n    <MESSAGE value=\"process all cmd\" />\r\n    <MESSAGE value=\"almost there\" />\r\n    <MESSAGE value=\"todo update\" />\r\n    <MESSAGE value=\"add benevole OK\" />\r\n    <MESSAGE value=\"bug fixed\" />\r\n    <MESSAGE value=\"rien ne vas plus\" />\r\n    <MESSAGE value=\"merging\" />\r\n    <MESSAGE value=\"fix convert to int\" />\r\n    <MESSAGE value=\"list of posts\" />\r\n    <MESSAGE value=\"comments\" />\r\n    <MESSAGE value=\"capacity test\" />\r\n    <MESSAGE value=\"update\" />\r\n    <MESSAGE value=\"add the number for each server\" />\r\n    <MESSAGE value=\"update readme and add file progress\" />\r\n    <option name=\"LAST_COMMIT_MESSAGE\" value=\"update readme and add file progress\" />\r\n  </component>\r\n  <component name=\"VgoProject\">\r\n    <settings-migrated>true</settings-migrated>\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision d4df073355e15a3f0e2b484ba6de46122063a038)
++++ b/.idea/workspace.xml	(date 1668174892504)
+@@ -5,7 +5,6 @@
+   </component>
+   <component name="ChangeListManager">
+     <list default="true" id="96597984-09df-44c3-a8c1-1f54c5238989" name="Changes" comment="update readme and add file progress">
+-      <change afterPath="$PROJECT_DIR$/main/server/Lamport.go" afterDir="false" />
+       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+     </list>
+     <option name="SHOW_DIALOG" value="false" />
+@@ -33,23 +32,23 @@
+     <option name="hideEmptyMiddlePackages" value="true" />
+     <option name="showLibraryContents" value="true" />
+   </component>
+-  <component name="PropertiesComponent"><![CDATA[{
+-  "keyToString": {
+-    "DefaultGoTemplateProperty": "Go File",
+-    "RunOnceActivity.OpenProjectViewOnStart": "true",
+-    "RunOnceActivity.ShowReadmeOnStart": "true",
+-    "RunOnceActivity.go.format.on.save.advertiser.fired": "true",
+-    "RunOnceActivity.go.formatter.settings.were.checked": "true",
+-    "RunOnceActivity.go.migrated.go.modules.settings": "true",
+-    "RunOnceActivity.go.modules.go.list.on.any.changes.was.set": "true",
+-    "RunOnceActivity.go.watchers.conflict.with.on.save.actions.check.performed": "true",
+-    "WebServerToolWindowFactoryState": "false",
+-    "go.import.settings.migrated": "true",
+-    "go.sdk.automatically.set": "true",
+-    "last_opened_file_path": "C:/Users/magal",
+-    "nodejs_package_manager_path": "npm"
++  <component name="PropertiesComponent">{
++  &quot;keyToString&quot;: {
++    &quot;DefaultGoTemplateProperty&quot;: &quot;Go File&quot;,
++    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
++    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
++    &quot;RunOnceActivity.go.format.on.save.advertiser.fired&quot;: &quot;true&quot;,
++    &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
++    &quot;RunOnceActivity.go.migrated.go.modules.settings&quot;: &quot;true&quot;,
++    &quot;RunOnceActivity.go.modules.go.list.on.any.changes.was.set&quot;: &quot;true&quot;,
++    &quot;RunOnceActivity.go.watchers.conflict.with.on.save.actions.check.performed&quot;: &quot;true&quot;,
++    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
++    &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
++    &quot;go.sdk.automatically.set&quot;: &quot;true&quot;,
++    &quot;last_opened_file_path&quot;: &quot;C:/Users/magal&quot;,
++    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;
+   }
+-}]]></component>
++}</component>
+   <component name="RunManager" selected="Go Build.go build SDR-Laboratoire1/main/server">
+     <configuration name="go build SDR-Laboratoire1/main/server" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+       <module name="SDR-Laboratoire1" />
