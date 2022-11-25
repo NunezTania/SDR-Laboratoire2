@@ -126,13 +126,14 @@ func Launch(idServer int, conf conf) {
 	StartClock(&clock)
 
 	// Lancement des goroutines pour la réception des messages
-	handleCommunicationWithOtherProcesses(idServer, &connsWithOtherServers, done, &msgArray, chanSC, &clock)
+	go handleCommunicationWithServers(idServer, processListener, &connsWithOtherServers, done, &msgArray, chanSC, &clock)
 
 	// Lancement de la boucle d'écoute pour les clients
 	RunBtwClient(idServer, clientListener, &connsWithOtherServers, chanSC, &clock, &msgArray)
 
 	<-done // Attends que les goroutines d'écoute des autres processus soient terminées
 
+	fmt.Println("Server is closing")
 	// Fermeture des connexions avec les autres processus servers
 	for i, conn := range connsWithOtherServers {
 		if i != idServer {
