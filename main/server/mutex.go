@@ -1,6 +1,9 @@
 package main
 
-var ChannelSc = make(chan string)
+import (
+	"fmt"
+	"net"
+)
 
 type Message struct {
 	rType string
@@ -12,19 +15,12 @@ type Message struct {
 channelMutexNetwork is used to send messages to the network
 channelNetworkMutex is used to receive messages from the network and process them
 */
-func MutexProcess(idServ int, chanClientMutex chan string, chanMutexNetwork chan Message, chanNetworkMutex chan Message, chanSC chan bool, done chan bool) {
-	var msgArray []Message
+func MutexProcess(idServ int, nbServ int, chanSC chan bool, conns *[]net.Conn, done chan bool) {
+	msgArray := make([]Message, nbServ)
 	var clock = Lamport{}
 	StartClock(&clock)
-	for {
-		select {
-		case clientMsg := <-chanClientMutex:
-			handleClientMsg(idServ, clientMsg, &msgArray, &clock, chanMutexNetwork)
-		case networkMsg := <-chanNetworkMutex:
-			handleNetworkMsg(idServ, networkMsg, chanMutexNetwork, chanSC, &msgArray, &clock)
-		}
-	}
-	done <- true
+	fmt.Println("Mutex process started with id", idServ, "and clock", clock.counterTime)
+	handleCommunicationWithOtherProcesses(idServ, conns, done, &msgArray, chanSC, &clock)
 }
 
 func handleNetworkMsg(id int, msg Message, chanMutexNetwork chan Message, chanSC chan bool, messages *[]Message, clock *Lamport) {
@@ -32,10 +28,12 @@ func handleNetworkMsg(id int, msg Message, chanMutexNetwork chan Message, chanSC
 	NoteNewMessage(id, msg, messages, chanSC)
 	if msg.rType == "req" {
 		// Attention l'identifiant ici est celui à qui on envoie le message
+		// TODO appeler directement les méthodes ne network plutôt que de communiquer par channel
 		chanMutexNetwork <- Message{"ack", *clock, msg.id}
 	}
 }
 
+/*
 func handleClientMsg(id int, msg string, messages *[]Message, clock *Lamport, chanMutexNetwork chan Message) {
 	switch msg {
 	case "ask":
@@ -44,14 +42,17 @@ func handleClientMsg(id int, msg string, messages *[]Message, clock *Lamport, ch
 		FreeSC(id, messages, clock, chanMutexNetwork)
 	}
 }
+*/
 
 func StartClock(clock *Lamport) {
 	clock.NewLamport()
 }
 
+/*
 func AskForSC(id int, messages *[]Message, clock *Lamport, chanMutexNetwork chan Message) {
 	clock.Increment()
 	var msg = Message{"req", *clock, id}
+	fmt.Println("Message sent from ", id, msg)
 	(*messages)[id] = msg
 	chanMutexNetwork <- msg
 }
@@ -60,10 +61,14 @@ func FreeSC(id int, messages *[]Message, clock *Lamport, chanMutexNetwork chan M
 	clock.Increment()
 	msg := Message{"rel", *clock, id}
 	(*messages)[id] = msg
-	chanMutexNetwork <- msg
+	go func() {
+		chanMutexNetwork <- msg
+	}()
 }
+*/
 
 func NoteNewMessage(id int, msg Message, messages *[]Message, chanSC chan bool) {
+	fmt.Println("Message received in process", id, " ", msg)
 	(*messages)[msg.id] = msg
 	if checkSCAvailable(id, messages) {
 		chanSC <- true

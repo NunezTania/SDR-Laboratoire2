@@ -116,21 +116,23 @@ func Launch(idServer int, conf conf) {
 
 	WaitForEveryBody(idServer, nbServ, &connsWithOtherServers, processListener)
 
-	/*
-		chanClientMutex := make(chan string)
-		chanMutexNetwork := make(chan Message)
-		chanNetworkMutex := make(chan Message)
-		chanSC := make(chan bool)
-		doneMutex := make(chan bool)
-		doneNetwork := make(chan bool)
+	// Création des canaux pour la synchronisation
+	chanSC := make(chan bool)
+	done := make(chan bool)
 
-		go RunBtwClient(idServer, clientListener, &connsWithOtherServers, chanClientMutex, chanSC)
-		go MutexProcess(idServer, chanClientMutex, chanMutexNetwork, chanNetworkMutex, chanSC, doneMutex)
-		go NetworkProcess(idServer, &connsWithOtherServers, chanMutexNetwork, chanNetworkMutex, doneNetwork)
+	// Variables pour processus mutex
+	msgArray := make([]Message, nbServ)
+	var clock = Lamport{}
+	StartClock(&clock)
 
-		<-doneMutex
-		<-doneNetwork
-	*/
+	// Lancement des goroutines pour la réception des messages
+	handleCommunicationWithOtherProcesses(idServer, &connsWithOtherServers, done, &msgArray, chanSC, &clock)
+
+	// Lancement de la boucle d'écoute pour les clients
+	RunBtwClient(idServer, clientListener, &connsWithOtherServers, chanSC, &clock, &msgArray)
+
+	<-done // Attends que les goroutines d'écoute des autres processus soient terminées
+
 	// Fermeture des connexions avec les autres processus servers
 	for i, conn := range connsWithOtherServers {
 		if i != idServer {
@@ -155,53 +157,60 @@ func Launch(idServer int, conf conf) {
 
 }
 
-func RunBtwClient(id int, listener net.Listener, conns *[]net.Conn, chanClientMutex chan string, chanSC chan bool) {
+func RunBtwClient(id int, listener net.Listener, conns *[]net.Conn, chanSC chan bool, clock *Lamport, msgArray *[]Message) {
 
 	go dataRW.HandleRWActions()
 
 	fmt.Println("Server is listening")
-	defer listener.Close()
+	defer func(listener net.Listener) {
+		err := listener.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}(listener)
+
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
 			log.Fatal(err)
 		}
-		go HandleRequest(id, conn, conns, chanClientMutex, chanSC)
+		go HandleRequest(id, conn, conns, chanSC, clock, msgArray)
 	}
 }
 
 // HandleRequest handles the requests from the clients
-func HandleRequest(id int, conn net.Conn, conns *[]net.Conn, chanClientMutex chan string, chanSC chan bool) {
+func HandleRequest(id int, clientConn net.Conn, processesConns *[]net.Conn, chanSC chan bool, clock *Lamport, msgArray *[]Message) {
 	buf := make([]byte, 1024)
-	_, err := conn.Read(buf)
+	_, err := clientConn.Read(buf)
 	if err != nil {
 		log.Fatal(err)
 	}
-	for commandTreatment := AskDataRW(id, buf, conns, chanClientMutex, chanSC); commandTreatment != "q"; commandTreatment = AskDataRW(id, buf, conns, chanClientMutex, chanSC) {
+	for commandTreatment := AskDataRW(id, buf, processesConns, chanSC, clock, msgArray); commandTreatment != "q"; commandTreatment = AskDataRW(id, buf, processesConns, chanSC, clock, msgArray) {
 		fmt.Println("Handling request")
-		_, err := conn.Write([]byte(commandTreatment))
+		_, err := clientConn.Write([]byte(commandTreatment))
 		if err != nil {
 			return
 		}
 		buf = make([]byte, 1024)
-		_, err = conn.Read(buf)
+		_, err = clientConn.Read(buf)
 		if err != nil {
 			return
 		}
 	}
-	_, writeErr := conn.Write([]byte("Bye"))
+	_, writeErr := clientConn.Write([]byte("Bye"))
 	if writeErr != nil {
 		log.Fatal(writeErr)
 	}
-	closeErr := conn.Close()
+	closeErr := clientConn.Close()
 	if closeErr != nil {
 		log.Fatal(closeErr)
 	}
 }
 
 // AskDataRW asks the dataRW to treat the command
-func AskDataRW(id int, commandParameters []byte, conns *[]net.Conn, chanClientMutex chan string, chanSC chan bool) string {
-	waitForSC(chanClientMutex, chanSC)
+func AskDataRW(id int, commandParameters []byte, conns *[]net.Conn, chanSC chan bool, clock *Lamport, msgArray *[]Message) string {
+	waitForSC(id, conns, clock, chanSC, msgArray)
+	fmt.Println("Entering SC")
 	clientChannel := make(chan []byte)
 	dataRW.DataChannel <- clientChannel
 	clientChannel <- commandParameters
@@ -209,15 +218,17 @@ func AskDataRW(id int, commandParameters []byte, conns *[]net.Conn, chanClientMu
 	if dataRW.DataModified {
 		SendDataSyncToAll(id, conns, commandParameters)
 	}
-	leaveSC(chanClientMutex)
+	leaveSC(id, conns, clock, msgArray)
 	return string(response)
 }
 
-func waitForSC(chanClientMutex chan string, chanSC chan bool) {
-	chanClientMutex <- "ask"
-	<-chanSC
+func waitForSC(id int, conns *[]net.Conn, clock *Lamport, chanSC chan bool, msgArray *[]Message) {
+	AskForSC(id, conns, clock, msgArray)
+	print(fmt.Println("Waiting for SC"))
+	<-chanSC // Devrait bloquer jusqu'à ce que les goroutines gérant la reception des messages finissent par envoyer un message sur le channel
 }
 
-func leaveSC(chanClientMutex chan string) {
-	chanClientMutex <- "free"
+func leaveSC(id int, conns *[]net.Conn, clock *Lamport, msgArray *[]Message) {
+	FreeSC(id, conns, clock, msgArray)
+	fmt.Println("Leaving SC")
 }

@@ -1,7 +1,7 @@
 // Package client contains the client of the program.
 // It is used to communicate with the server.
 // And can be used to create, close, add and list events.
-package client
+package main
 
 import (
 	"bufio"
@@ -16,9 +16,10 @@ import (
 )
 
 const (
-	HOST = "localhost"
-	PORT = "5557"
-	TYPE = "tcp"
+	HOST      = "localhost"
+	PORT      = "9000"
+	TYPE      = "tcp"
+	NB_SERVER = 3
 )
 
 func main() {
@@ -28,7 +29,13 @@ func main() {
 // Run the main function of the program client
 func Run() {
 	HelpMenu()
-	conn, err := net.Dial(TYPE, HOST+":"+PORT)
+	port, err := strconv.Atoi(PORT)
+	if err != nil {
+		log.Fatal(err)
+	}
+	port += NB_SERVER + 1
+	fmt.Println("Connecting to server on port " + strconv.Itoa(port))
+	conn, err := net.Dial(TYPE, HOST+":"+strconv.Itoa(port))
 	if err != nil {
 		log.Fatal(err)
 	}
