@@ -43,7 +43,7 @@ func handleCommunicationWithMutexProcess(id int, conns *[]net.Conn, chanMutexNet
 		idTo := msg.id
 		if msg.rType == "ack" {
 			msg.id = id
-			SendMessageTo(msg, &(*conns)[idTo])
+			SendMessageTo(msg, (*conns)[idTo])
 			return
 		}
 		// Si on reçoit un REQ ou un REL depuis le processus mutex, on doit envoyer le message à tous les autres processus
@@ -55,18 +55,18 @@ func handleCommunicationWithMutexProcess(id int, conns *[]net.Conn, chanMutexNet
 func handleCommunicationWithOtherProcesses(id int, conns *[]net.Conn, done chan bool, requests *[]Message, chanSC chan bool, clock *Lamport) {
 	fmt.Println("handleCommunicationWithOtherProcesses : Starting process ", id)
 	for i, conn := range *conns {
-		if conn != nil {
+		if i != id {
 			fmt.Println("Listening to process ", i)
-			go handleCommunicationWith(id, &conn, done, requests, chanSC, clock)
+			go handleCommunicationWith(id, conn, done, requests, chanSC, clock)
 		}
 	}
 }
 
-func handleCommunicationWith(id int, conn *net.Conn, done chan bool, requests *[]Message, chanSC chan bool, clock *Lamport) {
+func handleCommunicationWith(id int, conn net.Conn, done chan bool, requests *[]Message, chanSC chan bool, clock *Lamport) {
 	for {
-		fmt.Println("Process ", id, " listening to process ", (*conn).RemoteAddr())
+		fmt.Println("Process ", id, " listening to process ", conn.RemoteAddr())
 		buf := make([]byte, 1024)
-		_, err := (*conn).Read(buf)
+		_, err := conn.Read(buf)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -76,7 +76,7 @@ func handleCommunicationWith(id int, conn *net.Conn, done chan bool, requests *[
 	done <- true
 }
 
-func handleMessage(id int, buf []byte, clock *Lamport, requests *[]Message, chanSC chan bool, conn *net.Conn) {
+func handleMessage(id int, buf []byte, clock *Lamport, requests *[]Message, chanSC chan bool, conn net.Conn) {
 
 	var res = strings.Split(string(buf), " ")
 
@@ -116,17 +116,17 @@ func MessageToStr(request Message) string {
 	return request.rType + " " + strconv.Itoa(request.time.counterTime) + " " + strconv.Itoa(request.id)
 }
 
-func SendMessageTo(request Message, conn *net.Conn) {
-	fmt.Println("SendMessageTo : Sending message to", (*conn).RemoteAddr())
+func SendMessageTo(request Message, conn net.Conn) {
+	fmt.Println("SendMessageTo : Sending message to", conn.RemoteAddr())
 	msg := MessageToStr(request)
-	_, err := (*conn).Write([]byte(msg))
+	_, err := conn.Write([]byte(msg))
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func SendDataSyncTo(conn *net.Conn, data []byte) {
-	_, err := (*conn).Write(data)
+func SendDataSyncTo(conn net.Conn, data []byte) {
+	_, err := conn.Write(data)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -135,7 +135,7 @@ func SendDataSyncTo(conn *net.Conn, data []byte) {
 func SendToAll(id int, request Message, conns *[]net.Conn) {
 	for i, conn := range *conns {
 		if i != id {
-			SendMessageTo(request, &conn)
+			SendMessageTo(request, conn)
 		}
 	}
 }
@@ -144,7 +144,7 @@ func SendDataSyncToAll(id int, conns *[]net.Conn, command []byte) {
 	msg := append([]byte("data "), command...)
 	for i, conn := range *conns {
 		if i != id {
-			SendDataSyncTo(&conn, msg)
+			SendDataSyncTo(conn, msg)
 		}
 	}
 }
