@@ -22,7 +22,7 @@ type conf struct {
 var err error
 var nbServ int
 
-func RunBtwServer(id int) {
+func RunBtwServer(id int, clock *Lamport, inSC *bool, ChannelSC *chan string) {
 	config := ReadConfigFile()
 	nbServ = config.NServ
 	listenConn, err := net.Listen(config.Type, config.Host+":"+strconv.Itoa(config.Port+id))
@@ -37,11 +37,15 @@ func RunBtwServer(id int) {
 		}
 		buf := make([]byte, 1024)
 		_, err = conn.Read(buf)
-		go handleMessage(buf, id)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println("I'm id = ", id, " and im receiving a message from ", conn.RemoteAddr(), " with msg = ", string(buf))
+		go handleMessage(buf, id, clock, inSC, ChannelSC)
 	}
 }
 
-func handleMessage(buf []byte, id int) {
+func handleMessage(buf []byte, id int, clock *Lamport, inSC *bool, ChannelSC *chan string) {
 
 	var res = strings.Split(string(buf), " ")
 
@@ -52,30 +56,29 @@ func handleMessage(buf []byte, id int) {
 
 		var msg = strToMessage(string(buf))
 		if msg.rType == "req" {
-			clock = clock.Update(msg.time)
-			NoteNewMessage(msg, msg.id, id)
-			var r = Message{"ack", clock, id}
+			*clock = clock.Update(msg.time)
+			NoteNewMessage(msg, msg.id, id, inSC, ChannelSC, clock)
+			var r = Message{"ack", *clock, id}
 			SendMessageTo(msg.id, r)
-			fmt.Println("I'm id = ", id, " and I sent an ack to ", msg.id, " with clock ", clock.counterTime)
 
 		} else if msg.rType == "rel" {
-			clock = clock.Update(msg.time)
-			NoteNewMessage(msg, msg.id, id)
+			*clock = clock.Update(msg.time)
+			NoteNewMessage(msg, msg.id, id, inSC, ChannelSC, clock)
 
 		} else if msg.rType == "ack" {
-			clock = clock.Update(msg.time)
-			NoteNewMessage(msg, msg.id, id)
+			*clock = clock.Update(msg.time)
+			NoteNewMessage(msg, msg.id, id, inSC, ChannelSC, clock)
 		}
 	}
 }
 
-func sendRequests(clock Lamport, id int) {
-	var request = Message{"req", clock, id}
+func sendRequests(clock *Lamport, id int) {
+	var request = Message{"req", *clock, id}
 	SendToAll(request, id)
 }
 
-func sendReleases(clock Lamport, id int) {
-	var request = Message{"rel", clock, id}
+func sendReleases(clock *Lamport, id int) {
+	var request = Message{"rel", *clock, id}
 	SendToAll(request, id)
 }
 
@@ -112,6 +115,7 @@ func SendMessageTo(id int, request Message) {
 	msg := MessageToStr(request)
 	var currConn net.Conn
 	currConn, err = net.Dial("tcp", "localhost:"+strconv.Itoa(2500+id))
+	fmt.Println("I'm id = ", request.id, " and im sending a message to ", id, " with msg = ", msg)
 	//defer currConn.Close()
 	if err != nil {
 		log.Fatal(err)

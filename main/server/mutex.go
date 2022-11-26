@@ -4,10 +4,6 @@ import (
 	"fmt"
 )
 
-var clock = Lamport{}
-var inSC = false
-var ChannelSc = make(chan string)
-
 type Message struct {
 	rType string
 	time  Lamport
@@ -16,32 +12,35 @@ type Message struct {
 
 var msgArray []Message
 
-func StartClock() {
+func StartClock(clock *Lamport) {
 	clock.NewLamport()
 	msgArray = make([]Message, ReadConfigFile().NServ)
+	for id, _ := range msgArray {
+		msgArray[id].id = -1
+	}
 }
 
-func AskForSC(id int) {
+func AskForSC(id int, clock *Lamport) {
 	fmt.Println("I'm id = ", id, " and I ask for sc at time ", clock.counterTime)
 	clock.Increment()
 	sendRequests(clock, id)
-	msgArray[id] = Message{"req", clock, id}
+	msgArray[id] = Message{"req", *clock, id}
 }
 
-func FreeSC(id int) {
+func FreeSC(id int, clock *Lamport, inSC *bool) {
 	fmt.Println("I'm id = ", id, " and I free sc at the time", clock.counterTime)
 	clock.Increment()
 	sendReleases(clock, id)
-	msgArray[id] = Message{"rel", clock, id}
-	inSC = false
+	msgArray[id] = Message{"rel", *clock, id}
+	*inSC = false
 }
 
-func NoteNewMessage(message Message, index int, id int) {
+func NoteNewMessage(message Message, index int, id int, inSC *bool, ChannelSc *chan string, clock *Lamport) {
 	msgArray[index] = message
-	checkSCAvailable(id)
-	fmt.Println("I'm id = ", id, " and the checkSCAvailable is ", inSC)
-	if inSC {
-		ChannelSc <- "SC"
+	checkSCAvailable(id, inSC, clock)
+	fmt.Println("I'm id = ", id, " and the checkSCAvailable is ", *inSC)
+	if *inSC {
+		*ChannelSc <- "SC"
 	}
 	fmt.Println("The msgArray is ", msgArray)
 }
@@ -49,23 +48,20 @@ func NoteNewMessage(message Message, index int, id int) {
 // Check if the SC is available
 // the SC is available if all the servers have sent : an ack, a rel, or a req with an bigger clock
 // the SC is not available if one server has sent a req with a smaller clock or if a sever haven't answered
-func checkSCAvailable(id int) {
+func checkSCAvailable(id int, inSC *bool, clock *Lamport) {
 	fmt.Println("I'm id = ", id, " and I check if the SC is available at the time", clock.counterTime)
-	for i := 0; i < ReadConfigFile().NServ; i++ {
-		if i != id {
-			if msgArray[i].rType == "req" {
-				if msgArray[i].time.counterTime < clock.counterTime {
-					inSC = true
-				} else {
-					inSC = false
-					return
-				}
-			} else if msgArray[i].rType == "ack" || msgArray[i].rType == "rel" {
-				inSC = true
-			} else {
-				inSC = false
+	fmt.Println("The msgArray is ", msgArray)
+	if msgArray[id].rType != "req" {
+		*inSC = false
+		return
+	}
+	for _, msg := range msgArray {
+		if msg.id != id {
+			if msg.id == -1 || (msg.rType == "req" && msg.time.counterTime < msgArray[id].time.counterTime) {
+				*inSC = false
 				return
 			}
 		}
 	}
+	*inSC = true
 }

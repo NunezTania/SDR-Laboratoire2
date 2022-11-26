@@ -30,12 +30,15 @@ func main() {
 
 func Launch(idServer int) {
 	WaitForEveryBody(idServer)
-	StartClock()
-	go RunBtwServer(idServer)
-	go RunBtwClient(idServer)
+	var clock = Lamport{}
+	var inSC = false
+	var ChannelSc = make(chan string)
+	StartClock(&clock)
+	go RunBtwServer(idServer, &clock, &inSC, &ChannelSc)
+	go RunBtwClient(idServer, &ChannelSc, &clock, &inSC)
 }
 
-func RunBtwClient(id int) {
+func RunBtwClient(id int, ChannelSC *chan string, clock *Lamport, inSC *bool) {
 
 	go dataRW.HandleRWActions()
 	port := strconv.Itoa(PORT + id)
@@ -46,24 +49,29 @@ func RunBtwClient(id int) {
 	}
 
 	fmt.Println("Server is listening")
-	defer listen.Close()
+	defer func(listen net.Listener) {
+		err := listen.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}(listen)
 	for {
 		conn, err := listen.Accept()
 		if err != nil {
 			log.Fatal(err)
 		}
-		go HandleRequest(conn, id)
+		go HandleRequest(conn, id, ChannelSC, clock, inSC)
 	}
 }
 
 // HandleRequest handles the requests from the clients
-func HandleRequest(conn net.Conn, id int) {
+func HandleRequest(conn net.Conn, id int, ChannelSC *chan string, clock *Lamport, inSC *bool) {
 	buf := make([]byte, 1024)
 	_, err := conn.Read(buf)
 	if err != nil {
 		log.Fatal(err)
 	}
-	for commandTreatment := AskDataRW(buf, id); commandTreatment != "q"; commandTreatment = AskDataRW(buf, id) {
+	for commandTreatment := AskDataRW(buf, id, ChannelSC, clock, inSC); commandTreatment != "q"; commandTreatment = AskDataRW(buf, id, ChannelSC, clock, inSC) {
 		fmt.Println("Handling request")
 		_, err := conn.Write([]byte(commandTreatment))
 		if err != nil {
@@ -86,24 +94,24 @@ func HandleRequest(conn net.Conn, id int) {
 }
 
 // AskDataRW asks the dataRW to treat the command
-func AskDataRW(commandParameters []byte, id int) string {
-	waitForSC(id)
+func AskDataRW(commandParameters []byte, id int, ChannelSC *chan string, clock *Lamport, inSC *bool) string {
+	waitForSC(id, ChannelSC, clock)
 	clientChannel := make(chan []byte)
 	dataRW.DataChannel <- clientChannel
 	clientChannel <- commandParameters
 	response := <-clientChannel
-	leaveSC(id)
+	leaveSC(id, clock, inSC)
 	if dataRW.DataModified {
 		SendDataSyncToAll(commandParameters, id)
 	}
 	return string(response)
 }
 
-func waitForSC(id int) {
-	AskForSC(id)
-	<-ChannelSc
+func waitForSC(id int, ChannelSc *chan string, clock *Lamport) {
+	AskForSC(id, clock)
+	<-*ChannelSc
 }
 
-func leaveSC(id int) {
-	FreeSC(id)
+func leaveSC(id int, clock *Lamport, inSC *bool) {
+	FreeSC(id, clock, inSC)
 }
