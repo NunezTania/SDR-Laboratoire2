@@ -4,10 +4,12 @@
 package main
 
 import (
+	pm "SDR-Laboratoire1/main/server/processMutex"
 	"bufio"
 	"fmt"
 	"golang.org/x/term"
 	"log"
+	"math/rand"
 	"net"
 	"os"
 	"strconv"
@@ -15,20 +17,23 @@ import (
 	"syscall"
 )
 
-const (
-	HOST = "localhost"
-	PORT = "5557"
-	TYPE = "tcp"
-)
-
 func main() {
-	Run()
+	Run(0)
+}
+
+func RunRandomServ() {
+	Run(-1)
 }
 
 // Run the main function of the program client
-func Run() {
+func Run(idServ int) {
 	HelpMenu()
-	conn, err := net.Dial(TYPE, HOST+":"+PORT)
+	conf := pm.ReadConfigFile("../../main/server/config.yaml")
+	fmt.Println(conf)
+	if idServ == -1 {
+		idServ = rand.Int() % conf.NServ
+	}
+	conn, err := net.Dial(conf.Type, conf.Host+":"+strconv.Itoa(conf.PortClient+idServ))
 	if err != nil {
 		log.Fatal(err)
 	}

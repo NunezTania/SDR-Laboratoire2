@@ -1,4 +1,4 @@
-package main
+package processMutex
 
 import (
 	"bytes"
@@ -11,24 +11,17 @@ import (
 	"strings"
 )
 
-type conf struct {
-	NServ int    `yaml:"nServ"`
-	Port  int    `yaml:"port"`
-	Host  string `yaml:"host"`
-	Type  string `yaml:"type"`
+type Conf struct {
+	NServ      int    `yaml:"nServ"`
+	PortServ   int    `yaml:"portServ"`
+	PortClient int    `yaml:"portClient"`
+	Host       string `yaml:"host"`
+	Type       string `yaml:"type"`
 }
 
-var err error
-var nbServ int
+var Config = ReadConfigFile("./main/server/config.yaml")
 
-func RunBtwServer(id int, clock *Lamport, inSC *bool, ChannelSC *chan string, DataChannel *chan chan []byte) {
-	config := ReadConfigFile()
-	nbServ = config.NServ
-	listenConn, err := net.Listen(config.Type, config.Host+":"+strconv.Itoa(config.Port+id))
-	if err != nil {
-		log.Fatal(err)
-	}
-
+func RunBtwServer(id int, clock *Lamport, inSC *bool, ChannelSC *chan string, DataChannel *chan chan []byte, done chan bool, listenConn net.Listener) {
 	for {
 		conn, err := listenConn.Accept()
 		if err != nil {
@@ -42,6 +35,7 @@ func RunBtwServer(id int, clock *Lamport, inSC *bool, ChannelSC *chan string, Da
 		fmt.Println("I'm id = ", id, " and im receiving a message from ", conn.RemoteAddr(), " with msg = ", string(buf))
 		go handleMessage(buf, id, clock, inSC, ChannelSC, DataChannel)
 	}
+	done <- true
 }
 
 func handleMessage(buf []byte, id int, clock *Lamport, inSC *bool, ChannelSC *chan string, DataChannel *chan chan []byte) {
@@ -56,7 +50,6 @@ func handleMessage(buf []byte, id int, clock *Lamport, inSC *bool, ChannelSC *ch
 		fmt.Println(string(res))
 
 	} else { // message is a SC message
-
 		var msg = strToMessage(string(buf))
 		if msg.rType == "req" {
 			*clock = clock.Update(msg.time)
@@ -85,18 +78,18 @@ func sendReleases(clock *Lamport, id int) {
 	SendToAll(request, id)
 }
 
-func ReadConfigFile() conf {
-	yamlFile, error := os.ReadFile("./main/server/config.yaml")
-	if error != nil {
-		log.Printf("yamlFile.Get err   #%v ", error)
+func ReadConfigFile(path string) Conf {
+	yamlFile, err := os.ReadFile(path)
+	if err != nil {
+		log.Printf("yamlFile.Get err   #%v ", err)
 	}
-	var c conf
-	error = yaml.Unmarshal(yamlFile, &c)
-	if error != nil {
-		log.Fatalf("Unmarshal: %v", error)
+	var c Conf
+	err = yaml.Unmarshal(yamlFile, &c)
+	if err != nil {
+		log.Fatalf("Unmarshal: %v", err)
 	}
-	if error != nil {
-		log.Fatal(error)
+	if err != nil {
+		log.Fatal(err)
 	}
 	return c
 }
@@ -116,28 +109,32 @@ func MessageToStr(request Message) string {
 
 func SendMessageTo(id int, request Message) {
 	msg := MessageToStr(request)
-	var currConn net.Conn
-	currConn, err = net.Dial("tcp", "localhost:"+strconv.Itoa(2500+id))
+	currConn, err := net.Dial("tcp", Config.Host+":"+strconv.Itoa(Config.PortServ+id))
 	fmt.Println("I'm id = ", request.id, " and im sending a message to ", id, " with msg = ", msg)
-	//defer currConn.Close()
 	if err != nil {
 		log.Fatal(err)
 	}
 	_, err = currConn.Write([]byte(msg))
+	errClose := currConn.Close()
+	if errClose != nil {
+		log.Fatal(err)
+	}
 }
 
 func SendDataSyncTo(id int, data []byte) {
-	var currConn net.Conn
-	currConn, err = net.Dial("tcp", "localhost:"+strconv.Itoa(2500+id))
-	defer currConn.Close()
+	currConn, err := net.Dial(Config.Type, Config.Host+":"+strconv.Itoa(Config.PortServ+id))
 	if err != nil {
 		log.Fatal(err)
 	}
 	_, err = currConn.Write(data)
+	errClose := currConn.Close()
+	if errClose != nil {
+		log.Fatal(err)
+	}
 }
 
 func SendToAll(request Message, id int) {
-	for i := 0; i < nbServ; i++ {
+	for i := 0; i < Config.NServ; i++ {
 		if i != id {
 			SendMessageTo(i, request)
 		}
@@ -146,36 +143,44 @@ func SendToAll(request Message, id int) {
 
 func SendDataSyncToAll(command []byte, id int) {
 	msg := append([]byte("data "), command...)
-	for i := 0; i < nbServ; i++ {
+	for i := 0; i < Config.NServ; i++ {
 		if i != id {
 			SendDataSyncTo(i, msg)
 		}
 	}
 }
 
-func WaitForEveryBody(id int) {
+func WaitForEveryBody(id int, listenConn net.Listener, listening *[]chan bool) {
 	fmt.Println("I'm id = ", id, " and im Waiting for every body to be ready")
 	msg := "ready"
-	var listenConn net.Listener
+	waitReady := make(chan bool)
 
-	for i := 0; i < nbServ; i++ {
+	for i := 0; i < Config.NServ; i++ {
 		if i != id {
-			listenConn, err := net.Dial("tcp", "localhost:"+strconv.Itoa(8000+i))
-			//defer listenConn.Close()
+			<-(*listening)[i] // Waiting for every serv to listen so this does not crash
+			conn, err := net.Dial(Config.Type, Config.Host+":"+strconv.Itoa(Config.PortServ+i))
 			if err != nil {
 				log.Fatal(err)
 			}
-			_, err = listenConn.Write([]byte(msg))
+			_, err = conn.Write([]byte(msg))
+			errClose := conn.Close()
+			if errClose != nil {
+				log.Fatal(err)
+			}
 		}
 	}
 
-	for i := 0; i < nbServ-1; i++ {
-		conn, err := listenConn.Accept()
-		defer listenConn.Close()
-		if err != nil {
-			log.Fatal(err)
+	go func() {
+		for i := 0; i < Config.NServ-1; i++ {
+			conn, err := listenConn.Accept()
+			if err != nil {
+				log.Fatal(err)
+			}
+			buf := make([]byte, 1024)
+			_, err = conn.Read(buf)
 		}
-		buf := make([]byte, 1024)
-		_, err = conn.Read(buf)
-	}
+		waitReady <- true
+	}()
+	<-waitReady
+	fmt.Println("I'm id = ", id, " and everybody told me they are ready")
 }

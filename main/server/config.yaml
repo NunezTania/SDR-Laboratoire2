@@ -1,4 +1,5 @@
 nServ: 3
-port: 2500
+portServ: 5000
+portClient: 2500
 host: "localhost"
 type: "tcp"

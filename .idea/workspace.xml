@@ -4,10 +4,13 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="96597984-09df-44c3-a8c1-1f54c5238989" name="Changes" comment="PLus de probleme de check pour la SC">
+    <list default="true" id="96597984-09df-44c3-a8c1-1f54c5238989" name="Changes" comment="Enlevé affichage de test">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main/dataRW/dataReaderWriter.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/dataRW/dataReaderWriter.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main/server/network.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/server/network.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/client/client.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/client/client.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/server/config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/main/server/config.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/server/lamportClock.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/server/processMutex/lamportClock.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/server/mutex.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/server/processMutex/mutex.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/server/network.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/server/processMutex/network.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main/server/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/server/server.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -40,25 +43,39 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "DefaultGoTemplateProperty": "Go File",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.go.format.on.save.advertiser.fired": "true",
-    "RunOnceActivity.go.formatter.settings.were.checked": "true",
-    "RunOnceActivity.go.migrated.go.modules.settings": "true",
-    "RunOnceActivity.go.modules.go.list.on.any.changes.was.set": "true",
-    "RunOnceActivity.go.watchers.conflict.with.on.save.actions.check.performed": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "go.import.settings.migrated": "true",
-    "go.sdk.automatically.set": "true",
-    "last_opened_file_path": "C:/Users/FNGUSER004",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.lookFeel"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;DefaultGoTemplateProperty&quot;: &quot;Go File&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.format.on.save.advertiser.fired&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.migrated.go.modules.settings&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.modules.go.list.on.any.changes.was.set&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.watchers.conflict.with.on.save.actions.check.performed&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
+    &quot;go.sdk.automatically.set&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/FNGUSER004&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;
   }
-}]]></component>
+}</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\FNGUSER004\GolandProjects\SDR-Laboratoire2\main\server\processMutex" />
+    </key>
+  </component>
   <component name="RunManager" selected="Go Build.go build SDR-Laboratoire1/main/server">
+    <configuration name="go build SDR-Laboratoire1/main/client" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
+      <module name="SDR-Laboratoire1" />
+      <working_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="SDR-Laboratoire1/main/client" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$/main/client/client.go" />
+      <method v="2" />
+    </configuration>
     <configuration name="go build SDR-Laboratoire1/main/server" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="SDR-Laboratoire1" />
       <working_directory value="$PROJECT_DIR$" />
@@ -78,18 +95,6 @@
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
       <pattern value="^\QTestADDOne\E$" />
-      <method v="2" />
-    </configuration>
-    <configuration name="TestLISTM in SDR-Laboratoire1/test" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
-      <module name="SDR-Laboratoire1" />
-      <working_directory value="$PROJECT_DIR$/test" />
-      <root_directory value="$PROJECT_DIR$" />
-      <kind value="PACKAGE" />
-      <package value="SDR-Laboratoire1/test" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$" />
-      <framework value="gotest" />
-      <pattern value="^\QTestLISTM\E$" />
       <method v="2" />
     </configuration>
     <configuration name="go test SDR-Laboratoire1/test (1)" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
@@ -117,10 +122,10 @@
     <recent_temporary>
       <list>
         <item itemvalue="Go Build.go build SDR-Laboratoire1/main/server" />
+        <item itemvalue="Go Build.go build SDR-Laboratoire1/main/client" />
         <item itemvalue="Go Test.go test SDR-Laboratoire1/test" />
         <item itemvalue="Go Test.TestADDOne in SDR-Laboratoire1/test" />
         <item itemvalue="Go Test.go test SDR-Laboratoire1/test (1)" />
-        <item itemvalue="Go Test.TestLISTM in SDR-Laboratoire1/test" />
       </list>
     </recent_temporary>
   </component>
@@ -163,7 +168,9 @@
     <MESSAGE value="server communication works" />
     <MESSAGE value="PLus de probleme de conv" />
     <MESSAGE value="PLus de probleme de check pour la SC" />
-    <option name="LAST_COMMIT_MESSAGE" value="PLus de probleme de check pour la SC" />
+    <MESSAGE value="Data sync semble fonctionner entre processus" />
+    <MESSAGE value="Enlevé affichage de test" />
+    <option name="LAST_COMMIT_MESSAGE" value="Enlevé affichage de test" />
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>

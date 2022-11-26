@@ -1,4 +1,4 @@
-package main
+package processMutex
 
 import (
 	"fmt"
@@ -14,8 +14,8 @@ var msgArray []Message
 
 func StartClock(clock *Lamport) {
 	clock.NewLamport()
-	msgArray = make([]Message, ReadConfigFile().NServ)
-	for id, _ := range msgArray {
+	msgArray = make([]Message, Config.NServ)
+	for id := range msgArray {
 		msgArray[id].id = -1
 	}
 }
