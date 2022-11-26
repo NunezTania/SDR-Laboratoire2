@@ -10,9 +10,6 @@ import (
 	"strings"
 )
 
-var DataChannel = make(chan chan []byte)
-var DataModified = false
-
 type Event struct {
 	id     int
 	name   string
@@ -34,43 +31,37 @@ type User struct {
 	password string
 }
 
-var eventCounter = 0
-var postCounter = 0
-
-var events []Event
-var users []User
-
 // CreateUserAndEvent creates a user and an event
-func CreateUsersAndEvents() {
+func CreateUsersAndEvents(users *[]User, events *[]Event, postCounter *int, eventCounter *int) {
 	// creation of users
-	users = append(users, User{"Bob", "1234"})
-	users = append(users, User{"Lea", "1234"})
-	users = append(users, User{"Leo", "1234"})
-	users = append(users, User{"Willi", "1234"})
-	users = append(users, User{"Lili", "1234"})
-	users = append(users, User{"T", "1234"})
+	*users = append(*users, User{"Bob", "1234"})
+	*users = append(*users, User{"Lea", "1234"})
+	*users = append(*users, User{"Leo", "1234"})
+	*users = append(*users, User{"Willi", "1234"})
+	*users = append(*users, User{"Lili", "1234"})
+	*users = append(*users, User{"T", "1234"})
 	// creation of posts
 	var posts []Post
-	posts = append(posts, Post{postCounter, "Bar à bière", 3, 0, users[0:1]})
-	postCounter++
-	posts = append(posts, Post{postCounter, "Securité", 2, 0, users[2:4]})
-	postCounter = 0
-	posts = append(posts, Post{postCounter, "Vente de ticket", 5, 1, users[0:1]})
-	postCounter++
-	posts = append(posts, Post{postCounter, "Logistique", 1, 1, users[2:4]})
-	postCounter++
-	posts = append(posts, Post{postCounter, "Securité", 2, 1, users[4:5]})
-	postCounter++
+	posts = append(posts, Post{*postCounter, "Bar à bière", 3, 0, (*users)[0:1]})
+	*postCounter++
+	posts = append(posts, Post{*postCounter, "Securité", 2, 0, (*users)[2:4]})
+	*postCounter = 0
+	posts = append(posts, Post{*postCounter, "Vente de ticket", 5, 1, (*users)[0:1]})
+	*postCounter++
+	posts = append(posts, Post{*postCounter, "Logistique", 1, 1, (*users)[2:4]})
+	*postCounter++
+	posts = append(posts, Post{*postCounter, "Securité", 2, 1, (*users)[4:5]})
+	*postCounter++
 	// creation of events
-	events = append(events, Event{eventCounter, "Festival de la musique", users[0], true, posts[0:2]})
-	eventCounter++
-	events = append(events, Event{eventCounter, "Festival de la bière", users[0], true, posts[2:5]})
-	eventCounter++
+	*events = append(*events, Event{*eventCounter, "Festival de la musique", (*users)[0], true, posts[0:2]})
+	*eventCounter++
+	*events = append(*events, Event{*eventCounter, "Festival de la bière", (*users)[0], true, posts[2:5]})
+	*eventCounter++
 }
 
 // Authentification checks if the user is in the list of users and password is correct
-func Authentification(username string, password string) bool {
-	for _, user := range users {
+func Authentification(username string, password string, users *[]User) bool {
+	for _, user := range *users {
 		if user.name == username && user.password == password {
 			return true
 		}
@@ -79,13 +70,13 @@ func Authentification(username string, password string) bool {
 }
 
 // RemoveUserPost removes a user from a post
-func RemoveUserPost(username string, password string, idEvent string) {
-	event := GetEventById(idEvent)
+func RemoveUserPost(username string, password string, idEvent string, events *[]Event) {
+	event := GetEventById(idEvent, events)
 	for _, post := range event.posts {
 		for i, staff := range post.staff {
 			if staff.name == username && staff.password == password {
 				fmt.Println("Removing user from post")
-				events[event.id].posts[post.id].staff = append(events[event.id].posts[post.id].staff[:i], events[event.id].posts[post.id].staff[i+1:]...)
+				(*events)[event.id].posts[post.id].staff = append((*events)[event.id].posts[post.id].staff[:i], (*events)[event.id].posts[post.id].staff[i+1:]...)
 				post.capacity++
 			}
 		}
@@ -93,11 +84,11 @@ func RemoveUserPost(username string, password string, idEvent string) {
 }
 
 // GetEventById returns the event with the given id
-func GetEventById(id string) Event {
-	for i := 0; i < len(events); i++ {
+func GetEventById(id string, events *[]Event) Event {
+	for i := 0; i < len(*events); i++ {
 		idEvent, _ := strconv.Atoi(string(bytes.Trim([]byte(id), "\x00")))
-		if events[i].id == idEvent {
-			return events[i]
+		if (*events)[i].id == idEvent {
+			return (*events)[i]
 		}
 	}
 	return Event{}
@@ -114,7 +105,7 @@ func contains(users []User, person User) bool {
 }
 
 // CreateEvent creates an event
-func CreateEvent(parameters []string) string {
+func CreateEvent(parameters []string, users *[]User, events *[]Event, postCounter *int, eventCounter *int) string {
 	uname := parameters[0]
 	pwd := parameters[1]
 	eventName := parameters[2]
@@ -122,30 +113,30 @@ func CreateEvent(parameters []string) string {
 	if len(posts)%2 != 0 {
 		return "Invalid Number of arguments"
 	}
-	if Authentification(uname, pwd) {
-		postCounter = 0
+	if Authentification(uname, pwd, users) {
+		*postCounter = 0
 		owner := User{uname, pwd}
 		var newPost []Post
 		for i := 0; i < len(posts)-1; i += 2 {
 			capacity, _ := strconv.Atoi(string(bytes.Trim([]byte(posts[i+1]), "\x00")))
-			newPost = append(newPost, Post{postCounter, posts[i], capacity, eventCounter, nil})
-			postCounter++
+			newPost = append(newPost, Post{*postCounter, posts[i], capacity, *eventCounter, nil})
+			*postCounter++
 		}
-		events = append(events, Event{eventCounter, eventName, owner, true, newPost})
-		eventCounter++
+		*events = append(*events, Event{*eventCounter, eventName, owner, true, newPost})
+		*eventCounter++
 		return "Event Created"
 	}
 	return "Authentification failed"
 }
 
 // CloseEvent closes an event
-func CloseEvent(commandParameters []string) string {
+func CloseEvent(commandParameters []string, users *[]User, events *[]Event) string {
 	fmt.Println("Closing an event")
-	if Authentification(commandParameters[0], commandParameters[1]) {
-		for i := 0; i < len(events); i++ {
+	if Authentification(commandParameters[0], commandParameters[1], users) {
+		for i := 0; i < len(*events); i++ {
 			id, _ := strconv.Atoi(string(bytes.Trim([]byte(commandParameters[2]), "\x00")))
-			if events[i].id == id && events[i].owner.name == commandParameters[0] {
-				events[i].isOpen = false
+			if (*events)[i].id == id && (*events)[i].owner.name == commandParameters[0] {
+				(*events)[i].isOpen = false
 				return "Event closed"
 			}
 		}
@@ -156,17 +147,17 @@ func CloseEvent(commandParameters []string) string {
 }
 
 // AddBenevole adds a benevole to a post
-func AddBenevole(slice []string) string {
+func AddBenevole(slice []string, users *[]User, events *[]Event) string {
 	fmt.Println("Adding a benevole")
 	uname := slice[0]
 	pwd := slice[1]
 	idEvent := slice[2]
 	idPost := slice[3]
-	if Authentification(slice[0], slice[1]) {
+	if Authentification(slice[0], slice[1], users) {
 		idPost, _ := strconv.Atoi(string(bytes.Trim([]byte(idPost), "\x00")))
-		RemoveUserPost(uname, pwd, idEvent)
-		event := GetEventById(idEvent)
-		post := GetEventById(idEvent).posts[idPost]
+		RemoveUserPost(uname, pwd, idEvent, events)
+		event := GetEventById(idEvent, events)
+		post := GetEventById(idEvent, events).posts[idPost]
 		if post.capacity < 1 {
 			return "Could not add user to post because post is full"
 		}
@@ -184,19 +175,19 @@ func AddBenevole(slice []string) string {
 }
 
 // ListEvents lists all the events
-func ListEvents() string {
+func ListEvents(events *[]Event) string {
 	var str string
-	for i := 0; i < len(events); i++ {
-		if events[i].isOpen {
-			str += "Event's id: " + strconv.Itoa(events[i].id) + ", Event's name: " + events[i].name + ", Owner: " + events[i].owner.name + ", is open:" + strconv.FormatBool(events[i].isOpen) + "\n"
+	for i := 0; i < len(*events); i++ {
+		if (*events)[i].isOpen {
+			str += "Event's id: " + strconv.Itoa((*events)[i].id) + ", Event's name: " + (*events)[i].name + ", Owner: " + (*events)[i].owner.name + ", is open:" + strconv.FormatBool((*events)[i].isOpen) + "\n"
 		}
 	}
 	return str
 }
 
 // ListPosts lists all the posts of an event
-func ListPosts(slice []string) string {
-	event := GetEventById(slice[0])
+func ListPosts(slice []string, events *[]Event) string {
+	event := GetEventById(slice[0], events)
 	var str string
 	for i := 0; i < len(event.posts); i++ {
 		str += "Post's id: " + strconv.Itoa(event.posts[i].id) + ", Post's name: " + event.posts[i].name + ", Capacity: " + strconv.Itoa(event.posts[i].capacity) + "\n"
@@ -205,8 +196,8 @@ func ListPosts(slice []string) string {
 }
 
 // ListUsers lists all the users of all the posts of an event
-func ListUsers(slice []string) string {
-	var event = GetEventById(slice[0])
+func ListUsers(slice []string, events *[]Event) string {
+	var event = GetEventById(slice[0], events)
 
 	tabCell := "%-20v"
 	tabCellCross := "%-10v"
@@ -240,28 +231,28 @@ func ListUsers(slice []string) string {
 }
 
 // ProcessCommand find the first word (the command) of the command and call the corresponding function
-func ProcessCommand(commandParameters []string) string {
+func ProcessCommand(commandParameters []string, users *[]User, events *[]Event, DataModified *bool, postCounter *int, eventCounter *int) string {
 	switch commandParameters[0] {
 	case "CREATE":
-		DataModified = true
-		return CreateEvent(commandParameters[1:])
+		*DataModified = true
+		return CreateEvent(commandParameters[1:], users, events, postCounter, eventCounter)
 	case "CLOSE":
-		DataModified = true
-		return CloseEvent(commandParameters[1:])
+		*DataModified = true
+		return CloseEvent(commandParameters[1:], users, events)
 	case "ADD":
-		DataModified = true
-		return AddBenevole(commandParameters[1:])
+		*DataModified = true
+		return AddBenevole(commandParameters[1:], users, events)
 	case "LISTM":
-		DataModified = false
-		return ListEvents()
+		*DataModified = false
+		return ListEvents(events)
 	case "LISTP":
-		DataModified = false
-		return ListPosts(commandParameters[1:])
+		*DataModified = false
+		return ListPosts(commandParameters[1:], events)
 	case "LISTU":
-		DataModified = false
-		return ListUsers(commandParameters[1:])
+		*DataModified = false
+		return ListUsers(commandParameters[1:], events)
 	case "QUIT":
-		DataModified = false
+		*DataModified = false
 		return "q"
 	default:
 		return "Command not found"
@@ -269,14 +260,19 @@ func ProcessCommand(commandParameters []string) string {
 }
 
 // HandleRWActions handles the read/write actions
-func HandleRWActions() {
-	CreateUsersAndEvents()
+func HandleRWActions(DataChannel *chan chan []byte, DataModified *bool) {
+	var eventCounter = 0
+	var postCounter = 0
+
+	var events []Event
+	var users []User
+	CreateUsersAndEvents(&users, &events, &postCounter, &eventCounter)
 	for {
 		// Blocking eventual other requests for concurrent data access
-		clientChan := <-DataChannel
+		clientChan := <-*DataChannel
 		fmt.Println("Processing RW operation")
 		// Process request
 		command := <-clientChan
-		clientChan <- []byte(ProcessCommand(strings.Split(string(command), " ")))
+		clientChan <- []byte(ProcessCommand(strings.Split(string(command), " "), &users, &events, DataModified, &postCounter, &eventCounter))
 	}
 }

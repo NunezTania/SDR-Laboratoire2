@@ -1,7 +1,6 @@
 package main
 
 import (
-	"SDR-Laboratoire1/main/dataRW"
 	"bytes"
 	"fmt"
 	"gopkg.in/yaml.v3"
@@ -22,7 +21,7 @@ type conf struct {
 var err error
 var nbServ int
 
-func RunBtwServer(id int, clock *Lamport, inSC *bool, ChannelSC *chan string) {
+func RunBtwServer(id int, clock *Lamport, inSC *bool, ChannelSC *chan string, DataChannel *chan chan []byte) {
 	config := ReadConfigFile()
 	nbServ = config.NServ
 	listenConn, err := net.Listen(config.Type, config.Host+":"+strconv.Itoa(config.Port+id))
@@ -41,16 +40,22 @@ func RunBtwServer(id int, clock *Lamport, inSC *bool, ChannelSC *chan string) {
 			log.Fatal(err)
 		}
 		fmt.Println("I'm id = ", id, " and im receiving a message from ", conn.RemoteAddr(), " with msg = ", string(buf))
-		go handleMessage(buf, id, clock, inSC, ChannelSC)
+		go handleMessage(buf, id, clock, inSC, ChannelSC, DataChannel)
 	}
 }
 
-func handleMessage(buf []byte, id int, clock *Lamport, inSC *bool, ChannelSC *chan string) {
+func handleMessage(buf []byte, id int, clock *Lamport, inSC *bool, ChannelSC *chan string, DataChannel *chan chan []byte) {
 
 	var res = strings.Split(string(buf), " ")
 
 	if res[0] == "data" { // message is a data sync
-		dataRW.ProcessCommand(res[1:])
+		clientChannel := make(chan []byte)
+		*DataChannel <- clientChannel
+		fmt.Println("Keks avant")
+		clientChannel <- []byte(strings.Join(res[1:], " "))
+		fmt.Println("Keks apres")
+		res := <-clientChannel
+		fmt.Println(string(res))
 
 	} else { // message is a SC message
 
