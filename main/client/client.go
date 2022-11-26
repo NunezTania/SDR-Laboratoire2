@@ -29,7 +29,6 @@ func RunRandomServ() {
 func Run(idServ int) {
 	HelpMenu()
 	conf := pm.ReadConfigFile("../../main/server/config.yaml")
-	fmt.Println(conf)
 	if idServ == -1 {
 		idServ = rand.Int() % conf.NServ
 	}

@@ -66,7 +66,7 @@ func RunBtwClient(id int, ChannelSC *chan string, clock *pm.Lamport, inSC *bool,
 		log.Fatal(err)
 	}
 
-	fmt.Println("Server is listening")
+	fmt.Println("Server ", id, " is listening")
 	defer func(listen net.Listener) {
 		err := listen.Close()
 		if err != nil {

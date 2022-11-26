@@ -31,7 +31,6 @@ type User struct {
 	password string
 }
 
-// CreateUserAndEvent creates a user and an event
 func CreateUsersAndEvents(users *[]User, events *[]Event, postCounter *int, eventCounter *int) {
 	// creation of users
 	*users = append(*users, User{"Bob", "1234"})
@@ -91,7 +90,9 @@ func GetEventById(id string, events *[]Event) Event {
 			return (*events)[i]
 		}
 	}
-	return Event{}
+	var event Event
+	event.id = -1
+	return event
 }
 
 // contains check if a person is contains inside users
@@ -157,6 +158,12 @@ func AddBenevole(slice []string, users *[]User, events *[]Event) string {
 		idPost, _ := strconv.Atoi(string(bytes.Trim([]byte(idPost), "\x00")))
 		RemoveUserPost(uname, pwd, idEvent, events)
 		event := GetEventById(idEvent, events)
+		if event.id != -1 {
+			return "Event not found"
+		}
+		if len(event.posts) < idPost {
+			return "Post not found"
+		}
 		post := GetEventById(idEvent, events).posts[idPost]
 		if post.capacity < 1 {
 			return "Could not add user to post because post is full"

@@ -4,13 +4,10 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="96597984-09df-44c3-a8c1-1f54c5238989" name="Changes" comment="Enlevé affichage de test">
+    <list default="true" id="96597984-09df-44c3-a8c1-1f54c5238989" name="Changes" comment="Client run sur un serveur random">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main/client/client.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/client/client.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/dataRW/dataReaderWriter.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/dataRW/dataReaderWriter.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main/server/config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/main/server/config.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main/server/lamportClock.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/server/processMutex/lamportClock.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main/server/mutex.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/server/processMutex/mutex.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main/server/network.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/server/processMutex/network.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main/server/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/server/server.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -145,8 +142,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="process of cmd CREATE" />
-    <MESSAGE value="process all cmd" />
     <MESSAGE value="almost there" />
     <MESSAGE value="todo update" />
     <MESSAGE value="add benevole OK" />
@@ -170,7 +165,9 @@
     <MESSAGE value="PLus de probleme de check pour la SC" />
     <MESSAGE value="Data sync semble fonctionner entre processus" />
     <MESSAGE value="Enlevé affichage de test" />
-    <option name="LAST_COMMIT_MESSAGE" value="Enlevé affichage de test" />
+    <MESSAGE value="Adaptation des packages, modification en conséquent du client et retrait des config hardcodées" />
+    <MESSAGE value="Client run sur un serveur random" />
+    <option name="LAST_COMMIT_MESSAGE" value="Client run sur un serveur random" />
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>

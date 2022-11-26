@@ -1,4 +1,4 @@
-nServ: 3
+nServ: 4
 portServ: 5000
 portClient: 2500
 host: "localhost"
