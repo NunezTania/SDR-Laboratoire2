@@ -14,7 +14,7 @@ import (
 
 const (
 	HOST = "localhost"
-	PORT = "5557"
+	PORT = 5557
 	TYPE = "tcp"
 )
 
@@ -38,7 +38,7 @@ func Launch(idServer int) {
 func RunBtwClient(id int) {
 
 	go dataRW.HandleRWActions()
-	port := strconv.Itoa(5557 + id)
+	port := strconv.Itoa(PORT + id)
 	listen, err := net.Listen(TYPE, HOST+":"+port)
 
 	if err != nil {

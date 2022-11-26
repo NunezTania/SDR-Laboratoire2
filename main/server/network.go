@@ -2,6 +2,7 @@ package main
 
 import (
 	"SDR-Laboratoire1/main/dataRW"
+	"bytes"
 	"fmt"
 	"gopkg.in/yaml.v3"
 	"log"
@@ -99,7 +100,7 @@ func strToMessage(str string) Message {
 	var args = strings.Split(str, " ")
 	request.rType = args[0]
 	request.time = strToLamport(args[1])
-	request.id, _ = strconv.Atoi(args[2])
+	request.id, _ = strconv.Atoi(string(bytes.Trim([]byte(args[2]), "\x00")))
 	return request
 }
 
