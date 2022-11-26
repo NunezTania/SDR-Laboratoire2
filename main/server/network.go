@@ -51,9 +51,7 @@ func handleMessage(buf []byte, id int, clock *Lamport, inSC *bool, ChannelSC *ch
 	if res[0] == "data" { // message is a data sync
 		clientChannel := make(chan []byte)
 		*DataChannel <- clientChannel
-		fmt.Println("Keks avant")
 		clientChannel <- []byte(strings.Join(res[1:], " "))
-		fmt.Println("Keks apres")
 		res := <-clientChannel
 		fmt.Println(string(res))
 
