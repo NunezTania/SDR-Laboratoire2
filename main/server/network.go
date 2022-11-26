@@ -9,7 +9,8 @@ import (
 	"strings"
 )
 
-func handleCommunicationWithServers(id int, listenConn net.Listener, conns *[]net.Conn, done chan bool, requests *[]Message, chanSC chan bool, clock *Lamport) {
+func handleCommunicationWithServers(id int, listenConn net.Listener, conns *[]net.Conn, done chan bool, requests *[]Message, chanSC chan bool, clock *Lamport, isReady bool) {
+	callReady := CountReady()
 	for {
 		fmt.Println("Process ", id, " listening on port ", listenConn.Addr())
 		conn, err := listenConn.Accept()
@@ -21,16 +22,22 @@ func handleCommunicationWithServers(id int, listenConn net.Listener, conns *[]ne
 		if rErr != nil {
 			log.Fatal(err)
 		}
-		fmt.Println("handleCommunicationWith : Message received from process ", strToMessage(string(buf)).id)
-		handleMessage(id, buf, clock, requests, chanSC, (*conns)[strToMessage(string(buf)).id])
+
+		var res = strings.Split(string(buf), " ")
+		fmt.Println("Voila le message recu |", res[0], "|")
+		if strings.Contains(res[0], "ready") {
+			fmt.Println("Lu un msg ready")
+			callReady()
+		} else {
+			fmt.Println("handleCommunicationWith : Message received from process ", strToMessage(string(buf)).id)
+			handleMessage(id, buf, clock, requests, chanSC, (*conns)[strToMessage(string(buf)).id])
+		}
 	}
 	done <- true
 }
 
 func handleMessage(id int, buf []byte, clock *Lamport, requests *[]Message, chanSC chan bool, conn net.Conn) {
-
 	var res = strings.Split(string(buf), " ")
-
 	if res[0] == "data" { // message is a data sync
 		dataRW.ProcessCommand(res[1:])
 
@@ -52,6 +59,7 @@ func handleMessage(id int, buf []byte, clock *Lamport, requests *[]Message, chan
 			NoteNewMessage(id, msg, requests, chanSC)
 		}
 	}
+
 }
 
 func strToMessage(str string) Message {

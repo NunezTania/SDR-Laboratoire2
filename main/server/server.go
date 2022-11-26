@@ -27,6 +27,7 @@ type conf struct {
 	Type  string `yaml:"type"`
 }
 
+var ChanReady = make(chan bool)
 var Identifier int
 
 func main() {
@@ -57,7 +58,7 @@ func ReadConfigFile() conf {
 	return c
 }
 
-func WaitForEveryBody(id int, nbServ int, conns *[]net.Conn, listener net.Listener) {
+func sayReadyToAll(id int, conns *[]net.Conn) {
 	fmt.Println("Waiting for every body to be ready")
 	msg := "ready"
 
@@ -69,16 +70,6 @@ func WaitForEveryBody(id int, nbServ int, conns *[]net.Conn, listener net.Listen
 			}
 		}
 	}
-
-	for i := 0; i < nbServ-1; i++ {
-		conn, err := listener.Accept()
-		if err != nil {
-			log.Fatal(err)
-		}
-		buf := make([]byte, 1024)
-		_, err = conn.Read(buf)
-	}
-	fmt.Println("Everybody is ready")
 }
 
 func Launch(idServer int, conf conf) {
@@ -114,19 +105,24 @@ func Launch(idServer int, conf conf) {
 		}
 	}
 
-	WaitForEveryBody(idServer, nbServ, &connsWithOtherServers, processListener)
-
 	// Création des canaux pour la synchronisation
 	chanSC := make(chan bool)
 	done := make(chan bool)
+	isReady := false
 
 	// Variables pour processus mutex
 	msgArray := make([]Message, nbServ)
 	var clock = Lamport{}
 	StartClock(&clock)
 
+	//Envoie d'un message pour dire que le serveur est prêt
+	sayReadyToAll(idServer, &connsWithOtherServers)
+
 	// Lancement des goroutines pour la réception des messages
-	go handleCommunicationWithServers(idServer, processListener, &connsWithOtherServers, done, &msgArray, chanSC, &clock)
+	go handleCommunicationWithServers(idServer, processListener, &connsWithOtherServers, done, &msgArray, chanSC, &clock, isReady)
+
+	// Attente que tout les serveurs soient prêts
+	<-ChanReady
 
 	// Lancement de la boucle d'écoute pour les clients
 	RunBtwClient(idServer, clientListener, &connsWithOtherServers, chanSC, &clock, &msgArray)
@@ -155,7 +151,6 @@ func Launch(idServer int, conf conf) {
 	if errProcess != nil {
 		log.Fatal(errProcess)
 	}
-
 }
 
 func RunBtwClient(id int, listener net.Listener, conns *[]net.Conn, chanSC chan bool, clock *Lamport, msgArray *[]Message) {
@@ -232,4 +227,22 @@ func waitForSC(id int, conns *[]net.Conn, clock *Lamport, chanSC chan bool, msgA
 func leaveSC(id int, conns *[]net.Conn, clock *Lamport, msgArray *[]Message) {
 	FreeSC(id, conns, clock, msgArray)
 	fmt.Println("Leaving SC")
+}
+
+func CountReady() (IncrementReady func()) {
+	var nbReady = 0
+	IncrementReady = func() {
+		nbReady++
+	}
+	checkServersReady(nbReady)
+	return IncrementReady
+}
+
+func checkServersReady(nbReady int) {
+	conf := ReadConfigFile()
+	numberServer := conf.NServ
+	if nbReady == numberServer {
+		fmt.Println("wow all servers are ready")
+		ChanReady <- true
+	}
 }
