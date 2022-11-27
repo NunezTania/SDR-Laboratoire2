@@ -1,11 +1,8 @@
+package processMutex
+
 // The mutex file is used to managed the requests and the releases of the critical section
 // It's role is to create and read the messages exchanged between the servers and to stock them in a map
 // The map is used to check if the SC is available or not
-package processMutex
-
-import (
-	"fmt"
-)
 
 type Message struct {
 	rType string
@@ -20,7 +17,6 @@ func StartClock(clock *Lamport) {
 
 // AskForSC is used to ask for the SC, it starts by sending a request and then wait until the SC is available
 func AskForSC(id int, clock *Lamport, messages *[]Message) {
-	fmt.Println("I'm id = ", id, " and I ask for sc at time ", clock.counterTime)
 	clock.Increment()
 	sendRequests(clock, id)
 	(*messages)[id] = Message{"req", *clock, id}
@@ -28,7 +24,6 @@ func AskForSC(id int, clock *Lamport, messages *[]Message) {
 
 // FreeSC is used to free the SC, it sends a release to all the servers
 func FreeSC(id int, clock *Lamport, inSC *bool, messages *[]Message) {
-	fmt.Println("Server ", id, " leaves sc at time", clock.counterTime)
 	clock.Increment()
 	sendReleases(clock, id)
 	(*messages)[id] = Message{"rel", *clock, id}

@@ -7,7 +7,6 @@ package server
 import (
 	"SDR-Laboratoire1/main/dataRW"
 	pm "SDR-Laboratoire1/main/server/processMutex"
-	"fmt"
 	"log"
 	"net"
 	"strconv"
@@ -81,7 +80,6 @@ func RunBtwClient(id int, ChannelSC *chan string, clock *pm.Lamport, inSC *bool,
 		listen, err = net.Listen(conf.Type, conf.Host+":"+strconv.Itoa(conf.PortClient+id))
 	}
 
-	fmt.Println("Server ", id, " is listening")
 	defer func(listen net.Listener) {
 		err := listen.Close()
 		if err != nil {
@@ -91,7 +89,6 @@ func RunBtwClient(id int, ChannelSC *chan string, clock *pm.Lamport, inSC *bool,
 	for {
 		conn, err := listen.Accept()
 		if err != nil {
-			fmt.Println("Error accepting: ", err.Error())
 			continue
 		}
 		go HandleRequest(conn, id, ChannelSC, clock, inSC, DataChannel, &DataModified, messages)
@@ -107,7 +104,6 @@ func HandleRequest(conn net.Conn, id int, ChannelSC *chan string, clock *pm.Lamp
 		log.Fatal(err)
 	}
 	for commandTreatment := AskDataRW(buf, id, ChannelSC, clock, inSC, DataChannel, DataModified, messages); commandTreatment != "q"; commandTreatment = AskDataRW(buf, id, ChannelSC, clock, inSC, DataChannel, DataModified, messages) {
-		fmt.Println("Handling request")
 		_, err := conn.Write([]byte(commandTreatment))
 		if err != nil {
 			return
@@ -132,10 +128,8 @@ func HandleRequest(conn net.Conn, id int, ChannelSC *chan string, clock *pm.Lamp
 func AskDataRW(commandParameters []byte, id int, ChannelSC *chan string, clock *pm.Lamport, inSC *bool, DataChannel *chan chan []byte, DataModified *bool, messages *[]pm.Message) string {
 	waitForSC(id, ChannelSC, clock, messages)
 	if pm.Config.Debug == 1 {
-		fmt.Println("Sleeping for debug...")
 		time.Sleep(10 * time.Second)
 	}
-	fmt.Println("Server ", id, " is in SC")
 	clientChannel := make(chan []byte)
 	*DataChannel <- clientChannel
 	clientChannel <- commandParameters

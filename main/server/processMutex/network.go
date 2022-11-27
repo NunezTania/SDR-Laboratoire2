@@ -1,12 +1,11 @@
+package processMutex
+
 // the network.go file is the one that handles the communication between the servers
 // it contains the functions that are used to send messages to other servers
 // and to handle the messages received from other servers
-package processMutex
-
 import (
 	"SDR-Laboratoire1/main/dataRW"
 	"bytes"
-	"fmt"
 	"gopkg.in/yaml.v3"
 	"log"
 	"net"
@@ -61,8 +60,7 @@ func handleMessage(buf []byte, id int, clock *Lamport, inSC *bool, ChannelSC *ch
 		clientChannel := make(chan []byte)
 		*DataChannel <- clientChannel
 		clientChannel <- []byte(strings.Join(res[1:], " "))
-		res := <-clientChannel
-		fmt.Println(string(res))
+		<-clientChannel
 
 	} else { // message is a SC message
 		var msg = strToMessage(string(buf))
@@ -172,14 +170,12 @@ func SendDataSyncToAll(command []byte, id int) {
 
 // WaitForEveryBody waits for all servers to be ready before listening to clients
 func WaitForEveryBody(id int, listenConn net.Listener) {
-	fmt.Println("I'm id = ", id, " and im Waiting for every body to be ready")
 	msg := "ready"
 	waitReady := make(chan bool)
 	for i := 0; i < Config.NServ; i++ {
 		if i != id {
 			conn, err := net.Dial(Config.Type, Config.Host+":"+strconv.Itoa(Config.PortServ+i))
 			for err != nil {
-				fmt.Println("Could not dial server ", i, " trying again...")
 				conn, err = net.Dial(Config.Type, Config.Host+":"+strconv.Itoa(Config.PortServ+i))
 			}
 			_, err = conn.Write([]byte(msg))
@@ -202,5 +198,4 @@ func WaitForEveryBody(id int, listenConn net.Listener) {
 		waitReady <- true
 	}()
 	<-waitReady
-	fmt.Println("I'm id = ", id, " and everybody told me they are ready")
 }
