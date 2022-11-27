@@ -155,17 +155,24 @@ func AddBenevole(slice []string, users *[]User, events *[]Event) string {
 	idEvent := slice[2]
 	idPost := slice[3]
 	if Authentification(slice[0], slice[1], users) {
-		idPost, _ := strconv.Atoi(string(bytes.Trim([]byte(idPost), "\x00")))
+		idPost, err := strconv.Atoi(string(bytes.Trim([]byte(idPost), "\x00")))
+		if err != nil {
+			return "Invalid idPost"
+		}
 		RemoveUserPost(uname, pwd, idEvent, events)
 		event := GetEventById(idEvent, events)
-		if event.id != -1 {
+		evId, err2 := strconv.Atoi(string(bytes.Trim([]byte(idEvent), "\x00")))
+		if err2 != nil {
+			return "Invalid idEvent"
+		}
+		if len(*events) < evId {
 			return "Event not found"
 		}
 		if len(event.posts) < idPost {
 			return "Post not found"
 		}
 		post := GetEventById(idEvent, events).posts[idPost]
-		if post.capacity < 1 {
+		if post.capacity < len(post.staff)+1 {
 			return "Could not add user to post because post is full"
 		}
 		var staff []User
