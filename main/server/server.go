@@ -53,8 +53,8 @@ func RunBtwClient(id int, ChannelSC *chan string, clock *pm.Lamport, inSC *bool,
 	go dataRW.HandleRWActions(DataChannel, &DataModified)
 	listen, err := net.Listen(conf.Type, conf.Host+":"+strconv.Itoa(conf.PortClient+id))
 
-	if err != nil {
-		log.Fatal(err)
+	for err != nil {
+		listen, err = net.Listen(conf.Type, conf.Host+":"+strconv.Itoa(conf.PortClient+id))
 	}
 
 	fmt.Println("Server ", id, " is listening")
@@ -67,7 +67,8 @@ func RunBtwClient(id int, ChannelSC *chan string, clock *pm.Lamport, inSC *bool,
 	for {
 		conn, err := listen.Accept()
 		if err != nil {
-			log.Fatal(err)
+			fmt.Println("Error accepting: ", err.Error())
+			continue
 		}
 		go HandleRequest(conn, id, ChannelSC, clock, inSC, DataChannel, &DataModified)
 	}

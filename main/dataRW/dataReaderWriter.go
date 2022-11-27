@@ -160,10 +160,13 @@ func AddBenevole(slice []string, users *[]User, events *[]Event) string {
 			return "Invalid idPost"
 		}
 		RemoveUserPost(uname, pwd, idEvent, events)
-		event := GetEventById(idEvent, events)
 		evId, err2 := strconv.Atoi(string(bytes.Trim([]byte(idEvent), "\x00")))
 		if err2 != nil {
 			return "Invalid idEvent"
+		}
+		event := GetEventById(idEvent, events)
+		if !event.isOpen {
+			return "Event is closed"
 		}
 		if len(*events) < evId {
 			return "Event not found"
@@ -192,9 +195,7 @@ func AddBenevole(slice []string, users *[]User, events *[]Event) string {
 func ListEvents(events *[]Event) string {
 	var str string
 	for i := 0; i < len(*events); i++ {
-		if (*events)[i].isOpen {
-			str += "Event's id: " + strconv.Itoa((*events)[i].id) + ", Event's name: " + (*events)[i].name + ", Owner: " + (*events)[i].owner.name + ", is open:" + strconv.FormatBool((*events)[i].isOpen) + "\n"
-		}
+		str += "Event's id: " + strconv.Itoa((*events)[i].id) + ", Event's name: " + (*events)[i].name + ", Owner: " + (*events)[i].owner.name + ", is open:" + strconv.FormatBool((*events)[i].isOpen) + "\n"
 	}
 	return str
 }

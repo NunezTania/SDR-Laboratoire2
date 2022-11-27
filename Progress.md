@@ -6,6 +6,6 @@
 4. Le serveur ne devrait pas s’occuper de produire ce que le client va afficher mais envoyer uniquement au client les données utiles à un affichage par ce dernier (-1)
 5. ~~Les commandes du programme ne sont pas intuitives (quand on voit ADD, on sait pas ce que ça veut dire…). Expliquez vos commandes dans le README svp (-1).~~
 6. fichier de configuration JSON pour précharger des données existantes
-7. Lorsqu’un bénévole aimerait s’inscrire dans un poste (de l’une des manifestations) dont le nombre maximum de bénévoles a été atteint, alors l’inscription doit être refusée.
-8. Lorsqu’un événement a été fermé, votre serveur accepte toujours les inscriptions d’un bénévole alors que ça ne doit pas être le cas
-9. La commande qui affiche les manifestations (LISTM) doit également afficher les manifestations qui ont été clôturées aux inscriptions par leur organisateur. Ce n’est pas le cas dans votre implémentatio
+7. ~~Lorsqu’un bénévole aimerait s’inscrire dans un poste (de l’une des manifestations) dont le nombre maximum de bénévoles a été atteint, alors l’inscription doit être refusée.~~
+8. ~~Lorsqu’un événement a été fermé, votre serveur accepte toujours les inscriptions d’un bénévole alors que ça ne doit pas être le cas~~
+9. ~~La commande qui affiche les manifestations (LISTM) doit également afficher les manifestations qui ont été clôturées aux inscriptions par leur organisateur. Ce n’est pas le cas dans votre implémentation~~

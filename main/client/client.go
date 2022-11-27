@@ -20,7 +20,7 @@ import (
 
 func main() {
 	//RunRandomServ()
-	Run(1)
+	Run(3)
 }
 
 func RunRandomServ() {
@@ -37,8 +37,9 @@ func Run(idServ int) {
 		idServ = rand.Intn(conf.NServ)
 	}
 	conn, err := net.Dial(conf.Type, conf.Host+":"+strconv.Itoa(conf.PortClient+idServ))
-	if err != nil {
-		log.Fatal(err)
+	for err != nil {
+		fmt.Println("Error while connecting to the server, trying again...")
+		conn, err = net.Dial(conf.Type, conf.Host+":"+strconv.Itoa(conf.PortClient+idServ))
 	}
 
 	for {
