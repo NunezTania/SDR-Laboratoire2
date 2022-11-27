@@ -16,6 +16,7 @@ import (
 
 var conf = pm.Config
 
+// LaunchNServ launches n servers
 func LaunchNServ(nServ int) {
 	doneChans := make([]chan bool, nServ)
 	for i := 0; i < nServ; i++ {
@@ -29,6 +30,7 @@ func LaunchNServ(nServ int) {
 	}
 }
 
+// createUsersAndEventsFromConf creates the users and events from the configuration file
 func createUsersAndEventsFromConf(users *[]dataRW.User, events *[]dataRW.Event, eventCounter *int) {
 	for _, user := range conf.Users {
 		*users = append(*users, dataRW.User{user.Name, user.Password})
@@ -41,6 +43,7 @@ func createUsersAndEventsFromConf(users *[]dataRW.User, events *[]dataRW.Event, 
 	}
 }
 
+// Launch launches a specific server
 func Launch(idServer int, doneChan chan bool) {
 	listenConn, err := net.Listen(pm.Config.Type, pm.Config.Host+":"+strconv.Itoa(pm.Config.PortServ+idServer))
 	if err != nil {
@@ -62,6 +65,7 @@ func Launch(idServer int, doneChan chan bool) {
 	doneChan <- true
 }
 
+// RunBtwClient server listen to the clients
 func RunBtwClient(id int, ChannelSC *chan string, clock *pm.Lamport, inSC *bool, DataChannel *chan chan []byte, done chan bool, messages *[]pm.Message) {
 	var DataModified = false
 	var eventCounter = 0
@@ -143,6 +147,7 @@ func AskDataRW(commandParameters []byte, id int, ChannelSC *chan string, clock *
 	return string(response)
 }
 
+// waitForSC waits for the SC
 func waitForSC(id int, ChannelSc *chan string, clock *pm.Lamport, messages *[]pm.Message) {
 	if pm.Config.NServ == 1 {
 		return
@@ -151,6 +156,7 @@ func waitForSC(id int, ChannelSc *chan string, clock *pm.Lamport, messages *[]pm
 	<-*ChannelSc
 }
 
+// leaveSC leaves the SC
 func leaveSC(id int, clock *pm.Lamport, inSC *bool, messages *[]pm.Message) {
 	pm.FreeSC(id, clock, inSC, messages)
 }
