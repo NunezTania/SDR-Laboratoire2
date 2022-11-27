@@ -4,8 +4,9 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="96597984-09df-44c3-a8c1-1f54c5238989" name="Changes" comment=":)">
-      <change beforePath="$PROJECT_DIR$/test/serverclient_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/test/serverclient_test.go" afterDir="false" />
+    <list default="true" id="96597984-09df-44c3-a8c1-1f54c5238989" name="Changes" comment="Correction d'une assertion fausse dans TestAddUserToEventShouldAppearOnOtherServ">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -148,7 +149,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="list of posts" />
     <MESSAGE value="comments" />
     <MESSAGE value="capacity test" />
     <MESSAGE value="update" />
@@ -173,7 +173,8 @@
     <MESSAGE value="Lecture des users et events depuis le fichier yaml" />
     <MESSAGE value="Ajout de tests pour cas serveurs multiples" />
     <MESSAGE value=":)" />
-    <option name="LAST_COMMIT_MESSAGE" value=":)" />
+    <MESSAGE value="Correction d'une assertion fausse dans TestAddUserToEventShouldAppearOnOtherServ" />
+    <option name="LAST_COMMIT_MESSAGE" value="Correction d'une assertion fausse dans TestAddUserToEventShouldAppearOnOtherServ" />
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>

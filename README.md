@@ -9,15 +9,21 @@ répartition de bénévoles pour l’organisation de manifestations.
 Afin d'utiliser notre programme, il faut cloner le repository github puis lancer le serveur et ensuite un/des client(s).
 
 Pour ce faire, ouvrez un terminal à la racine du projet. Lancez le serveur à l'aide de la commande 
-```go run ./main/main.go server```.
-Lancez le client à l'aide de la commande ```go run ./main/main.go client```.
+```go run ./main/server/mainServer.go server```.
+Lancez le client à l'aide de la commande ```go run ./main/client/client.go```.
 
 Afin d'arrêter le client, il vous suffit d'entrer la commande ```QUIT``` lors de son exécution.
-Afin d'arrêter le server, il faut effectuer un CTRL+C puisqu'il consiste en une boucle infinie à l'écoute de connexions
+Pour arrêter le serveur, il faut effectuer un CTRL+C puisqu'il consiste en une boucle infinie à l'écoute de connexions
 potentielles.
 
+Si vous souhaitez lancer un nombre de serveurs souhaité, vous pouvez modifier le main du fichier mainServer.go et
+appeler directement la fonction LaunchNServ(n) du package server. Sinon, ce nombre sera celui se trouvant dans le fichier
+de configuration. Il y a également la possibilité de lancer un serveur directement à partir de son identifiant en 
+appelant la fonction Launch(id, done), notez que le deuxième paramètre est un channel de type bool qui permet de faire
+attendre la routine principale jusqu'à ce que le serveur soit lancé et se ferme.
+
 La configuration du programme se trouve dans le fichier ```config.yaml```. Ce fichier permet de modifier les ports utilisés 
-ainsi que le nombre de servers lancés.
+ainsi que le nombre de serveurs lancés.
 
 Concernant les tests, il faut vous placer dans le dossier test et exécuter la commande ```go test```.
 
@@ -44,10 +50,10 @@ L'utilisateur peut entrer les commandes suivantes :
 
 ### Lancement en mode "debug"
 Pour lancer le server en mode debug, on peut modifier le fichier de configuration ```config.json``` en mettant ```"debug": 1```.
-Cela permettera de ralentir l'execution du programme afin de pouvoir observer les étapes de l'execution, grâce à un ```time.Sleep()```. 
+Cela permettera de ralentir l'execution du programme afin de pouvoir observer les étapes de l'execution, grâce à un ```time.Sleep()``` de 10 secondes. 
 Ensuite il est possible de lancer plusieurs clients en même temps en ouvrant plusieurs terminaux et en effectuant la commande ```go run ./main/client/client.go client```.
 En remettant ```"debug": 0```, le programme s'exécutera normalement. 
-Pour lancer le serveur en mode trace, il faut lancer la commande ```go run ./main/server/server.go server -trace```. Nous pouvons
+Pour lancer le serveur en mode trace, il faut lancer la commande ```go run ./main/server/mainServer.go server -trace```. Nous pouvons
 faire pareil pour le client avec la commande ```go run ./main/client/client.go client -trace```. 
 
 ### Fonctionnement de l'algorithme de Lamport
