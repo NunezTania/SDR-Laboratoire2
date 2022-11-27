@@ -29,7 +29,7 @@ func RunRandomServ() {
 // Run the main function of the program client
 func Run(idServ int) {
 	HelpMenu()
-	conf := pm.ReadConfigFile("../../main/server/config.yaml")
+	conf := pm.Config
 	if idServ == -1 {
 		rand.Seed(time.Now().UnixNano())
 		idServ = rand.Intn(conf.NServ)

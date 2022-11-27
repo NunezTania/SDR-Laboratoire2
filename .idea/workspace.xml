@@ -4,14 +4,17 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="96597984-09df-44c3-a8c1-1f54c5238989" name="Changes" comment="Plus de crash à cause du client qui se ferme prematurement">
+    <list default="true" id="96597984-09df-44c3-a8c1-1f54c5238989" name="Changes" comment="Lecture des users et events depuis le fichier yaml">
+      <change afterPath="$PROJECT_DIR$/main/server/mainServer.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Progress.md" beforeDir="false" afterPath="$PROJECT_DIR$/Progress.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main/client/client.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/client/client.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main/dataRW/dataReaderWriter.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/dataRW/dataReaderWriter.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main/server/config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/main/server/config.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/server/config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/main/server/processMutex/config.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main/server/processMutex/mutex.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/server/processMutex/mutex.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main/server/processMutex/network.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/server/processMutex/network.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main/server/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/server/server.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/server/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/server/server/server.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/serverclient_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/test/serverclient_test.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -36,6 +39,9 @@
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectId" id="2G7jD0jL5rXIAGHbUuzLXUBTNRN" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -64,18 +70,11 @@
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\FNGUSER004\GolandProjects\SDR-Laboratoire2\main\server\processMutex" />
+      <recent name="C:\Users\FNGUSER004\GolandProjects\SDR-Laboratoire2" />
+      <recent name="C:\Users\FNGUSER004\GolandProjects\SDR-Laboratoire2\main\server\server" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Build.go build SDR-Laboratoire1/main/server">
-    <configuration name="go build SDR-Laboratoire1/main/client" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
-      <module name="SDR-Laboratoire1" />
-      <working_directory value="$PROJECT_DIR$" />
-      <kind value="PACKAGE" />
-      <package value="SDR-Laboratoire1/main/client" />
-      <directory value="$PROJECT_DIR$" />
-      <filePath value="$PROJECT_DIR$/main/client/client.go" />
-      <method v="2" />
-    </configuration>
+  <component name="RunManager" selected="Go Test.TestAddUserToEventShouldAppearOnOtherServ in SDR-Laboratoire1/test">
     <configuration name="go build SDR-Laboratoire1/main/server" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="SDR-Laboratoire1" />
       <working_directory value="$PROJECT_DIR$" />
@@ -85,7 +84,7 @@
       <filePath value="$PROJECT_DIR$/main/server/server.go" />
       <method v="2" />
     </configuration>
-    <configuration name="TestADDOne in SDR-Laboratoire1/test" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="TestAddUserToEventShouldAppearOnOtherServ in SDR-Laboratoire1/test" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="SDR-Laboratoire1" />
       <working_directory value="$PROJECT_DIR$/test" />
       <root_directory value="$PROJECT_DIR$" />
@@ -94,10 +93,10 @@
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
-      <pattern value="^\QTestADDOne\E$" />
+      <pattern value="^\QTestAddUserToEventShouldAppearOnOtherServ\E$" />
       <method v="2" />
     </configuration>
-    <configuration name="go test SDR-Laboratoire1/test (1)" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="TestCreateEventWithUnsuccessfulAuth in SDR-Laboratoire1/test" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="SDR-Laboratoire1" />
       <working_directory value="$PROJECT_DIR$/test" />
       <root_directory value="$PROJECT_DIR$" />
@@ -106,9 +105,22 @@
       <directory value="$PROJECT_DIR$" />
       <filePath value="$PROJECT_DIR$" />
       <framework value="gotest" />
+      <pattern value="^\QTestCreateEventWithUnsuccessfulAuth\E$" />
       <method v="2" />
     </configuration>
-    <configuration name="go test SDR-Laboratoire1/test" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+    <configuration name="TestCreateOnOneServShouldBeOnAnother in SDR-Laboratoire1/test" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
+      <module name="SDR-Laboratoire1" />
+      <working_directory value="$PROJECT_DIR$/test" />
+      <root_directory value="$PROJECT_DIR$" />
+      <kind value="PACKAGE" />
+      <package value="SDR-Laboratoire1/test" />
+      <directory value="$PROJECT_DIR$" />
+      <filePath value="$PROJECT_DIR$" />
+      <framework value="gotest" />
+      <pattern value="^\QTestCreateOnOneServShouldBeOnAnother\E$" />
+      <method v="2" />
+    </configuration>
+    <configuration name="go test SDR-Laboratoire1/test (2)" type="GoTestRunConfiguration" factoryName="Go Test" temporary="true" nameIsGenerated="true">
       <module name="SDR-Laboratoire1" />
       <working_directory value="$PROJECT_DIR$/test" />
       <root_directory value="$PROJECT_DIR$" />
@@ -121,11 +133,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Go Test.TestAddUserToEventShouldAppearOnOtherServ in SDR-Laboratoire1/test" />
+        <item itemvalue="Go Test.TestCreateOnOneServShouldBeOnAnother in SDR-Laboratoire1/test" />
         <item itemvalue="Go Build.go build SDR-Laboratoire1/main/server" />
-        <item itemvalue="Go Build.go build SDR-Laboratoire1/main/client" />
-        <item itemvalue="Go Test.go test SDR-Laboratoire1/test" />
-        <item itemvalue="Go Test.TestADDOne in SDR-Laboratoire1/test" />
-        <item itemvalue="Go Test.go test SDR-Laboratoire1/test (1)" />
+        <item itemvalue="Go Test.go test SDR-Laboratoire1/test (2)" />
+        <item itemvalue="Go Test.TestCreateEventWithUnsuccessfulAuth in SDR-Laboratoire1/test" />
       </list>
     </recent_temporary>
   </component>
@@ -145,7 +157,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="rien ne vas plus" />
     <MESSAGE value="merging" />
     <MESSAGE value="fix convert to int" />
     <MESSAGE value="list of posts" />
@@ -170,7 +181,8 @@
     <MESSAGE value="Correction du crash si le client quitte prématurement avant de faire une cmd" />
     <MESSAGE value="Marche avec un seul serveur aussi..." />
     <MESSAGE value="Plus de crash à cause du client qui se ferme prematurement" />
-    <option name="LAST_COMMIT_MESSAGE" value="Plus de crash à cause du client qui se ferme prematurement" />
+    <MESSAGE value="Lecture des users et events depuis le fichier yaml" />
+    <option name="LAST_COMMIT_MESSAGE" value="Lecture des users et events depuis le fichier yaml" />
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>

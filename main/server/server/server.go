@@ -2,7 +2,7 @@
 // It is used to communicate with the client.
 // And can be used to create, close, add and list events.
 // In order to manage data, it uses the dataRW package.
-package main
+package server
 
 import (
 	"SDR-Laboratoire1/main/dataRW"
@@ -11,19 +11,20 @@ import (
 	"log"
 	"net"
 	"strconv"
+	"time"
 )
 
 var conf = pm.Config
 
-func main() {
-	doneChans := make([]chan bool, conf.NServ)
-	for i := 0; i < conf.NServ; i++ {
+func LaunchNServ(nServ int) {
+	doneChans := make([]chan bool, nServ)
+	for i := 0; i < nServ; i++ {
 		doneChans[i] = make(chan bool)
 	}
-	for i := 0; i < conf.NServ; i++ {
+	for i := 0; i < nServ; i++ {
 		go Launch(i, doneChans[i])
 	}
-	for i := 0; i < conf.NServ; i++ {
+	for i := 0; i < nServ; i++ {
 		<-doneChans[i]
 	}
 }
@@ -36,7 +37,7 @@ func createUsersAndEventsFromConf(users *[]dataRW.User, events *[]dataRW.Event, 
 	for _, event := range conf.Events {
 		*eventCounter++
 		*events = append(*events,
-			dataRW.Event{event.Id, event.Name, event.Owner, event.IsOpen, event.Posts})
+			dataRW.Event{event.Id, event.Name, event.Owner, true, event.Posts})
 	}
 }
 
@@ -125,6 +126,11 @@ func HandleRequest(conn net.Conn, id int, ChannelSC *chan string, clock *pm.Lamp
 // AskDataRW asks the dataRW to treat the command
 func AskDataRW(commandParameters []byte, id int, ChannelSC *chan string, clock *pm.Lamport, inSC *bool, DataChannel *chan chan []byte, DataModified *bool) string {
 	waitForSC(id, ChannelSC, clock)
+	if pm.Config.Debug == 1 {
+		fmt.Println("Sleeping for debug...")
+		time.Sleep(10 * time.Second)
+	}
+	fmt.Println("Server ", id, " is in SC")
 	clientChannel := make(chan []byte)
 	*DataChannel <- clientChannel
 	clientChannel <- commandParameters

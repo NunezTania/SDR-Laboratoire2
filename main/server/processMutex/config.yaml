@@ -1,3 +1,4 @@
+version: 1.1.0
 nServ: 3
 portServ: 5000
 portClient: 2500
@@ -22,7 +23,7 @@ events:
     owner:
       name: "Bob"
       password: "1234"
-    isOpen: true
+    isOpen: Yes
     posts:
       - id: 0
         name: "Bar à bière"
@@ -45,7 +46,7 @@ events:
     owner:
       name: "Lea"
       password: "1234"
-    isOpen: true
+    isOpen: y
     posts:
       - id: 0
         name: "Vente de ticket"
@@ -68,3 +69,4 @@ events:
         staff:
           - name: "Toto"
             password: "1234"
+debug: 0

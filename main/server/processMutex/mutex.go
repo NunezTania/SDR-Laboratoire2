@@ -31,7 +31,7 @@ func AskForSC(id int, clock *Lamport) {
 }
 
 func FreeSC(id int, clock *Lamport, inSC *bool) {
-	fmt.Println("I'm id = ", id, " and I free sc at the time", clock.counterTime)
+	fmt.Println("Server ", id, " leaves sc at time", clock.counterTime)
 	clock.Increment()
 	sendReleases(clock, id)
 	mapMessage[id][id] = Message{"rel", *clock, id}

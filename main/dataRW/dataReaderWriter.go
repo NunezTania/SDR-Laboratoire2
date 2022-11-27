@@ -31,11 +31,6 @@ type User struct {
 	Password string
 }
 
-func CreateUsersAndEventsFromConfigFile(users *[]User, events *[]Event, eventCounter *int) {
-	// creation of users
-
-}
-
 func CreateUsersAndEvents(users *[]User, events *[]Event, postCounter *int, eventCounter *int) {
 	// creation of users
 	*users = append(*users, User{"Bob", "1234"})

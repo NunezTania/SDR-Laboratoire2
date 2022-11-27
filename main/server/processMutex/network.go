@@ -8,6 +8,8 @@ import (
 	"log"
 	"net"
 	"os"
+	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
 )
@@ -20,9 +22,15 @@ type Conf struct {
 	Type       string         `yaml:"type"`
 	Users      []dataRW.User  `yaml:"users"`
 	Events     []dataRW.Event `yaml:"events"`
+	Debug      int            `yaml:"debug"`
 }
 
-var Config = ReadConfigFile("./main/server/config.yaml")
+var (
+	_, b, _, _ = runtime.Caller(0)
+	basepath   = filepath.Dir(b)
+)
+
+var Config = ReadConfigFile(basepath + "/config.yaml")
 
 func RunBtwServer(id int, clock *Lamport, inSC *bool, ChannelSC *chan string, DataChannel *chan chan []byte, done chan bool, listenConn net.Listener) {
 	for {
@@ -112,7 +120,6 @@ func MessageToStr(request Message) string {
 func SendMessageTo(id int, request Message) {
 	msg := MessageToStr(request)
 	currConn, err := net.Dial("tcp", Config.Host+":"+strconv.Itoa(Config.PortServ+id))
-	fmt.Println("I'm id = ", request.id, " and im sending a message to ", id, " with msg = ", msg)
 	if err != nil {
 		log.Fatal(err)
 	}
