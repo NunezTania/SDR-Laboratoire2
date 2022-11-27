@@ -28,6 +28,18 @@ func main() {
 	}
 }
 
+func createUsersAndEventsFromConf(users *[]dataRW.User, events *[]dataRW.Event, eventCounter *int) {
+	for _, user := range conf.Users {
+		*users = append(*users, dataRW.User{user.Name, user.Password})
+	}
+	// creation of events
+	for _, event := range conf.Events {
+		*eventCounter++
+		*events = append(*events,
+			dataRW.Event{event.Id, event.Name, event.Owner, event.IsOpen, event.Posts})
+	}
+}
+
 func Launch(idServer int, doneChan chan bool) {
 	listenConn, err := net.Listen(pm.Config.Type, pm.Config.Host+":"+strconv.Itoa(pm.Config.PortServ+idServer))
 	if err != nil {
@@ -50,7 +62,13 @@ func Launch(idServer int, doneChan chan bool) {
 
 func RunBtwClient(id int, ChannelSC *chan string, clock *pm.Lamport, inSC *bool, DataChannel *chan chan []byte, done chan bool) {
 	var DataModified = false
-	go dataRW.HandleRWActions(DataChannel, &DataModified)
+	var eventCounter = 0
+	var postCounter = 0
+
+	var events = make([]dataRW.Event, 0)
+	var users = make([]dataRW.User, 0)
+	createUsersAndEventsFromConf(&users, &events, &eventCounter)
+	go dataRW.HandleRWActions(DataChannel, &DataModified, &users, &events, &postCounter, &eventCounter)
 	listen, err := net.Listen(conf.Type, conf.Host+":"+strconv.Itoa(conf.PortClient+id))
 
 	for err != nil {

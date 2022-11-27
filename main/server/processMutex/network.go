@@ -1,6 +1,7 @@
 package processMutex
 
 import (
+	"SDR-Laboratoire1/main/dataRW"
 	"bytes"
 	"fmt"
 	"gopkg.in/yaml.v3"
@@ -12,11 +13,13 @@ import (
 )
 
 type Conf struct {
-	NServ      int    `yaml:"nServ"`
-	PortServ   int    `yaml:"portServ"`
-	PortClient int    `yaml:"portClient"`
-	Host       string `yaml:"host"`
-	Type       string `yaml:"type"`
+	NServ      int            `yaml:"nServ"`
+	PortServ   int            `yaml:"portServ"`
+	PortClient int            `yaml:"portClient"`
+	Host       string         `yaml:"host"`
+	Type       string         `yaml:"type"`
+	Users      []dataRW.User  `yaml:"users"`
+	Events     []dataRW.Event `yaml:"events"`
 }
 
 var Config = ReadConfigFile("./main/server/config.yaml")
@@ -32,7 +35,6 @@ func RunBtwServer(id int, clock *Lamport, inSC *bool, ChannelSC *chan string, Da
 		if err != nil {
 			log.Fatal(err)
 		}
-		fmt.Println("I'm id = ", id, " and im receiving a message from ", conn.RemoteAddr(), " with msg = ", string(buf))
 		go handleMessage(buf, id, clock, inSC, ChannelSC, DataChannel)
 	}
 	done <- true
@@ -53,17 +55,17 @@ func handleMessage(buf []byte, id int, clock *Lamport, inSC *bool, ChannelSC *ch
 		var msg = strToMessage(string(buf))
 		if msg.rType == "req" {
 			*clock = clock.Update(msg.time)
-			NoteNewMessage(msg, msg.id, id, inSC, ChannelSC, clock)
+			NoteNewMessage(msg, msg.id, id, inSC, ChannelSC)
 			var r = Message{"ack", *clock, id}
 			SendMessageTo(msg.id, r)
 
 		} else if msg.rType == "rel" {
 			*clock = clock.Update(msg.time)
-			NoteNewMessage(msg, msg.id, id, inSC, ChannelSC, clock)
+			NoteNewMessage(msg, msg.id, id, inSC, ChannelSC)
 
 		} else if msg.rType == "ack" {
 			*clock = clock.Update(msg.time)
-			NoteNewMessage(msg, msg.id, id, inSC, ChannelSC, clock)
+			NoteNewMessage(msg, msg.id, id, inSC, ChannelSC)
 		}
 	}
 }

@@ -1,5 +1,5 @@
 // Package dataRW contains the functions to read and write data
-// It allows to create events, close events, list events and add users to posts
+// It allows to create events, close events, list events and add users to Posts
 // All of these actions are concurrency safe
 package dataRW
 
@@ -11,24 +11,29 @@ import (
 )
 
 type Event struct {
-	id     int
-	name   string
-	owner  User
-	isOpen bool
-	posts  []Post
+	Id     int
+	Name   string
+	Owner  User
+	IsOpen bool
+	Posts  []Post
 }
 
 type Post struct {
-	id       int
-	name     string
-	capacity int
-	eventId  int
-	staff    []User
+	Id       int
+	Name     string
+	Capacity int
+	EventId  int
+	Staff    []User
 }
 
 type User struct {
-	name     string
-	password string
+	Name     string
+	Password string
+}
+
+func CreateUsersAndEventsFromConfigFile(users *[]User, events *[]Event, eventCounter *int) {
+	// creation of users
+
 }
 
 func CreateUsersAndEvents(users *[]User, events *[]Event, postCounter *int, eventCounter *int) {
@@ -38,8 +43,8 @@ func CreateUsersAndEvents(users *[]User, events *[]Event, postCounter *int, even
 	*users = append(*users, User{"Leo", "1234"})
 	*users = append(*users, User{"Willi", "1234"})
 	*users = append(*users, User{"Lili", "1234"})
-	*users = append(*users, User{"T", "1234"})
-	// creation of posts
+	*users = append(*users, User{"Toto", "1234"})
+	// creation of Posts
 	var posts []Post
 	posts = append(posts, Post{*postCounter, "Bar à bière", 3, 0, (*users)[0:1]})
 	*postCounter++
@@ -58,10 +63,10 @@ func CreateUsersAndEvents(users *[]User, events *[]Event, postCounter *int, even
 	*eventCounter++
 }
 
-// Authentification checks if the user is in the list of users and password is correct
+// Authentification checks if the user is in the list of users and Password is correct
 func Authentification(username string, password string, users *[]User) bool {
 	for _, user := range *users {
-		if user.name == username && user.password == password {
+		if user.Name == username && user.Password == password {
 			return true
 		}
 	}
@@ -71,27 +76,27 @@ func Authentification(username string, password string, users *[]User) bool {
 // RemoveUserPost removes a user from a post
 func RemoveUserPost(username string, password string, idEvent string, events *[]Event) {
 	event := GetEventById(idEvent, events)
-	for _, post := range event.posts {
-		for i, staff := range post.staff {
-			if staff.name == username && staff.password == password {
+	for _, post := range event.Posts {
+		for i, staff := range post.Staff {
+			if staff.Name == username && staff.Password == password {
 				fmt.Println("Removing user from post")
-				(*events)[event.id].posts[post.id].staff = append((*events)[event.id].posts[post.id].staff[:i], (*events)[event.id].posts[post.id].staff[i+1:]...)
-				post.capacity++
+				(*events)[event.Id].Posts[post.Id].Staff = append((*events)[event.Id].Posts[post.Id].Staff[:i], (*events)[event.Id].Posts[post.Id].Staff[i+1:]...)
+				post.Capacity++
 			}
 		}
 	}
 }
 
-// GetEventById returns the event with the given id
+// GetEventById returns the event with the given Id
 func GetEventById(id string, events *[]Event) Event {
 	for i := 0; i < len(*events); i++ {
 		idEvent, _ := strconv.Atoi(string(bytes.Trim([]byte(id), "\x00")))
-		if (*events)[i].id == idEvent {
+		if (*events)[i].Id == idEvent {
 			return (*events)[i]
 		}
 	}
 	var event Event
-	event.id = -1
+	event.Id = -1
 	return event
 }
 
@@ -136,8 +141,8 @@ func CloseEvent(commandParameters []string, users *[]User, events *[]Event) stri
 	if Authentification(commandParameters[0], commandParameters[1], users) {
 		for i := 0; i < len(*events); i++ {
 			id, _ := strconv.Atoi(string(bytes.Trim([]byte(commandParameters[2]), "\x00")))
-			if (*events)[i].id == id && (*events)[i].owner.name == commandParameters[0] {
-				(*events)[i].isOpen = false
+			if (*events)[i].Id == id && (*events)[i].Owner.Name == commandParameters[0] {
+				(*events)[i].IsOpen = false
 				return "Event closed"
 			}
 		}
@@ -165,26 +170,26 @@ func AddBenevole(slice []string, users *[]User, events *[]Event) string {
 			return "Invalid idEvent"
 		}
 		event := GetEventById(idEvent, events)
-		if !event.isOpen {
+		if !event.IsOpen {
 			return "Event is closed"
 		}
 		if len(*events) < evId {
 			return "Event not found"
 		}
-		if len(event.posts) < idPost {
+		if len(event.Posts) < idPost {
 			return "Post not found"
 		}
-		post := GetEventById(idEvent, events).posts[idPost]
-		if post.capacity < len(post.staff)+1 {
+		post := GetEventById(idEvent, events).Posts[idPost]
+		if post.Capacity < len(post.Staff)+1 {
 			return "Could not add user to post because post is full"
 		}
 		var staff []User
-		copy(post.staff, staff)
-		if !contains(post.staff, User{uname, pwd}) {
-			for _, user := range post.staff {
+		copy(post.Staff, staff)
+		if !contains(post.Staff, User{uname, pwd}) {
+			for _, user := range post.Staff {
 				staff = append(staff, user)
 			}
-			event.posts[idPost].staff = append(staff, User{uname, pwd})
+			event.Posts[idPost].Staff = append(staff, User{uname, pwd})
 		}
 		return "User successfully added to post"
 	}
@@ -195,40 +200,40 @@ func AddBenevole(slice []string, users *[]User, events *[]Event) string {
 func ListEvents(events *[]Event) string {
 	var str string
 	for i := 0; i < len(*events); i++ {
-		str += "Event's id: " + strconv.Itoa((*events)[i].id) + ", Event's name: " + (*events)[i].name + ", Owner: " + (*events)[i].owner.name + ", is open:" + strconv.FormatBool((*events)[i].isOpen) + "\n"
+		str += "Event's Id: " + strconv.Itoa((*events)[i].Id) + ", Event's Name: " + (*events)[i].Name + ", Owner: " + (*events)[i].Owner.Name + ", is open:" + strconv.FormatBool((*events)[i].IsOpen) + "\n"
 	}
 	return str
 }
 
-// ListPosts lists all the posts of an event
+// ListPosts lists all the Posts of an event
 func ListPosts(slice []string, events *[]Event) string {
 	event := GetEventById(slice[0], events)
 	var str string
-	for i := 0; i < len(event.posts); i++ {
-		str += "Post's id: " + strconv.Itoa(event.posts[i].id) + ", Post's name: " + event.posts[i].name + ", Capacity: " + strconv.Itoa(event.posts[i].capacity) + "\n"
+	for i := 0; i < len(event.Posts); i++ {
+		str += "Post's Id: " + strconv.Itoa(event.Posts[i].Id) + ", Post's Name: " + event.Posts[i].Name + ", Capacity: " + strconv.Itoa(event.Posts[i].Capacity) + "\n"
 	}
 	return str
 }
 
-// ListUsers lists all the users of all the posts of an event
+// ListUsers lists all the users of all the Posts of an event
 func ListUsers(slice []string, events *[]Event) string {
 	var event = GetEventById(slice[0], events)
 
 	tabCell := "%-20v"
 	tabCellCross := "%-10v"
 	firstColumn := "%-25v" // Line label
-	header := fmt.Sprintf(firstColumn, event.name) + "|"
+	header := fmt.Sprintf(firstColumn, event.Name) + "|"
 	nbInscrit := fmt.Sprintf(firstColumn, "nbInscrit") + "|"
 	tab := ""
 
-	for i, post := range event.posts {
-		header += fmt.Sprintf(tabCell, post.name+" "+strconv.Itoa(post.id))
+	for i, post := range event.Posts {
+		header += fmt.Sprintf(tabCell, post.Name+" "+strconv.Itoa(post.Id))
 		header += "|"
-		nbInscrit += fmt.Sprintf(tabCell, len(post.staff))
+		nbInscrit += fmt.Sprintf(tabCell, len(post.Staff))
 		nbInscrit += "|"
-		for _, user := range post.staff {
-			tab += fmt.Sprintf(firstColumn, user.name) + "|"
-			for j := 0; j < len(event.posts); j++ {
+		for _, user := range post.Staff {
+			tab += fmt.Sprintf(firstColumn, user.Name) + "|"
+			for j := 0; j < len(event.Posts); j++ {
 				if j == i {
 					tab += fmt.Sprintf(tabCellCross, "x") + "          "
 				} else {
@@ -275,19 +280,15 @@ func ProcessCommand(commandParameters []string, users *[]User, events *[]Event, 
 }
 
 // HandleRWActions handles the read/write actions
-func HandleRWActions(DataChannel *chan chan []byte, DataModified *bool) {
-	var eventCounter = 0
-	var postCounter = 0
+func HandleRWActions(DataChannel *chan chan []byte, DataModified *bool, users *[]User, events *[]Event, postCounter *int, eventCounter *int) {
 
-	var events []Event
-	var users []User
-	CreateUsersAndEvents(&users, &events, &postCounter, &eventCounter)
+	//CreateUsersAndEvents(users, events, postCounter, eventCounter)
 	for {
 		// Blocking eventual other requests for concurrent data access
 		clientChan := <-*DataChannel
 		fmt.Println("Processing RW operation")
 		// Process request
 		command := <-clientChan
-		clientChan <- []byte(ProcessCommand(strings.Split(string(command), " "), &users, &events, DataModified, &postCounter, &eventCounter))
+		clientChan <- []byte(ProcessCommand(strings.Split(string(command), " "), users, events, DataModified, postCounter, eventCounter))
 	}
 }

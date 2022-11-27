@@ -4,8 +4,14 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="96597984-09df-44c3-a8c1-1f54c5238989" name="Changes" comment="Marche avec un seul serveur aussi...">
+    <list default="true" id="96597984-09df-44c3-a8c1-1f54c5238989" name="Changes" comment="Plus de crash à cause du client qui se ferme prematurement">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main/client/client.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/client/client.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/dataRW/dataReaderWriter.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/dataRW/dataReaderWriter.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/server/config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/main/server/config.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/server/processMutex/mutex.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/server/processMutex/mutex.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/server/processMutex/network.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/server/processMutex/network.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/server/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/server/server.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -139,7 +145,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="bug fixed" />
     <MESSAGE value="rien ne vas plus" />
     <MESSAGE value="merging" />
     <MESSAGE value="fix convert to int" />
@@ -164,7 +169,8 @@
     <MESSAGE value="Enlevé l'affichage de debug dans le client" />
     <MESSAGE value="Correction du crash si le client quitte prématurement avant de faire une cmd" />
     <MESSAGE value="Marche avec un seul serveur aussi..." />
-    <option name="LAST_COMMIT_MESSAGE" value="Marche avec un seul serveur aussi..." />
+    <MESSAGE value="Plus de crash à cause du client qui se ferme prematurement" />
+    <option name="LAST_COMMIT_MESSAGE" value="Plus de crash à cause du client qui se ferme prematurement" />
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>
