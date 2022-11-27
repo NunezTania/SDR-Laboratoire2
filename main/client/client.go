@@ -18,15 +18,18 @@ import (
 	"time"
 )
 
+// main function of the program client
 func main() {
 	RunRandomServ()
 }
 
+// RunRandomServ connects the client to a random server
 func RunRandomServ() {
 	Run(-1)
 }
 
-// Run the main function of the program client
+// Run connects the client to a server with the id given in parameter
+// if the id is -1, it connects to a random server
 func Run(idServ int) {
 	HelpMenu()
 	conf := pm.Config

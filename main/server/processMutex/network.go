@@ -1,3 +1,6 @@
+// the network.go file is the one that handles the communication between the servers
+// it contains the functions that are used to send messages to other servers
+// and to handle the messages received from other servers
 package processMutex
 
 import (
@@ -32,6 +35,7 @@ var (
 
 var Config = ReadConfigFile(basepath + "/config.yaml")
 
+// RunBtwServer allow a server to listen to other servers
 func RunBtwServer(id int, clock *Lamport, inSC *bool, ChannelSC *chan string, DataChannel *chan chan []byte, done chan bool, listenConn net.Listener, messages *[]Message) {
 	for {
 		conn, err := listenConn.Accept()
@@ -48,6 +52,7 @@ func RunBtwServer(id int, clock *Lamport, inSC *bool, ChannelSC *chan string, Da
 	done <- true
 }
 
+// handleMessage handles the messages received from other servers
 func handleMessage(buf []byte, id int, clock *Lamport, inSC *bool, ChannelSC *chan string, DataChannel *chan chan []byte, messages *[]Message) {
 
 	var res = strings.Split(string(buf), " ")
@@ -75,16 +80,19 @@ func handleMessage(buf []byte, id int, clock *Lamport, inSC *bool, ChannelSC *ch
 	}
 }
 
+// sendRequests sends a request to all servers
 func sendRequests(clock *Lamport, id int) {
 	var request = Message{"req", *clock, id}
 	SendToAll(request, id)
 }
 
+// sendRelease sends a release message to all servers
 func sendReleases(clock *Lamport, id int) {
 	var request = Message{"rel", *clock, id}
 	SendToAll(request, id)
 }
 
+// ReadConfigFile reads the config file and returns a Conf struct
 func ReadConfigFile(path string) Conf {
 	yamlFile, err := os.ReadFile(path)
 	if err != nil {
@@ -101,6 +109,7 @@ func ReadConfigFile(path string) Conf {
 	return c
 }
 
+// strToMessage converts a string to a Message struct
 func strToMessage(str string) Message {
 	var request Message
 	var args = strings.Split(str, " ")
@@ -110,10 +119,12 @@ func strToMessage(str string) Message {
 	return request
 }
 
+// MessageToStr converts a Message struct to a string
 func MessageToStr(request Message) string {
 	return request.rType + " " + strconv.Itoa(request.time.counterTime) + " " + strconv.Itoa(request.id)
 }
 
+// SendMessageTo sends a message to a specific server
 func SendMessageTo(id int, request Message) {
 	msg := MessageToStr(request)
 	currConn, err := net.Dial("tcp", Config.Host+":"+strconv.Itoa(Config.PortServ+id))
@@ -127,6 +138,7 @@ func SendMessageTo(id int, request Message) {
 	}
 }
 
+// SendDataSyncTo sends a data sync message to a specific server
 func SendDataSyncTo(id int, data []byte) {
 	currConn, err := net.Dial(Config.Type, Config.Host+":"+strconv.Itoa(Config.PortServ+id))
 	if err != nil {
@@ -139,6 +151,7 @@ func SendDataSyncTo(id int, data []byte) {
 	}
 }
 
+// SendToAll sends a message to all servers
 func SendToAll(request Message, id int) {
 	for i := 0; i < Config.NServ; i++ {
 		if i != id {
@@ -147,6 +160,7 @@ func SendToAll(request Message, id int) {
 	}
 }
 
+// SendDataSyncToAll sends a data sync message to all servers
 func SendDataSyncToAll(command []byte, id int) {
 	msg := append([]byte("data "), command...)
 	for i := 0; i < Config.NServ; i++ {
@@ -156,6 +170,7 @@ func SendDataSyncToAll(command []byte, id int) {
 	}
 }
 
+// WaitForEveryBody waits for all servers to be ready before listening to clients
 func WaitForEveryBody(id int, listenConn net.Listener) {
 	fmt.Println("I'm id = ", id, " and im Waiting for every body to be ready")
 	msg := "ready"

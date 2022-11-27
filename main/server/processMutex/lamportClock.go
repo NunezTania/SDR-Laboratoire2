@@ -1,3 +1,4 @@
+// The Lamport Clock is a logical clock that is used to order events in a distributed system.
 package processMutex
 
 import "strconv"
@@ -6,7 +7,7 @@ type Lamport struct {
 	counterTime int
 }
 
-// NewLamport Create a new Lamport clock
+// NewLamport Create a new Lamport clock and initialize it to 0
 func (l *Lamport) NewLamport() *Lamport {
 	l.counterTime = 0
 	return l
@@ -32,6 +33,7 @@ func (l *Lamport) Update(otherTime Lamport) Lamport {
 	return *l
 }
 
+// strToLamport Convert a string to a Lamport clock
 func strToLamport(str string) Lamport {
 	var clock Lamport
 	clock.counterTime, _ = strconv.Atoi(str)

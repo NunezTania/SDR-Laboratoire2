@@ -4,13 +4,13 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="96597984-09df-44c3-a8c1-1f54c5238989" name="Changes" comment="Ajout de tests pour cas serveurs multiples">
+    <list default="true" id="96597984-09df-44c3-a8c1-1f54c5238989" name="Changes" comment="readme update">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main/server/mainServer.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/server/mainServer.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/client/client.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/client/client.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/dataRW/dataReaderWriter.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/dataRW/dataReaderWriter.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/server/processMutex/lamportClock.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/server/processMutex/lamportClock.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main/server/processMutex/mutex.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/server/processMutex/mutex.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main/server/processMutex/network.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/server/processMutex/network.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main/server/server/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/server/server/server.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/serverclient_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/test/serverclient_test.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

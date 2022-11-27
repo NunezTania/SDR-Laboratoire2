@@ -31,33 +31,6 @@ type User struct {
 	Password string
 }
 
-func CreateUsersAndEvents(users *[]User, events *[]Event, postCounter *int, eventCounter *int) {
-	// creation of users
-	*users = append(*users, User{"Bob", "1234"})
-	*users = append(*users, User{"Lea", "1234"})
-	*users = append(*users, User{"Leo", "1234"})
-	*users = append(*users, User{"Willi", "1234"})
-	*users = append(*users, User{"Lili", "1234"})
-	*users = append(*users, User{"Toto", "1234"})
-	// creation of Posts
-	var posts []Post
-	posts = append(posts, Post{*postCounter, "Bar à bière", 3, 0, (*users)[0:1]})
-	*postCounter++
-	posts = append(posts, Post{*postCounter, "Securité", 2, 0, (*users)[2:4]})
-	*postCounter = 0
-	posts = append(posts, Post{*postCounter, "Vente de ticket", 5, 1, (*users)[0:1]})
-	*postCounter++
-	posts = append(posts, Post{*postCounter, "Logistique", 1, 1, (*users)[2:4]})
-	*postCounter++
-	posts = append(posts, Post{*postCounter, "Securité", 2, 1, (*users)[4:5]})
-	*postCounter++
-	// creation of events
-	*events = append(*events, Event{*eventCounter, "Festival de la musique", (*users)[0], true, posts[0:2]})
-	*eventCounter++
-	*events = append(*events, Event{*eventCounter, "Festival de la bière", (*users)[0], true, posts[2:5]})
-	*eventCounter++
-}
-
 // Authentification checks if the user is in the list of users and Password is correct
 func Authentification(username string, password string, users *[]User) bool {
 	for _, user := range *users {
@@ -74,7 +47,6 @@ func RemoveUserPost(username string, password string, idEvent string, events *[]
 	for _, post := range event.Posts {
 		for i, staff := range post.Staff {
 			if staff.Name == username && staff.Password == password {
-				fmt.Println("Removing user from post")
 				(*events)[event.Id].Posts[post.Id].Staff = append((*events)[event.Id].Posts[post.Id].Staff[:i], (*events)[event.Id].Posts[post.Id].Staff[i+1:]...)
 				post.Capacity++
 			}
@@ -132,7 +104,6 @@ func CreateEvent(parameters []string, users *[]User, events *[]Event, postCounte
 
 // CloseEvent closes an event
 func CloseEvent(commandParameters []string, users *[]User, events *[]Event) string {
-	fmt.Println("Closing an event")
 	if Authentification(commandParameters[0], commandParameters[1], users) {
 		for i := 0; i < len(*events); i++ {
 			id, _ := strconv.Atoi(string(bytes.Trim([]byte(commandParameters[2]), "\x00")))
@@ -149,7 +120,6 @@ func CloseEvent(commandParameters []string, users *[]User, events *[]Event) stri
 
 // AddBenevole adds a benevole to a post
 func AddBenevole(slice []string, users *[]User, events *[]Event) string {
-	fmt.Println("Adding a benevole")
 	uname := slice[0]
 	pwd := slice[1]
 	idEvent := slice[2]
@@ -281,7 +251,6 @@ func HandleRWActions(DataChannel *chan chan []byte, DataModified *bool, users *[
 	for {
 		// Blocking eventual other requests for concurrent data access
 		clientChan := <-*DataChannel
-		fmt.Println("Processing RW operation")
 		// Process request
 		command := <-clientChan
 		clientChan <- []byte(ProcessCommand(strings.Split(string(command), " "), users, events, DataModified, postCounter, eventCounter))
