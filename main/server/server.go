@@ -17,32 +17,23 @@ var conf = pm.Config
 
 func main() {
 	doneChans := make([]chan bool, conf.NServ)
-	listenChans := make([]chan bool, conf.NServ)
 	for i := 0; i < conf.NServ; i++ {
 		doneChans[i] = make(chan bool)
 	}
 	for i := 0; i < conf.NServ; i++ {
-		listenChans[i] = make(chan bool)
-	}
-	for i := 0; i < conf.NServ; i++ {
-		go Launch(i, doneChans[i], &listenChans)
+		go Launch(i, doneChans[i])
 	}
 	for i := 0; i < conf.NServ; i++ {
 		<-doneChans[i]
 	}
 }
 
-func Launch(idServer int, doneChan chan bool, listenChans *[]chan bool) {
+func Launch(idServer int, doneChan chan bool) {
 	listenConn, err := net.Listen(pm.Config.Type, pm.Config.Host+":"+strconv.Itoa(pm.Config.PortServ+idServer))
 	if err != nil {
 		log.Fatal(err)
 	}
-	go func() {
-		for i := 0; i < pm.Config.NServ-1; i++ { // Unblocks other servers when they try to dial this one
-			(*listenChans)[idServer] <- true
-		}
-	}() // In a goroutine to avoid blocking
-	pm.WaitForEveryBody(idServer, listenConn, listenChans)
+	pm.WaitForEveryBody(idServer, listenConn)
 	var clock = pm.Lamport{}
 	var inSC = false
 	var ChannelSc = make(chan string)

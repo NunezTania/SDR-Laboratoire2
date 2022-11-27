@@ -150,17 +150,16 @@ func SendDataSyncToAll(command []byte, id int) {
 	}
 }
 
-func WaitForEveryBody(id int, listenConn net.Listener, listening *[]chan bool) {
+func WaitForEveryBody(id int, listenConn net.Listener) {
 	fmt.Println("I'm id = ", id, " and im Waiting for every body to be ready")
 	msg := "ready"
 	waitReady := make(chan bool)
-
 	for i := 0; i < Config.NServ; i++ {
 		if i != id {
-			<-(*listening)[i] // Waiting for every serv to listen so this does not crash
 			conn, err := net.Dial(Config.Type, Config.Host+":"+strconv.Itoa(Config.PortServ+i))
-			if err != nil {
-				log.Fatal(err)
+			for err != nil {
+				fmt.Println("Could not dial server ", i, " trying again...")
+				conn, err = net.Dial(Config.Type, Config.Host+":"+strconv.Itoa(Config.PortServ+i))
 			}
 			_, err = conn.Write([]byte(msg))
 			errClose := conn.Close()

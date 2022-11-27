@@ -18,7 +18,8 @@ import (
 )
 
 func main() {
-	RunRandomServ()
+	//RunRandomServ()
+	Run(1)
 }
 
 func RunRandomServ() {
