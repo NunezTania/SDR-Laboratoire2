@@ -16,7 +16,8 @@ Afin d'arrêter le client, il vous suffit d'entrer la commande ```QUIT``` lors d
 Afin d'arrêter le server, il faut effectuer un CTRL+C puisqu'il consiste en une boucle infinie à l'écoute de connexions
 potentielles.
 
-Si vous changez le port et/ou l'hôte, pensez à effectuer le changement du côté serveur, client et tests.
+La configuration du programme se trouve dans le fichier ```config.yaml```. Ce fichier permet de modifier les ports utilisés 
+ainsi que le nombre de servers lancés.
 
 Concernant les tests, il faut vous placer dans le dossier test et exécuter la commande ```go test```.
 
@@ -41,17 +42,23 @@ L'utilisateur peut entrer les commandes suivantes :
 - ```CREATE``` : permet de créer un événement. Cette commande nécessite une authentification, ainsi que de préciser le nom de la manifestation, le nom de chaque poste suivie de sa capacité.
 - ```CLOSE``` : permet de fermer un événement. Cette commande nécessite une authentification et de préciser le numéro de la manifestation.
 
+### Lancement en mode "debug"
+Pour lancer le server en mode debug, on peut modifier le fichier de configuration ```config.json``` en mettant ```"debug": 1```.
+Cela permettera de ralentir l'execution du programme afin de pouvoir observer les étapes de l'execution, grâce à un ```time.Sleep()```. 
+Ensuite il est possible de lancer plusieurs clients en même temps en ouvrant plusieurs terminaux et en effectuant la commande ```go run ./main/client/client.go client```.
+En remettant ```"debug": 0```, le programme s'exécutera normalement. 
+Pour lancer le serveur en mode trace, il faut lancer la commande ```go run ./main/server/server.go server -trace```. Nous pouvons
+faire pareil pour le client avec la commande ```go run ./main/client/client.go client -trace```. 
 
+### Fonctionnement de l'algorithme de Lamport
+L'algorithme de Lamport permet de résoudre le problème de l'exclusion mutuelle. Il permet de garantir l'exclusion mutuelle entre les processus server.
+Nous avons exploré les différents aspects de l'algorithme de Lamport, notamment la gestion des messages, la gestion de la clock et la gestion de la ressource critique.
+Les messages entre les servers ont la forme suivante : ```<type> <clock> <id>```. Le type peut être "req" pour une requête, "rel" pour une release, "ack" pour une acknowledgement, "data" pour une modification
+des données (voir en bas du paragraphe) et "ready"
+pour indiquer que le serveur est prêt à recevoir des requêtes. La clock est un entier qui représente le temps du serveur. L'id est un entier qui représente l'id du serveur.
+Le package processMutex contient les éléments centraux de l'algorithme de Lamport, notamment l'horloge de Lamport implementée dans le fichier lamportClock.go, la gestion de la communication entre
+servers dans le fichier network.go et la gestion de l'accès à la ressource critique dans le fichier mutex.go.
+L'accès à la section critique se fait via la methode ```AskDataRW()``` du fichier server.go.
+Les messages de type data sont envoyés lorsque l'on veut modifier les données. Ils sont envoyés à tous les serveurs commence par le mot "data" suivie du changement à effectuer. Le format du
+changement est le même que celle de la commande envoyée par le client.
 
-### Fonctionnalités non réalisées
-
-Pour ce travail, il était demandé de charger les utilisateurs et événements depuis un fichier de configuration. Notre
-programme possède ces données directement dans la classe dataReaderWriter sous forme de tableau d'utilisateur et
-d'événements.
-Concernant la possibilité de tester l'accès concurrent aux données manuellement, nous l'avons fait en utilisant des 
-breakpoints placés au point critique (par exemple, lorsque quelqu'un crée un event) puis en exécutant un deuxième client
-essayant d'effectuer une lecture ou écriture. Il est possible d'ajouter un ``sleep(x)`` dans le dataReaderWriter afin de
-bloquer le processus le temps de lancer un autre client et d'essayer d'accéder aux données.
-
-Nous n'avons également pas testé le lancement du server avec un autre hôte que localhost, dès lors la connexion depuis
-un autre ordinateur peut ne pas être fonctionnel.
