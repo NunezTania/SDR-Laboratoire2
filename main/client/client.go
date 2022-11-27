@@ -15,6 +15,7 @@ import (
 	"strconv"
 	"strings"
 	"syscall"
+	"time"
 )
 
 func main() {
@@ -29,8 +30,10 @@ func RunRandomServ() {
 func Run(idServ int) {
 	HelpMenu()
 	conf := pm.ReadConfigFile("../../main/server/config.yaml")
+	fmt.Println("conf :", conf)
 	if idServ == -1 {
-		idServ = rand.Int() % conf.NServ
+		rand.Seed(time.Now().UnixNano())
+		idServ = rand.Intn(conf.NServ)
 	}
 	conn, err := net.Dial(conf.Type, conf.Host+":"+strconv.Itoa(conf.PortClient+idServ))
 	if err != nil {

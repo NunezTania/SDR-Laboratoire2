@@ -49,12 +49,12 @@ func NoteNewMessage(message Message, index int, id int, inSC *bool, ChannelSc *c
 // the SC is available if all the servers have sent : an ack, a rel, or a req with an bigger clock
 // the SC is not available if one server has sent a req with a smaller clock or if a sever haven't answered
 func checkSCAvailable(id int, inSC *bool, clock *Lamport) {
-	fmt.Println("I'm id = ", id, " and I check if the SC is available at the time", clock.counterTime)
 	fmt.Println("The msgArray is ", msgArray)
 	if msgArray[id].rType != "req" {
 		*inSC = false
 		return
 	}
+	fmt.Println("I'm id = ", id, " and I check if the SC is available at the time", clock.counterTime)
 	for _, msg := range msgArray {
 		if msg.id != id {
 			if msg.id == -1 || (msg.rType == "req" && msg.time.counterTime < msgArray[id].time.counterTime) {
