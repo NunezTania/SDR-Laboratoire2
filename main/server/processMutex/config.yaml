@@ -1,0 +1,72 @@
+version: 1.1.0
+nServ: 3
+portServ: 5000
+portClient: 2500
+host: "localhost"
+type: "tcp"
+users:
+  - name: "Bob"
+    password: "1234"
+  - name: "Lea"
+    password: "1234"
+  - name: "Leo"
+    password: "1234"
+  - name: "Willi"
+    password: "1234"
+  - name: "Lili"
+    password: "1234"
+  - name: "Toto"
+    password: "1234"
+events:
+  - id: 0
+    name: "Festival de la musique"
+    owner:
+      name: "Bob"
+      password: "1234"
+    isOpen: Yes
+    posts:
+      - id: 0
+        name: "Bar à bière"
+        capacity: 3
+        eventId: 0
+        staff:
+          - name: "Bob"
+            password: "1234"
+      - id: 1
+        name: "Securité"
+        capacity: 2
+        eventId: 0
+        staff:
+            - name: "Leo"
+              password: "1234"
+            - name: "Willi"
+              password: "1234"
+  - id: 1
+    name : "Festival de la bière"
+    owner:
+      name: "Lea"
+      password: "1234"
+    isOpen: y
+    posts:
+      - id: 0
+        name: "Vente de ticket"
+        capacity: 5
+        eventId: 1
+        staff:
+          - name: "Lili"
+            password: "1234"
+      - id: 1
+        name: "Logistique"
+        capacity: 1
+        eventId: 1
+        staff:
+            - name: "Lea"
+              password: "1234"
+      - id: 2
+        name: "Accueil"
+        capacity: 3
+        eventId: 1
+        staff:
+          - name: "Toto"
+            password: "1234"
+debug: 0

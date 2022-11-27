@@ -31,28 +31,25 @@ func AskForSC(id int, clock *Lamport) {
 }
 
 func FreeSC(id int, clock *Lamport, inSC *bool) {
-	fmt.Println("I'm id = ", id, " and I free sc at the time", clock.counterTime)
+	fmt.Println("Server ", id, " leaves sc at time", clock.counterTime)
 	clock.Increment()
 	sendReleases(clock, id)
 	mapMessage[id][id] = Message{"rel", *clock, id}
 	*inSC = false
 }
 
-func NoteNewMessage(message Message, index int, id int, inSC *bool, ChannelSc *chan string, clock *Lamport) {
+func NoteNewMessage(message Message, index int, id int, inSC *bool, ChannelSc *chan string) {
 	mapMessage[id][index] = message
-	checkSCAvailable(id, inSC, clock)
-	fmt.Println("I'm id = ", id, " and the checkSCAvailable is ", *inSC)
+	checkSCAvailable(id, inSC)
 	if *inSC {
 		*ChannelSc <- "SC"
 	}
-	fmt.Println("I'm id = ", id, " and The msgArray is ", mapMessage[id])
 }
 
 // Check if the SC is available
 // the SC is available if all the servers have sent : an ack, a rel, or a req with an bigger clock
 // the SC is not available if one server has sent a req with a smaller clock or if a sever haven't answered
-func checkSCAvailable(id int, inSC *bool, clock *Lamport) {
-	fmt.Println("I'm id = ", id, " and The msgArray is ", mapMessage[id])
+func checkSCAvailable(id int, inSC *bool) {
 	if mapMessage[id][id].rType != "req" {
 		*inSC = false
 		return
@@ -61,7 +58,6 @@ func checkSCAvailable(id int, inSC *bool, clock *Lamport) {
 		*inSC = true
 		return
 	}
-	fmt.Println("I'm id = ", id, " and I check if the SC is available at the time", clock.counterTime)
 	for _, msg := range mapMessage[id] {
 		if msg.id != id {
 			if msg.id == -1 || (msg.rType == "req" && msg.time.counterTime < mapMessage[id][id].time.counterTime) {
