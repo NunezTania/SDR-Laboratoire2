@@ -405,12 +405,9 @@ func TestCreateOnOneServShouldBeOnAnother(t *testing.T) {
 		log.Fatal(errR)
 	}
 
-	expected := fmt.Sprintln("Event's Id: 0, Event's Name: Festival de la musique, Owner: Bob, is open:true\n" +
-		"Event's Id: 1, Event's Name: Festival de la bière, Owner: Lea, is open:true\n" +
-		"Event's Id: 2, Event's Name: FestiNeuch, Owner: Lili, is open:true")
-	if strings.Compare(string(bufferClientIn),
-		expected) != 0 {
-		log.Fatal(fmt.Errorf("Expected: %s, got: %s", expected, string(bufferClientIn)))
+	substr := fmt.Sprintln("Event's Id: 2, Event's Name: FestiNeuch, Owner: Lili, is open:true")
+	if !strings.Contains(string(bufferClientIn), substr) {
+		log.Fatal(fmt.Errorf("Expected: %s to contain : %s", string(bufferClientIn), substr))
 	}
 	errClose := connServ1.Close()
 	if errClose != nil {

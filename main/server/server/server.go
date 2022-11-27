@@ -53,15 +53,16 @@ func Launch(idServer int, doneChan chan bool) {
 	var DataChannel = make(chan chan []byte)
 	doneClient := make(chan bool)
 	doneServer := make(chan bool)
+	messages := make([]pm.Message, conf.NServ)
 	pm.StartClock(&clock)
-	go pm.RunBtwServer(idServer, &clock, &inSC, &ChannelSc, &DataChannel, doneServer, listenConn)
-	go RunBtwClient(idServer, &ChannelSc, &clock, &inSC, &DataChannel, doneClient)
+	go pm.RunBtwServer(idServer, &clock, &inSC, &ChannelSc, &DataChannel, doneServer, listenConn, &messages)
+	go RunBtwClient(idServer, &ChannelSc, &clock, &inSC, &DataChannel, doneClient, &messages)
 	<-doneClient
 	<-doneServer
 	doneChan <- true
 }
 
-func RunBtwClient(id int, ChannelSC *chan string, clock *pm.Lamport, inSC *bool, DataChannel *chan chan []byte, done chan bool) {
+func RunBtwClient(id int, ChannelSC *chan string, clock *pm.Lamport, inSC *bool, DataChannel *chan chan []byte, done chan bool, messages *[]pm.Message) {
 	var DataModified = false
 	var eventCounter = 0
 	var postCounter = 0
@@ -89,19 +90,19 @@ func RunBtwClient(id int, ChannelSC *chan string, clock *pm.Lamport, inSC *bool,
 			fmt.Println("Error accepting: ", err.Error())
 			continue
 		}
-		go HandleRequest(conn, id, ChannelSC, clock, inSC, DataChannel, &DataModified)
+		go HandleRequest(conn, id, ChannelSC, clock, inSC, DataChannel, &DataModified, messages)
 	}
 	done <- true
 }
 
 // HandleRequest handles the requests from the clients
-func HandleRequest(conn net.Conn, id int, ChannelSC *chan string, clock *pm.Lamport, inSC *bool, DataChannel *chan chan []byte, DataModified *bool) {
+func HandleRequest(conn net.Conn, id int, ChannelSC *chan string, clock *pm.Lamport, inSC *bool, DataChannel *chan chan []byte, DataModified *bool, messages *[]pm.Message) {
 	buf := make([]byte, 1024)
 	_, err := conn.Read(buf)
 	if err != nil {
 		log.Fatal(err)
 	}
-	for commandTreatment := AskDataRW(buf, id, ChannelSC, clock, inSC, DataChannel, DataModified); commandTreatment != "q"; commandTreatment = AskDataRW(buf, id, ChannelSC, clock, inSC, DataChannel, DataModified) {
+	for commandTreatment := AskDataRW(buf, id, ChannelSC, clock, inSC, DataChannel, DataModified, messages); commandTreatment != "q"; commandTreatment = AskDataRW(buf, id, ChannelSC, clock, inSC, DataChannel, DataModified, messages) {
 		fmt.Println("Handling request")
 		_, err := conn.Write([]byte(commandTreatment))
 		if err != nil {
@@ -124,8 +125,8 @@ func HandleRequest(conn net.Conn, id int, ChannelSC *chan string, clock *pm.Lamp
 }
 
 // AskDataRW asks the dataRW to treat the command
-func AskDataRW(commandParameters []byte, id int, ChannelSC *chan string, clock *pm.Lamport, inSC *bool, DataChannel *chan chan []byte, DataModified *bool) string {
-	waitForSC(id, ChannelSC, clock)
+func AskDataRW(commandParameters []byte, id int, ChannelSC *chan string, clock *pm.Lamport, inSC *bool, DataChannel *chan chan []byte, DataModified *bool, messages *[]pm.Message) string {
+	waitForSC(id, ChannelSC, clock, messages)
 	if pm.Config.Debug == 1 {
 		fmt.Println("Sleeping for debug...")
 		time.Sleep(10 * time.Second)
@@ -135,21 +136,21 @@ func AskDataRW(commandParameters []byte, id int, ChannelSC *chan string, clock *
 	*DataChannel <- clientChannel
 	clientChannel <- commandParameters
 	response := <-clientChannel
-	leaveSC(id, clock, inSC)
+	leaveSC(id, clock, inSC, messages)
 	if *DataModified {
 		pm.SendDataSyncToAll(commandParameters, id)
 	}
 	return string(response)
 }
 
-func waitForSC(id int, ChannelSc *chan string, clock *pm.Lamport) {
+func waitForSC(id int, ChannelSc *chan string, clock *pm.Lamport, messages *[]pm.Message) {
 	if pm.Config.NServ == 1 {
 		return
 	}
-	pm.AskForSC(id, clock)
+	pm.AskForSC(id, clock, messages)
 	<-*ChannelSc
 }
 
-func leaveSC(id int, clock *pm.Lamport, inSC *bool) {
-	pm.FreeSC(id, clock, inSC)
+func leaveSC(id int, clock *pm.Lamport, inSC *bool, messages *[]pm.Message) {
+	pm.FreeSC(id, clock, inSC, messages)
 }

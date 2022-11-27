@@ -4,16 +4,12 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="96597984-09df-44c3-a8c1-1f54c5238989" name="Changes" comment="Lecture des users et events depuis le fichier yaml">
-      <change afterPath="$PROJECT_DIR$/main/server/mainServer.go" afterDir="false" />
+    <list default="true" id="96597984-09df-44c3-a8c1-1f54c5238989" name="Changes" comment="Ajout de tests pour cas serveurs multiples">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Progress.md" beforeDir="false" afterPath="$PROJECT_DIR$/Progress.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main/client/client.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/client/client.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main/dataRW/dataReaderWriter.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/dataRW/dataReaderWriter.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main/server/config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/main/server/processMutex/config.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/server/mainServer.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/server/mainServer.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main/server/processMutex/mutex.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/server/processMutex/mutex.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main/server/processMutex/network.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/server/processMutex/network.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main/server/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/server/server/server.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main/server/server/server.go" beforeDir="false" afterPath="$PROJECT_DIR$/main/server/server/server.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/test/serverclient_test.go" beforeDir="false" afterPath="$PROJECT_DIR$/test/serverclient_test.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -74,7 +70,7 @@
       <recent name="C:\Users\FNGUSER004\GolandProjects\SDR-Laboratoire2\main\server\server" />
     </key>
   </component>
-  <component name="RunManager" selected="Go Test.TestAddUserToEventShouldAppearOnOtherServ in SDR-Laboratoire1/test">
+  <component name="RunManager" selected="Go Test.go test SDR-Laboratoire1/test (2)">
     <configuration name="go build SDR-Laboratoire1/main/server" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true" nameIsGenerated="true">
       <module name="SDR-Laboratoire1" />
       <working_directory value="$PROJECT_DIR$" />
@@ -133,10 +129,10 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Go Test.TestAddUserToEventShouldAppearOnOtherServ in SDR-Laboratoire1/test" />
+        <item itemvalue="Go Test.go test SDR-Laboratoire1/test (2)" />
         <item itemvalue="Go Test.TestCreateOnOneServShouldBeOnAnother in SDR-Laboratoire1/test" />
         <item itemvalue="Go Build.go build SDR-Laboratoire1/main/server" />
-        <item itemvalue="Go Test.go test SDR-Laboratoire1/test (2)" />
+        <item itemvalue="Go Test.TestAddUserToEventShouldAppearOnOtherServ in SDR-Laboratoire1/test" />
         <item itemvalue="Go Test.TestCreateEventWithUnsuccessfulAuth in SDR-Laboratoire1/test" />
       </list>
     </recent_temporary>
@@ -157,7 +153,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="merging" />
     <MESSAGE value="fix convert to int" />
     <MESSAGE value="list of posts" />
     <MESSAGE value="comments" />
@@ -182,7 +177,8 @@
     <MESSAGE value="Marche avec un seul serveur aussi..." />
     <MESSAGE value="Plus de crash à cause du client qui se ferme prematurement" />
     <MESSAGE value="Lecture des users et events depuis le fichier yaml" />
-    <option name="LAST_COMMIT_MESSAGE" value="Lecture des users et events depuis le fichier yaml" />
+    <MESSAGE value="Ajout de tests pour cas serveurs multiples" />
+    <option name="LAST_COMMIT_MESSAGE" value="Ajout de tests pour cas serveurs multiples" />
   </component>
   <component name="VgoProject">
     <settings-migrated>true</settings-migrated>

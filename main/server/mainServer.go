@@ -2,11 +2,10 @@ package main
 
 import (
 	pm "SDR-Laboratoire1/main/server/processMutex"
-	"fmt"
+	"SDR-Laboratoire1/main/server/server"
 )
 
 func main() {
 	conf := pm.Config
-	fmt.Println(conf)
-	//server.LaunchNServ(conf.NServ)
+	server.LaunchNServ(conf.NServ)
 }

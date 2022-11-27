@@ -32,7 +32,7 @@ var (
 
 var Config = ReadConfigFile(basepath + "/config.yaml")
 
-func RunBtwServer(id int, clock *Lamport, inSC *bool, ChannelSC *chan string, DataChannel *chan chan []byte, done chan bool, listenConn net.Listener) {
+func RunBtwServer(id int, clock *Lamport, inSC *bool, ChannelSC *chan string, DataChannel *chan chan []byte, done chan bool, listenConn net.Listener, messages *[]Message) {
 	for {
 		conn, err := listenConn.Accept()
 		if err != nil {
@@ -43,12 +43,12 @@ func RunBtwServer(id int, clock *Lamport, inSC *bool, ChannelSC *chan string, Da
 		if err != nil {
 			log.Fatal(err)
 		}
-		go handleMessage(buf, id, clock, inSC, ChannelSC, DataChannel)
+		go handleMessage(buf, id, clock, inSC, ChannelSC, DataChannel, messages)
 	}
 	done <- true
 }
 
-func handleMessage(buf []byte, id int, clock *Lamport, inSC *bool, ChannelSC *chan string, DataChannel *chan chan []byte) {
+func handleMessage(buf []byte, id int, clock *Lamport, inSC *bool, ChannelSC *chan string, DataChannel *chan chan []byte, messages *[]Message) {
 
 	var res = strings.Split(string(buf), " ")
 
@@ -63,17 +63,14 @@ func handleMessage(buf []byte, id int, clock *Lamport, inSC *bool, ChannelSC *ch
 		var msg = strToMessage(string(buf))
 		if msg.rType == "req" {
 			*clock = clock.Update(msg.time)
-			NoteNewMessage(msg, msg.id, id, inSC, ChannelSC)
+			NoteNewMessage(msg, msg.id, id, inSC, ChannelSC, messages)
 			var r = Message{"ack", *clock, id}
 			SendMessageTo(msg.id, r)
 
-		} else if msg.rType == "rel" {
+		} else if msg.rType == "rel" || msg.rType == "ack" {
 			*clock = clock.Update(msg.time)
-			NoteNewMessage(msg, msg.id, id, inSC, ChannelSC)
+			NoteNewMessage(msg, msg.id, id, inSC, ChannelSC, messages)
 
-		} else if msg.rType == "ack" {
-			*clock = clock.Update(msg.time)
-			NoteNewMessage(msg, msg.id, id, inSC, ChannelSC)
 		}
 	}
 }
