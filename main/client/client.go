@@ -35,23 +35,18 @@ func Run(idServ int) {
 		rand.Seed(time.Now().UnixNano())
 		idServ = rand.Intn(conf.NServ)
 	}
-	conn, err := net.Dial(conf.Type, conf.Host+":"+strconv.Itoa(conf.PortClient+idServ))
-	for err != nil {
-		fmt.Println("Error while connecting to the server, trying again...")
-		conn, err = net.Dial(conf.Type, conf.Host+":"+strconv.Itoa(conf.PortClient+idServ))
-	}
 
 	for {
 		fmt.Println("Please enter a command:")
 		var command string
 		Scanner := bufio.NewScanner(os.Stdin)
 		Scanner.Scan()
-		err := Scanner.Err()
-		for err != nil {
+		errRead := Scanner.Err()
+		for errRead != nil {
 			fmt.Println("Error while reading the command, trying again...")
 			Scanner = bufio.NewScanner(os.Stdin)
 			Scanner.Scan()
-			err = Scanner.Err()
+			errRead = Scanner.Err()
 		}
 
 		command = Scanner.Text()
@@ -64,24 +59,31 @@ func Run(idServ int) {
 			break
 		}
 
-		_, err = conn.Write([]byte(command))
+		conn, err := net.Dial(conf.Type, conf.Host+":"+strconv.Itoa(conf.PortClient+idServ))
 		for err != nil {
+			fmt.Println("Error while connecting to the server, trying again...")
+			conn, errRead = net.Dial(conf.Type, conf.Host+":"+strconv.Itoa(conf.PortClient+idServ))
+		}
+
+		_, errRead = conn.Write([]byte(command))
+		for errRead != nil {
 			fmt.Println("Error while sending the command, trying again...")
-			_, err = conn.Write([]byte(command))
+			_, errRead = conn.Write([]byte(command))
 		}
 
 		buf := make([]byte, 1024)
-		_, err = conn.Read(buf)
-		for err != nil {
+		_, errRead = conn.Read(buf)
+		for errRead != nil {
 			fmt.Println("Error while reading the response, trying again...")
-			_, err = conn.Read(buf)
+			_, errRead = conn.Read(buf)
 		}
 
 		fmt.Println("La reponse est : \n" + string(buf))
-	}
-	errClosedConn := conn.Close()
-	if errClosedConn != nil {
-		fmt.Println("Error while closing the connection")
+
+		errClosedConn := conn.Close()
+		if errClosedConn != nil {
+			fmt.Println("Error while closing the connection")
+		}
 	}
 }
 
