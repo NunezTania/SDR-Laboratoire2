@@ -119,6 +119,9 @@ func AskDataRW(commandParameters []byte, id int, ChannelSC *chan string, clock *
 }
 
 func waitForSC(id int, ChannelSc *chan string, clock *pm.Lamport) {
+	if pm.Config.NServ == 1 {
+		return
+	}
 	pm.AskForSC(id, clock)
 	<-*ChannelSc
 }

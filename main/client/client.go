@@ -19,8 +19,7 @@ import (
 )
 
 func main() {
-	//RunRandomServ()
-	Run(3)
+	RunRandomServ()
 }
 
 func RunRandomServ() {
@@ -47,8 +46,12 @@ func Run(idServ int) {
 		var command string
 		Scanner := bufio.NewScanner(os.Stdin)
 		Scanner.Scan()
-		if err := Scanner.Err(); err != nil {
-			log.Fatal(err)
+		err := Scanner.Err()
+		for err != nil {
+			fmt.Println("Error while reading the command, trying again...")
+			Scanner = bufio.NewScanner(os.Stdin)
+			Scanner.Scan()
+			err = Scanner.Err()
 		}
 
 		command = Scanner.Text()
@@ -62,21 +65,23 @@ func Run(idServ int) {
 		}
 
 		_, err = conn.Write([]byte(command))
-		if err != nil {
-			log.Fatal(err)
+		for err != nil {
+			fmt.Println("Error while sending the command, trying again...")
+			_, err = conn.Write([]byte(command))
 		}
 
 		buf := make([]byte, 1024)
 		_, err = conn.Read(buf)
-		if err != nil {
-			log.Fatal(err)
+		for err != nil {
+			fmt.Println("Error while reading the response, trying again...")
+			_, err = conn.Read(buf)
 		}
 
 		fmt.Println("La reponse est : \n" + string(buf))
 	}
 	errClosedConn := conn.Close()
-	if err != nil {
-		log.Fatal(errClosedConn)
+	if errClosedConn != nil {
+		fmt.Println("Error while closing the connection")
 	}
 }
 

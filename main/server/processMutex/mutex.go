@@ -57,6 +57,10 @@ func checkSCAvailable(id int, inSC *bool, clock *Lamport) {
 		*inSC = false
 		return
 	}
+	if Config.NServ == 1 {
+		*inSC = true
+		return
+	}
 	fmt.Println("I'm id = ", id, " and I check if the SC is available at the time", clock.counterTime)
 	for _, msg := range mapMessage[id] {
 		if msg.id != id {
